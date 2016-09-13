@@ -1,9 +1,10 @@
-/***********************************************************************************
- *  _________          _       _   _ ___ 
- * |__  / ___|__ _ ___| |__   | | | |_ _|
- *   / / |   / _` / __| '_ \  | | | || | 
- *  / /| |__| (_| \__ \ | | | | |_| || | 
- * /____\____\__,_|___/_| |_|  \___/|___|
+/************************************************************************************************
+ *  _________          _     ____          _           __        __    _ _      _   _   _ ___ 
+ * |__  / ___|__ _ ___| |__ / ___|_      _(_)_ __   __ \ \      / /_ _| | | ___| |_| | | |_ _|
+ *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || | 
+ *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || | 
+ * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
+ *                                                 |___/                                      
  *                                       
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  *
@@ -35,6 +36,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -61,8 +63,13 @@ public class DashboardPanel
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
 	
-	private JLabel daemonStatusLabel;
-	private JLabel walletBalanceLabel;
+	private JLabel daemonStatusLabel   = null;
+	private JLabel walletBalanceLabel  = null;
+	private JTable transactionsTable   = null;
+	private JScrollPane transactionsTablePane  = null;
+	
+	private String[][] lastTransactionsData = null;
+	
 	
 	public DashboardPanel(ZCashInstallationObserver installationObserver,
 			              ZCashClientCaller clientCaller)
@@ -88,24 +95,10 @@ public class DashboardPanel
 		dashboard.add(balanceStatusPanel, BorderLayout.NORTH);
 
 		// Table of transactions
-		String columnNames[] = { "Direction", "Amount", "Address"};
-		String rowData[][] = 
-		{ 
-			{ "=> IN", "123", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-            { "<= OUT", "456", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-			{ "=> IN", "123", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-            { "<= OUT", "456", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-			{ "=> IN", "123", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-            { "<= OUT", "456", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-			{ "=> IN", "123", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-            { "<= OUT", "456", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},            
-		};
-        JTable table = new JTable(rowData, columnNames);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(90);
-        table.getColumnModel().getColumn(1).setPreferredWidth(90);
-        table.getColumnModel().getColumn(2).setPreferredWidth(900);
-		dashboard.add(new JScrollPane(table), BorderLayout.CENTER);
+		lastTransactionsData = getTransactionsDataFromWallet();
+		dashboard.add(transactionsTablePane = new JScrollPane(
+				         transactionsTable = this.createTransactionsTable(lastTransactionsData)), 
+				      BorderLayout.CENTER);
 
 		// Lower panel with installation status
 		JPanel installationStatusPanel = new JPanel();
@@ -124,6 +117,7 @@ public class DashboardPanel
 				{
 					DashboardPanel.this.updateDaemonStatusLabel();
 					DashboardPanel.this.updateWalletStatusLabel();
+					DashboardPanel.this.updateWalletTransactionsTable();
 				} catch (Exception ex) 
 				{ 
 					/* TODO: -report exceptions to teh user */ 
@@ -161,6 +155,7 @@ public class DashboardPanel
 		this.daemonStatusLabel.setText(text);
 	}
 	
+	
 	private void updateWalletStatusLabel()
 		throws WalletCallException, IOException, InterruptedException
 	{
@@ -171,5 +166,71 @@ public class DashboardPanel
 			"Immature: <span style=\"font-weight:bold\">" + balance.imatureBalance + "</span><br/> " + 
 			"Unconfirmed: <span style=\"color:orange;font-weight:bold\">" + balance.unconfirmedBalance + "</span> <br/>  </html>";
 		this.walletBalanceLabel.setText(text);
+	}
+	
+	
+	private void updateWalletTransactionsTable()
+		throws WalletCallException, IOException, InterruptedException
+	{	
+		String[][] newTransactionsData = this.getTransactionsDataFromWallet();
+		
+		if (lastTransactionsData.length != newTransactionsData.length)
+		{
+			this.remove(transactionsTablePane);
+			this.add(transactionsTablePane = new JScrollPane(
+			             transactionsTable = this.createTransactionsTable(newTransactionsData)), 
+			         BorderLayout.CENTER);
+		}
+		
+		lastTransactionsData = newTransactionsData;
+		
+		this.validate();
+		this.repaint();
+	}
+	
+	
+	private JTable createTransactionsTable(String rowData[][])
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String columnNames[] = { "Direction", "Amount", "Date", "Address"};
+        JTable table = new JTable(rowData, columnNames);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        table.getColumnModel().getColumn(0).setPreferredWidth(90);
+        table.getColumnModel().getColumn(1).setPreferredWidth(90);
+        table.getColumnModel().getColumn(2).setPreferredWidth(250);
+        table.getColumnModel().getColumn(3).setPreferredWidth(700);
+        
+        return table;
+	}
+	
+	int rand = 0;
+	private String[][] getTransactionsDataFromWallet()
+		throws WalletCallException, IOException, InterruptedException
+	{
+		System.out.println("RANDOM = " + rand);
+		if (rand++ % 2 == 1)
+		
+		return new String[][]
+		{ 
+			{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+			{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+			{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+			{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},            
+		};
+		
+		else
+			
+			return new String[][]
+					{ 
+						{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+			            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+						{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
+			            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},            
+					};
+			
 	}
 }

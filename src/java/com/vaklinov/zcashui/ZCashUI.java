@@ -1,9 +1,10 @@
-/***********************************************************************************
- *  _________          _       _   _ ___ 
- * |__  / ___|__ _ ___| |__   | | | |_ _|
- *   / / |   / _` / __| '_ \  | | | || | 
- *  / /| |__| (_| \__ \ | | | | |_| || | 
- * /____\____\__,_|___/_| |_|  \___/|___|
+/************************************************************************************************
+ *  _________          _     ____          _           __        __    _ _      _   _   _ ___ 
+ * |__  / ___|__ _ ___| |__ / ___|_      _(_)_ __   __ \ \      / /_ _| | | ___| |_| | | |_ _|
+ *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || | 
+ *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || | 
+ * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
+ *                                                 |___/                                      
  *                                       
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  *
@@ -34,7 +35,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -84,7 +84,7 @@ public class ZCashUI
 		tabs.add("Send cash", new JPanel());
 		contentPane.add(tabs);
 		
-		this.setSize(new Dimension(800, 500));
+		this.setSize(new Dimension(800, 400));
 		
 		// Build menu
 		JMenuBar mb = new JMenuBar();
