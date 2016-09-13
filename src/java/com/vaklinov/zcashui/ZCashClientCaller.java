@@ -83,8 +83,14 @@ public class ZCashClientCaller
 	    CommandExecutor caller = new CommandExecutor(new String[] {
 	    	this.zcashcli.getCanonicalPath(), "getwalletinfo"
 	    });
-		
-		JsonValue response = Json.parse(caller.execute());
+	    
+	    String strResponse = caller.execute();
+	    if (strResponse.startsWith("error:"))
+	    {
+	    	throw new WalletCallException("Error response from wallet: " + strResponse);
+	    }
+	    
+		JsonValue response = Json.parse(strResponse);
 		WalletBalance balance = new WalletBalance();
 		
 		if (response.isObject())

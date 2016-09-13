@@ -79,7 +79,7 @@ public class ZCashInstallationObserver
 		if ((!zcashd.exists()) || (!zcashcli.exists()))
 		{
 			throw new InstallationDetectionException(
-				"The ZCash installation directory " + installDir + " needs to contain " +
+				"The ZCash installation directory " + installDir + " needs \nto contain " +
 				"the command line utilities zcashd and zcash-cli. At least one of them is missing!");
 		}
 	}		

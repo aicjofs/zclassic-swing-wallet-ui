@@ -42,12 +42,14 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
+import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
 
 
 /**
@@ -78,8 +80,7 @@ public class ZCashUI
 		// Build content
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.add("Dashboard", dashboard = new DashboardPanel(installationObserver, clientCaller));
-		tabs.add("Z (Anonymous) Adresses", new JPanel());
-		tabs.add("T (Transparent) Adresses", new JPanel());
+		tabs.add("Adresses", new JPanel());
 		tabs.add("Send cash", new JPanel());
 		contentPane.add(tabs);
 		
@@ -162,10 +163,36 @@ public class ZCashUI
 			ZCashUI ui = new ZCashUI();
 			ui.setVisible(true);
 
+		} catch (InstallationDetectionException ide) 
+		{
+			ide.printStackTrace();
+			JOptionPane.showMessageDialog(
+				null,
+				"This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
+				ide.getMessage() + "\n" +
+				"See the console output for more detailed error information!",
+				"Installation error",
+				JOptionPane.ERROR_MESSAGE);
+		} catch (WalletCallException wce) 
+		{
+			wce.printStackTrace();
+			JOptionPane.showMessageDialog(
+				null,
+				"There was a problem communicating with the ZCash daemon/wallet. \n" +
+				"Please ensure that zcashd is started. Error message is: \n" +		
+				 wce.getMessage() +
+				"See the console output for more detailed error information!",
+				"Wallet communication error",
+				JOptionPane.ERROR_MESSAGE);
 		} catch (Exception e) 
 		{
-		    // TODO:
 			e.printStackTrace();
-		}		
+			JOptionPane.showMessageDialog(
+				null,
+				"A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
+				"See the console output for more detailed error information!",
+				"Error",
+				JOptionPane.ERROR_MESSAGE);
+		} 	
 	}
 }
