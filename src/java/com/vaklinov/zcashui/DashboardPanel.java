@@ -1,11 +1,11 @@
 /************************************************************************************************
- *  _________          _     ____          _           __        __    _ _      _   _   _ ___ 
+ *  _________          _     ____          _           __        __    _ _      _   _   _ ___
  * |__  / ___|__ _ ___| |__ / ___|_      _(_)_ __   __ \ \      / /_ _| | | ___| |_| | | |_ _|
- *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || | 
- *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || | 
+ *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || |
+ *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || |
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
- *                                                 |___/                                      
- *                                       
+ *                                                 |___/
+ *
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -14,10 +14,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -54,35 +54,35 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 
 /**
  * Dashboard ...
- * 
+ *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
-public class DashboardPanel 
+public class DashboardPanel
 	extends JPanel
-{	
+{
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
-	
+
 	private JLabel daemonStatusLabel   = null;
 	private JLabel walletBalanceLabel  = null;
 	private JTable transactionsTable   = null;
 	private JScrollPane transactionsTablePane  = null;
-	
+
 	private String[][] lastTransactionsData = null;
-	
-	
+
+
 	public DashboardPanel(ZCashInstallationObserver installationObserver,
 			              ZCashClientCaller clientCaller)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.installationObserver = installationObserver;
 		this.clientCaller = clientCaller;
-				
+
 		// Build content
 		JPanel dashboard = this;
 		dashboard.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		dashboard.setLayout(new BorderLayout(0, 0));
-		
+
 		// Upper panel with wallet balance
 		JPanel balanceStatusPanel = new JPanel();
 		balanceStatusPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
@@ -97,39 +97,39 @@ public class DashboardPanel
 		// Table of transactions
 		lastTransactionsData = getTransactionsDataFromWallet();
 		dashboard.add(transactionsTablePane = new JScrollPane(
-				         transactionsTable = this.createTransactionsTable(lastTransactionsData)), 
+				         transactionsTable = this.createTransactionsTable(lastTransactionsData)),
 				      BorderLayout.CENTER);
 
 		// Lower panel with installation status
 		JPanel installationStatusPanel = new JPanel();
 		installationStatusPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
 		installationStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		installationStatusPanel.add(daemonStatusLabel = new JLabel());		
+		installationStatusPanel.add(daemonStatusLabel = new JLabel());
 		this.updateDaemonStatusLabel();
-		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);		
-		
+		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
+
 		// Start timer to refresh the status
 		ActionListener al = new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) 
+			public void actionPerformed(ActionEvent e)
 			{
-				try 
+				try
 				{
 					DashboardPanel.this.updateDaemonStatusLabel();
 					DashboardPanel.this.updateWalletStatusLabel();
 					DashboardPanel.this.updateWalletTransactionsTable();
-				} catch (Exception ex) 
-				{ 
-					/* TODO: -report exceptions to teh user */ 
+				} catch (Exception ex)
+				{
+					/* TODO: -report exceptions to teh user */
 					ex.printStackTrace();
 				}
 			}
 		};
 		new Timer(2000, al).start();
 
-	}		
-	
-	
+	}
+
+
 	private void updateDaemonStatusLabel()
 		throws IOException, InterruptedException
 	{
@@ -146,7 +146,7 @@ public class DashboardPanel
 					      " MB, CPU Usage: " + daemonInfo.cpuPercentage + "%";
 		}
 
-		String text = 
+		String text =
 			"<html>Daemon status: " + daemonStatus + ",   " + runtimeInfo + " <br/>" +
 			"Tools directory: " + OSUtil.getProgramDirectory() + " <br/> " +
 	        "Blockchain directory: " + OSUtil.getBlockchainDirectory()+ " <br/> " +
@@ -154,83 +154,60 @@ public class DashboardPanel
 			"</html>";
 		this.daemonStatusLabel.setText(text);
 	}
-	
-	
+
+
 	private void updateWalletStatusLabel()
 		throws WalletCallException, IOException, InterruptedException
 	{
 		WalletBalance balance = this.clientCaller.getWalletInfo();
-		
-		String text = 			
+
+		String text =
 			"<html><span style=\"font-weight:bold\">Balance: " + balance.balance + "</span><br/> " +
-			"Immature: <span style=\"font-weight:bold\">" + balance.imatureBalance + "</span><br/> " + 
+			"Immature: <span style=\"font-weight:bold\">" + balance.imatureBalance + "</span><br/> " +
 			"Unconfirmed: <span style=\"color:orange;font-weight:bold\">" + balance.unconfirmedBalance + "</span> <br/>  </html>";
 		this.walletBalanceLabel.setText(text);
 	}
-	
-	
+
+
 	private void updateWalletTransactionsTable()
 		throws WalletCallException, IOException, InterruptedException
-	{	
+	{
 		String[][] newTransactionsData = this.getTransactionsDataFromWallet();
-		
+
 		if (lastTransactionsData.length != newTransactionsData.length)
 		{
 			this.remove(transactionsTablePane);
 			this.add(transactionsTablePane = new JScrollPane(
-			             transactionsTable = this.createTransactionsTable(newTransactionsData)), 
+			             transactionsTable = this.createTransactionsTable(newTransactionsData)),
 			         BorderLayout.CENTER);
 		}
-		
+
 		lastTransactionsData = newTransactionsData;
-		
+
 		this.validate();
 		this.repaint();
 	}
-	
-	
+
+
 	private JTable createTransactionsTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String columnNames[] = { "Direction", "Amount", "Date", "Address"};
         JTable table = new JTable(rowData, columnNames);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(90);
-        table.getColumnModel().getColumn(1).setPreferredWidth(90);
+        table.getColumnModel().getColumn(0).setPreferredWidth(120);
+        table.getColumnModel().getColumn(1).setPreferredWidth(150);
         table.getColumnModel().getColumn(2).setPreferredWidth(250);
-        table.getColumnModel().getColumn(3).setPreferredWidth(700);
-        
+        table.getColumnModel().getColumn(3).setPreferredWidth(800);
+
         return table;
 	}
-	
-	int rand = 0;
+
+
 	private String[][] getTransactionsDataFromWallet()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		System.out.println("RANDOM = " + rand);
-		if (rand++ % 2 == 1)
-		
-		return new String[][]
-		{ 
-			{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-			{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-			{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-			{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},            
-		};
-		
-		else
-			
-			return new String[][]
-					{ 
-						{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-			            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-						{ "=> IN", "123", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},
-			            { "<= OUT", "456", "01 Jan 2016 9:35.67", "tnQKD37NyaeUCkhMer52b1AQkLHQTTTe46utecKHdbvjT29bBfELDMrnynLTuTPAFFbSJd4nNvnUs8EfQZiiz3oaD99HNci"},            
-					};
-			
+		// TODO: Sort and transform
+		return this.clientCaller.getWalletTransactions();
 	}
 }
