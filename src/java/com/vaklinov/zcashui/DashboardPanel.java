@@ -36,6 +36,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
@@ -142,7 +143,7 @@ public class DashboardPanel
 		String runtimeInfo = "";
 		if (daemonInfo.status == DAEMON_STATUS.RUNNING)
 		{
-			runtimeInfo = "Resident: " + daemonInfo.residentSizeMB + "MB, Virtual: " + daemonInfo.virtualSizeMB +
+			runtimeInfo = "Resident: " + daemonInfo.residentSizeMB + " MB, Virtual: " + daemonInfo.virtualSizeMB +
 					      " MB, CPU Usage: " + daemonInfo.cpuPercentage + "%";
 		}
 
@@ -162,9 +163,9 @@ public class DashboardPanel
 		WalletBalance balance = this.clientCaller.getWalletInfo();
 
 		String text =
-			"<html><span style=\"font-weight:bold\">Balance: " + balance.balance + "</span><br/> " +
-			"Immature: <span style=\"font-weight:bold\">" + balance.imatureBalance + "</span><br/> " +
-			"Unconfirmed: <span style=\"color:orange;font-weight:bold\">" + balance.unconfirmedBalance + "</span> <br/>  </html>";
+			"<html><span style=\"\">Transparent balance: " + balance.transparentBalance + "</span><br/> " +
+			"Private ( Z ) balance: <span style=\"font-weight:bold\">" + balance.privateBalance + "</span><br/> " +
+			"Total ( Z+T ) balance: <span style=\"font-weight:bold\">" + balance.totalBalance + "</span> <br/>  </html>";
 		this.walletBalanceLabel.setText(text);
 	}
 
@@ -192,13 +193,14 @@ public class DashboardPanel
 	private JTable createTransactionsTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String columnNames[] = { "Direction", "Amount", "Date", "Address"};
+		String columnNames[] = { "Type", "Direction", "Amount", "Date", "Address"};
         JTable table = new JTable(rowData, columnNames);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(120);
-        table.getColumnModel().getColumn(1).setPreferredWidth(150);
-        table.getColumnModel().getColumn(2).setPreferredWidth(250);
-        table.getColumnModel().getColumn(3).setPreferredWidth(800);
+        table.getColumnModel().getColumn(0).setPreferredWidth(160);
+        table.getColumnModel().getColumn(1).setPreferredWidth(120);
+        table.getColumnModel().getColumn(2).setPreferredWidth(180);
+        table.getColumnModel().getColumn(3).setPreferredWidth(250);
+        table.getColumnModel().getColumn(4).setPreferredWidth(800);
 
         return table;
 	}
@@ -207,7 +209,42 @@ public class DashboardPanel
 	private String[][] getTransactionsDataFromWallet()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		// TODO: Sort and transform
-		return this.clientCaller.getWalletTransactions();
+		// Get available public+private transactions and unify them.
+		String[][] publicTransactions = this.clientCaller.getWalletPublicTransactions();
+		String[][] zReceivedTransactions = this.clientCaller.getWalletZReceivedTransactions();
+
+		String[][] allTransactions = new String[publicTransactions.length + zReceivedTransactions.length][];
+
+		int i  = 0;
+
+		for (String[] t : publicTransactions)
+		{
+			allTransactions[i++] = t;
+		}
+
+		for (String[] t : zReceivedTransactions)
+		{
+			allTransactions[i++] = t;
+		}
+
+		// Change the direction and date attributes for presentation purposes
+		for (String[] t : allTransactions)
+		{
+			if (t[1].equals("receive"))
+			{
+				t[1] = "=> IN";
+			} else if (t[1].equals("send"))
+			{
+				t[1] = "<= OUT";
+			};
+
+			if (!t[3].equals("N/A"))
+			{
+				t[3] = new Date(Long.valueOf(t[3]).longValue() * 1000L).toGMTString();
+			}
+		}
+
+
+		return allTransactions;
 	}
 }

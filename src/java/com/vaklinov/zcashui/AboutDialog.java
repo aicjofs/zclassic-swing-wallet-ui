@@ -1,11 +1,11 @@
 /************************************************************************************************
- *  _________          _     ____          _           __        __    _ _      _   _   _ ___ 
+ *  _________          _     ____          _           __        __    _ _      _   _   _ ___
  * |__  / ___|__ _ ___| |__ / ___|_      _(_)_ __   __ \ \      / /_ _| | | ___| |_| | | |_ _|
- *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || | 
- *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || | 
+ *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || |
+ *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || |
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
- *                                                 |___/                                      
- *                                       
+ *                                                 |___/
+ *
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -14,10 +14,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,16 +41,17 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.border.EtchedBorder;
 
 
 /**
  * Typical about box stuff...
- * 
+ *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
-public class AboutDialog 
+public class AboutDialog
 	extends JDialog
-{	
+{
 	public AboutDialog(JFrame parent)
 	{
 		this.setTitle("About...");
@@ -59,11 +60,11 @@ public class AboutDialog
 		this.setLocationRelativeTo(parent);
 		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 		JTabbedPane tabs = new JTabbedPane();
-		
+
 		JPanel copyrigthPanel = new JPanel();
-		copyrigthPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+		copyrigthPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		copyrigthPanel.setLayout(new BorderLayout(3, 3));
 		JLabel copyrightLabel = new JLabel();
 		copyrightLabel.setText(
@@ -75,16 +76,18 @@ public class AboutDialog
 		    "presents the information in a user-friendly manner.<br/><br/>" +
 			"<span style=\"font-weight:bold\">Disclaimer:</span> this program is not officially " +
 		    "endorsed by or associatd with the ZCash project and the ZCash parent company.<br/><br/>"+
-		    "Acknowledgements: This program includes software for JSON processing " + 
+		    "Acknowledgements: This program includes software for JSON processing " +
 		    "(https://github.com/ralfstx/minimal-json) " +
 		    "that is Copyright (c) 2015, 2016 EclipseSource." +
-		    "</body></html>"); 
+		    "<br/><br/><br/><br/><br/><br/><br/>" +
+		    "</body></html>");
+		copyrightLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		copyrigthPanel.add(copyrightLabel, BorderLayout.NORTH);
 
 		tabs.add("About", copyrigthPanel);
-		
+
 		JPanel licensePanel = new JPanel();
-		licensePanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+		licensePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		licensePanel.setLayout(new BorderLayout(3, 3));
 		JLabel licenseLabel = new JLabel();
 		licenseLabel.setText(
@@ -108,28 +111,29 @@ public class AboutDialog
 			" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
 			" OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
 			" THE SOFTWARE.		\n" +
-			"</pre></body></html>"); 
+			"</pre></body></html>");
+		licenseLabel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		licensePanel.add(licenseLabel, BorderLayout.NORTH);
-		
+
 		tabs.add("License", licensePanel);
-		
+
 		this.getContentPane().setLayout(new BorderLayout(0, 0));
 		this.getContentPane().add(tabs, BorderLayout.NORTH);
-		
+
 		JPanel closePanel = new JPanel();
 		closePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
 		JButton closeButon = new JButton("Close");
 		closePanel.add(closeButon);
 		this.getContentPane().add(closePanel, BorderLayout.SOUTH);
-		
-		closeButon.addActionListener(new ActionListener() 
+
+		closeButon.addActionListener(new ActionListener()
 			{
 				@Override
-				public void actionPerformed(ActionEvent e) 
+				public void actionPerformed(ActionEvent e)
 				{
 					AboutDialog.this.setVisible(false);
 					AboutDialog.this.dispose();
 				}
 		});
-	}		
+	}
 }

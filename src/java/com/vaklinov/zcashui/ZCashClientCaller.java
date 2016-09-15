@@ -31,6 +31,8 @@ package com.vaklinov.zcashui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -48,9 +50,9 @@ public class ZCashClientCaller
 {
 	public static class WalletBalance
 	{
-		public double balance;
-		public double unconfirmedBalance;
-		public double imatureBalance;
+		public double transparentBalance;
+		public double privateBalance;
+		public double totalBalance;
 	}
 
 	public static class WalletCallException
@@ -88,8 +90,9 @@ public class ZCashClientCaller
 	public synchronized WalletBalance getWalletInfo()
 		throws WalletCallException, IOException, InterruptedException
 	{
-	    CommandExecutor caller = new CommandExecutor(new String[] {
-	    	this.zcashcli.getCanonicalPath(), "getwalletinfo"
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+	    	this.zcashcli.getCanonicalPath(), "z_gettotalbalance"
 	    });
 
 	    String strResponse = caller.execute();
@@ -117,9 +120,9 @@ public class ZCashClientCaller
 		    	throw new WalletCallException("Error response from wallet: " + response.toString());
 		    } else
 		    {
-		    	balance.balance = objResponse.getDouble("balance", -1);
-		    	balance.unconfirmedBalance = objResponse.getDouble("unconfirmed_balance", -1);
-		    	balance.imatureBalance = objResponse.getDouble("immature_balance", -1);
+		    	balance.transparentBalance = Double.valueOf(objResponse.getString("transparent", "-1"));
+		    	balance.privateBalance = Double.valueOf(objResponse.getString("private", "-1"));
+		    	balance.totalBalance = Double.valueOf(objResponse.getString("total", "-1"));
 		    }
 		} else
 		{
@@ -130,10 +133,11 @@ public class ZCashClientCaller
 	}
 
 
-	public synchronized String[][] getWalletTransactions()
+	public synchronized String[][] getWalletPublicTransactions()
 		throws WalletCallException, IOException, InterruptedException
 	{
-	    CommandExecutor caller = new CommandExecutor(new String[] {
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
 	    	this.zcashcli.getCanonicalPath(), "listtransactions"
 	    });
 
@@ -161,16 +165,110 @@ public class ZCashClientCaller
 	    String strTransactions[][] = new String[jsonTransactions.size()][];
 	    for (int i = 0; i < jsonTransactions.size(); i++)
 	    {
-	    	strTransactions[i] = new String[4];
+	    	strTransactions[i] = new String[5];
 	    	JsonObject trans = jsonTransactions.get(i).asObject();
 
-	    	strTransactions[i][0] = trans.getString("category", "ERROR!");
-	    	strTransactions[i][1] = trans.get("amount").toString();
-	    	strTransactions[i][2] = trans.get("time").toString();
-	    	strTransactions[i][3] = trans.getString("address", "ERROR!");
+	    	strTransactions[i][0] = "T (Public)";
+	    	strTransactions[i][1] = trans.getString("category", "ERROR!");
+	    	strTransactions[i][2] = trans.get("amount").toString();
+	    	strTransactions[i][3] = trans.get("time").toString();
+	    	strTransactions[i][4] = trans.getString("address", "ERROR!");
 	    }
 
 	    return strTransactions;
+	}
+
+
+	public synchronized String[] getWalletZAddresses()
+		throws WalletCallException, IOException, InterruptedException
+	{
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "z_listaddresses"
+		});
+
+		String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		JsonValue response = null;
+		try
+		{
+		  	response = Json.parse(strResponse);
+		} catch (ParseException pe)
+		{
+		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+		}
+
+		if (!response.isArray())
+		{
+		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
+		}
+
+		JsonArray jsonAddresses = response.asArray();
+		String strAddresses[] = new String[jsonAddresses.size()];
+		for (int i = 0; i < jsonAddresses.size(); i++)
+		{
+		    strAddresses[i] = jsonAddresses.get(i).asString();
+		}
+
+	    return strAddresses;
+	}
+
+
+	public synchronized String[][] getWalletZReceivedTransactions()
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String[] zAddresses = this.getWalletZAddresses();
+
+		List<String[]> zReceivedTransactions = new ArrayList<String[]>();
+
+		for (String zAddress : zAddresses)
+		{
+		    CommandExecutor caller = new CommandExecutor(new String[]
+		    {
+			   	this.zcashcli.getCanonicalPath(), "z_listreceivedbyaddress", zAddress
+			});
+
+		    String strResponse = caller.execute();
+		    if (strResponse.trim().startsWith("error:"))
+		    {
+		    	throw new WalletCallException("Error response from wallet: " + strResponse);
+		    }
+
+		    JsonValue response = null;
+		    try
+		    {
+		    	response = Json.parse(strResponse);
+		    } catch (ParseException pe)
+		    {
+		    	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+		    }
+
+		    if (!response.isArray())
+		    {
+		    	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
+		    }
+
+		    JsonArray jsonTransactions = response.asArray();
+		    for (int i = 0; i < jsonTransactions.size(); i++)
+		    {
+		    	String[] currentTransaction = new String[5];
+		    	JsonObject trans = jsonTransactions.get(i).asObject();
+
+		    	currentTransaction[0] = "Z (Private)";
+		    	currentTransaction[1] = "receive";
+		    	currentTransaction[2] = trans.get("amount").toString();
+		    	currentTransaction[3] = "N/A";
+		    	currentTransaction[4] = zAddress;
+
+		    	zReceivedTransactions.add(currentTransaction);
+		    }
+		}
+
+		return zReceivedTransactions.toArray(new String[0][]);
 	}
 
 
