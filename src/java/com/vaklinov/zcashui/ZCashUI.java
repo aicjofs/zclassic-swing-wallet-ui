@@ -67,6 +67,7 @@ public class ZCashUI
 	private JMenuItem menuItemAbout;
 
 	private DashboardPanel dashboard;
+	private AddressesPanel addresses;
 	
 	public ZCashUI()
 		throws IOException, InterruptedException, WalletCallException
@@ -80,7 +81,7 @@ public class ZCashUI
 		// Build content
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.add("Dashboard", dashboard = new DashboardPanel(installationObserver, clientCaller));
-		tabs.add("Adresses", new JPanel());
+		tabs.add("Adresses", addresses = new AddressesPanel(clientCaller));
 		tabs.add("Send cash", new JPanel());
 		contentPane.add(tabs);
 		

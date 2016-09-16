@@ -261,7 +261,8 @@ public class ZCashClientCaller
 		    	currentTransaction[0] = "Z (Private)";
 		    	currentTransaction[1] = "receive";
 		    	currentTransaction[2] = trans.get("amount").toString();
-		    	currentTransaction[3] = "N/A";
+		    	String txID = trans.getString("txid", "ERROR!");
+		    	currentTransaction[3] = this.getWalletTransactionTime(txID);
 		    	currentTransaction[4] = zAddress;
 
 		    	zReceivedTransactions.add(currentTransaction);
@@ -271,5 +272,39 @@ public class ZCashClientCaller
 		return zReceivedTransactions.toArray(new String[0][]);
 	}
 
+	
+	// return UNIX time as tring
+	public synchronized String getWalletTransactionTime(String txID)
+		throws WalletCallException, IOException, InterruptedException
+	{
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "gettransaction", txID
+		});
 
+		String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		JsonValue response = null;
+		try
+		{
+		  	response = Json.parse(strResponse);
+		} catch (ParseException pe)
+		{
+		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+		}
+
+		if (!response.isObject())
+		{
+		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
+		}
+
+		JsonObject jsonTransaction = response.asObject();
+		return String.valueOf(jsonTransaction.getLong("time", -1));
+	}
+	
+	
 }

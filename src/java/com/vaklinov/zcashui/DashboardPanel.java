@@ -88,11 +88,26 @@ public class DashboardPanel
 		JPanel balanceStatusPanel = new JPanel();
 		balanceStatusPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
 		balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		JLabel zcLabel = new JLabel("ZCash Wallet  ");
+		
+		JLabel zcLabel = new JLabel("ZCash Wallet    ");
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD, 35));
 		balanceStatusPanel.add(zcLabel);
+		
+//		JLabel arrowLabel = new JLabel("\u2193");
+//		arrowLabel.setFont(new Font("Helvetica", Font.BOLD, 35));
+//		balanceStatusPanel.add(arrowLabel);
+		
+		JLabel transactionHeadingLabel = new JLabel("<html><br/>Transactions:</html>");
+		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 20));
+		balanceStatusPanel.add(transactionHeadingLabel);
+				
+		JLabel divider = new JLabel("      ");
+		divider.setFont(new Font("Helvetica", Font.BOLD, 35));
+		balanceStatusPanel.add(divider);
+		
 		balanceStatusPanel.add(walletBalanceLabel = new JLabel());
 		this.updateWalletStatusLabel();
+		
 		dashboard.add(balanceStatusPanel, BorderLayout.NORTH);
 
 		// Table of transactions
@@ -109,16 +124,18 @@ public class DashboardPanel
 		this.updateDaemonStatusLabel();
 		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
 
-		// Start timer to refresh the status
-		ActionListener al = new ActionListener() {
+		// Start timers to refresh the status
+		ActionListener alQuick = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				try
 				{
+					long start = System.currentTimeMillis();
 					DashboardPanel.this.updateDaemonStatusLabel();
-					DashboardPanel.this.updateWalletStatusLabel();
-					DashboardPanel.this.updateWalletTransactionsTable();
+					long end = System.currentTimeMillis();
+					
+					System.out.println("Update dashboard quick done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
 					/* TODO: -report exceptions to teh user */
@@ -126,7 +143,28 @@ public class DashboardPanel
 				}
 			}
 		};
-		new Timer(2000, al).start();
+		new Timer(2000, alQuick).start();
+		
+		ActionListener alSlow = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					long start = System.currentTimeMillis();
+					DashboardPanel.this.updateWalletStatusLabel();
+					DashboardPanel.this.updateWalletTransactionsTable();
+					long end = System.currentTimeMillis();
+					
+					System.out.println("Update dashboard transactions done in " + (end - start) + "ms." );
+				} catch (Exception ex)
+				{
+					/* TODO: -report exceptions to teh user */
+					ex.printStackTrace();
+				}
+			}
+		};
+		new Timer(8000, alSlow).start();
 
 	}
 
@@ -232,10 +270,10 @@ public class DashboardPanel
 		{
 			if (t[1].equals("receive"))
 			{
-				t[1] = "=> IN";
+				t[1] = "\u21E8 IN";
 			} else if (t[1].equals("send"))
 			{
-				t[1] = "<= OUT";
+				t[1] = "\u21E6 OUT";
 			};
 
 			if (!t[3].equals("N/A"))
