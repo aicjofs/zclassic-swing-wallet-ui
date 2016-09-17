@@ -51,7 +51,7 @@ For security reasons is is recommended to always build the program from source.
 
 3. Running the installed ZCash GUI wallet
 
-   Before running the GUI uuou need to start zcashd (e.g. `zcashd --daemon`). The wallet GUI is a Java program packaged as an executable JAR file. It may be run from command line or started from another GUI tool (e.g. file manager). Assuming you have already installed [ZCash](https://z.cash/) and the GUI Wallet `ZCashSwingWalletUI.jar` in directory `/home/user/zcash/bin` one way to run it from comamnd line is:
+   Before running the GUI you need to start zcashd (e.g. `zcashd --daemon`). The wallet GUI is a Java program packaged as an executable JAR file. It may be run from command line or started from another GUI tool (e.g. file manager). Assuming you have already installed [ZCash](https://z.cash/) and the GUI Wallet `ZCashSwingWalletUI.jar` in directory `/home/user/zcash/bin` one way to run it from comamnd line is:
    ```
    user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ java -jar /home/user/zcash/bin/ZCashSwingWalletUI.jar
    ```
