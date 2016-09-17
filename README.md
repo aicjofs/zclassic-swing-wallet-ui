@@ -17,7 +17,11 @@ For security reasons is is recommended to always build the program from source.
 
 1. Operating system and tools
 
-   As of September 2016 this program is only intended to work on Linux (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run the Wallet GUI are Java (JDK7 or later) and Ant. If using Ubuntu Linux they may be installed via command: `user@ubuntu:~/build-dir$ sudo apt-get install git default-jdk ant` If you have another Linux distribution, please check your relevant documentation on installing JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line before proceeding with build.
+   As of September 2016 this program is only intended to work on Linux (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run the Wallet GUI are Java (JDK7 or later) and Ant. If using Ubuntu Linux they may be installed via command: 
+   ```
+   user@ubuntu:~/build-dir$ sudo apt-get install git default-jdk ant
+   ``` 
+   If you have another Linux distribution, please check your relevant documentation on installing JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line before proceeding with build.
 
 2. Building from source code
 
@@ -25,14 +29,21 @@ For security reasons is is recommended to always build the program from source.
    ```
    user@ubuntu:~/build-dir$ git clone https://github.com/vaklinov/zcash-swing-wallet-ui.git
    ```
-   Then change the current directory:
+   Change the current directory:
    ```
    user@ubuntu:~/build-dir$ cd zcash-swing-wallet-ui/
    ```
-   
-   
+   Issue the build command:
+   ```
+   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ ant -buildfile ./src/build/build.xml
+   ```
+   This takes a few seconds and when it finishes, it builds a JAR file `./build/jars/ZCashSwingWalletUI.jar`. You need to make this file executable:
+   ```
+   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ chmod u+x ./build/jars/ZCashSwingWalletUI.jar
+   ```
+   At this point the build process is finished the built GUI wallet program is the JAR file `./build/jars/ZCashSwingWalletUI.jar`
 
-3. Installing the built wallet GUI
+3. Installing the built GUI wallet
 
    Assuming you have already installed [ZCash](https://z.cash/) in directory `/home/user/zcash/bin` (for example) which contains the command line tools `zcash-cli` and `zcashd` you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it to diretcory `/home/user/zcash/bin` (the same dir. that contains `zcash-cli` and `zcashd`).
 
