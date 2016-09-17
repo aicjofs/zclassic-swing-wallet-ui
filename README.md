@@ -17,15 +17,24 @@ For security reasons is is recommended to always build the program from source.
 
 1. Operating system and tools
 
-   As of September 2016 this program is only intended to work on Linux (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run the Wallet GUI are Java (JDK7 or later) and Ant. If using Ubuntu Linux they may be installed via command: `user@ubuntu:~/build-dir$ sudo apt-get install default-jdk ant` If you have another Linux distribution, please check your relevant documentation on installing JDK and Ant. The commands `java`, `javac` and `ant` need to be startable from command line before proceeding with build.
+   As of September 2016 this program is only intended to work on Linux (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run the Wallet GUI are Java (JDK7 or later) and Ant. If using Ubuntu Linux they may be installed via command: `user@ubuntu:~/build-dir$ sudo apt-get install git default-jdk ant` If you have another Linux distribution, please check your relevant documentation on installing JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line before proceeding with build.
 
 2. Building from source code
 
-   TODO:
+   As a start you need to clone the zcash-swing-wallet-ui Git repository:
+   ```
+   user@ubuntu:~/build-dir$ git clone https://github.com/vaklinov/zcash-swing-wallet-ui.git
+   ```
+   Then change the current directory:
+   ```
+   user@ubuntu:~/build-dir$ cd zcash-swing-wallet-ui/
+   ```
+   
+   
 
 3. Installing the built wallet GUI
 
-   Assuming you have already installed [ZCash](https://z.cash/) in directory `/home/user/zcash` (for example) which contains the command line tools `zcash-cli` and `zcashd` you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it to diretcory `/home/user/zcash` (the same dir. that contains `zcash-cli` and `zcashd`).
+   Assuming you have already installed [ZCash](https://z.cash/) in directory `/home/user/zcash/bin` (for example) which contains the command line tools `zcash-cli` and `zcashd` you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it to diretcory `/home/user/zcash/bin` (the same dir. that contains `zcash-cli` and `zcashd`).
 
 
 ### License
