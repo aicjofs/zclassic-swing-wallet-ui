@@ -10,7 +10,7 @@ presents the information in a user-friendly manner.
 
 **The project is currently a work in progress (unfinihsed) and has not yet reached production quality!**
 
-## Building and installing the Wallet GUI
+## Building, installing and running the Wallet GUI
 
 For security reasons is is recommended to always build the program from source. 
 
@@ -51,11 +51,11 @@ For security reasons is is recommended to always build the program from source.
 
 3. Running the installed ZCash GUI wallet
 
-   The wallet GUI is a Java program packaged as an executable JAR file. It may be run from command line or started from another GUI tool (e.g. file manager). Assuming you have already installed [ZCash](https://z.cash/) and the GUI Wallet `ZCashSwingWalletUI.jar` in directory `/home/user/zcash/bin` one way to run it from comamnd line is:
+   Before running the GUI uuou need to start zcashd (e.g. `zcashd --daemon`). The wallet GUI is a Java program packaged as an executable JAR file. It may be run from command line or started from another GUI tool (e.g. file manager). Assuming you have already installed [ZCash](https://z.cash/) and the GUI Wallet `ZCashSwingWalletUI.jar` in directory `/home/user/zcash/bin` one way to run it from comamnd line is:
    ```
    user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ java -jar /home/user/zcash/bin/ZCashSwingWalletUI.jar
    ```
-   I you are using Ubuntu (or similar ;) Linux you may instead just use the file manager and right-click on the `ZCashSwingWalletUI.jar` file and choose the option "Open with OpenJDK 8 Runtime". This will start the ZCash GUI wallet.
+   If you are using Ubuntu (or similar ;) Linux you may instead just use the file manager and right-click on the `ZCashSwingWalletUI.jar` file and choose the option "Open with OpenJDK 8 Runtime". This will start the ZCash GUI wallet.
 
 
 
