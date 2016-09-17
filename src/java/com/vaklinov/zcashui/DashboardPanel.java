@@ -90,7 +90,7 @@ public class DashboardPanel
 		balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
 		JLabel zcLabel = new JLabel("ZCash Wallet    ");
-		zcLabel.setFont(new Font("Helvetica", Font.BOLD, 35));
+		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 35));
 		balanceStatusPanel.add(zcLabel);
 		
 //		JLabel arrowLabel = new JLabel("\u2193");
@@ -138,7 +138,7 @@ public class DashboardPanel
 					System.out.println("Update dashboard quick done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
-					/* TODO: -report exceptions to teh user */
+					/* TODO: report exceptions to the user */
 					ex.printStackTrace();
 				}
 			}
@@ -159,7 +159,7 @@ public class DashboardPanel
 					System.out.println("Update dashboard transactions done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
-					/* TODO: -report exceptions to teh user */
+					/* TODO: report exceptions to the user */
 					ex.printStackTrace();
 				}
 			}
@@ -185,10 +185,13 @@ public class DashboardPanel
 					      " MB, CPU Usage: " + daemonInfo.cpuPercentage + "%";
 		}
 
+		File walletDAT = new File(OSUtil.getBlockchainDirectory() + "/wallet.dat");
+		
 		String text =
 			"<html>Daemon status: " + daemonStatus + ",   " + runtimeInfo + " <br/>" +
-			"Tools directory: " + OSUtil.getProgramDirectory() + " <br/> " +
-	        "Blockchain directory: " + OSUtil.getBlockchainDirectory()+ " <br/> " +
+			"Installation directory: " + OSUtil.getProgramDirectory() + " <br/> " +
+	        "Blockchain directory: " + OSUtil.getBlockchainDirectory() + ", " +
+			"Wallet file: " + walletDAT.getCanonicalPath() + " <br/> " +
 		    "System: " + OSUtil.getSystemInfo() +
 			"</html>";
 		this.daemonStatusLabel.setText(text);
@@ -237,7 +240,7 @@ public class DashboardPanel
         table.getColumnModel().getColumn(0).setPreferredWidth(160);
         table.getColumnModel().getColumn(1).setPreferredWidth(120);
         table.getColumnModel().getColumn(2).setPreferredWidth(180);
-        table.getColumnModel().getColumn(3).setPreferredWidth(250);
+        table.getColumnModel().getColumn(3).setPreferredWidth(390);
         table.getColumnModel().getColumn(4).setPreferredWidth(800);
 
         return table;

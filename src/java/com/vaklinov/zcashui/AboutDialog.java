@@ -75,7 +75,7 @@ public class AboutDialog
 			"by providing a Graphical User Interface (GUI) that acts as a wrapper and " +
 		    "presents the information in a user-friendly manner.<br/><br/>" +
 			"<span style=\"font-weight:bold\">Disclaimer:</span> this program is not officially " +
-		    "endorsed by or associatd with the ZCash project and the ZCash parent company.<br/><br/>"+
+		    "endorsed by or associated with the ZCash project and the ZCash parent company.<br/><br/>"+
 		    "Acknowledgements: This program includes software for JSON processing " +
 		    "(https://github.com/ralfstx/minimal-json) " +
 		    "that is Copyright (c) 2015, 2016 EclipseSource." +

@@ -307,4 +307,48 @@ public class ZCashClientCaller
 	}
 	
 	
+	public synchronized String getBalanceForAddress(String address)
+		throws WalletCallException, IOException, InterruptedException
+	{
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "z_getbalance", address
+		});
+
+	    String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		JsonValue response = null;
+		try
+		{
+		  	response = Json.parse(strResponse);
+		} catch (ParseException pe)
+		{
+		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+		}
+		
+		return String.valueOf(response.toString());
+	}
+	
+
+	public synchronized String createNewAddress(boolean isZAddress)
+		throws WalletCallException, IOException, InterruptedException
+	{
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), (isZAddress ? "z_" : "") + "getnewaddress"
+		});
+
+	    String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		return strResponse.trim();
+	}
+
 }

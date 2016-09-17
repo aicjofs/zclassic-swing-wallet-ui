@@ -40,10 +40,11 @@ import java.io.IOException;
  */
 public class OSUtil 
 {	
-	public static enum OS_TYPE 
-	{ 
-		LINUX, WINDOWS, MAC_OS, FREE_BSD, OTHER_BSD, SOLARIS, AIX, OTHER_OS 
-	};
+	
+//	public static enum OS_TYPE 
+//	{ 
+//		LINUX, WINDOWS, MAC_OS, FREE_BSD, OTHER_BSD, SOLARIS, AIX, OTHER_OS 
+//	};
 	
 	
 	public static String getProgramDirectory()
@@ -79,10 +80,25 @@ public class OSUtil
 		return new File(".").getCanonicalPath();
 	}
 	
+	
 	public static String getBlockchainDirectory()
 		throws IOException
 	{
 		return new File(System.getProperty("user.home") + "/.zcash").getCanonicalPath();
+	}
+	
+	
+	// Directory with program settings to store
+	public static String getSettingsDirectory()
+		throws IOException
+	{
+		File dir = new File(System.getProperty("user.home") + "/.ZCashSwingWalletUI");
+		if (!dir.exists())
+		{
+			dir.mkdirs();
+		}
+		
+		return dir.getCanonicalPath();
 	}
 	
 	

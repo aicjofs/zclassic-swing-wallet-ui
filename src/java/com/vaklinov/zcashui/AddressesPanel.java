@@ -30,13 +30,25 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.RandomAccessFile;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.EtchedBorder;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 
@@ -49,6 +61,8 @@ import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 public class AddressesPanel
 	extends JPanel
 {
+	private static final String T_ADDRESSES_FILE = "CreatedTransparentAddresses.txt";
+	
 	private ZCashClientCaller clientCaller;
 
 	private JTable addressBalanceTable   = null;
@@ -65,26 +79,94 @@ public class AddressesPanel
 		JPanel addressesPanel = this;
 		addressesPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 		addressesPanel.setLayout(new BorderLayout(0, 0));
+	
+		// Build panel of buttons
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 3, 3));
+		buttonPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
-		addressesPanel.add(new JButton("TODO"), BorderLayout.SOUTH);
+		JButton newTAddressButton = new JButton("New T (Transparent) address");
+		buttonPanel.add(newTAddressButton);
+		JButton newZAddressButton = new JButton("New Z (Private) address");
+		buttonPanel.add(newZAddressButton);
+		buttonPanel.add(new JLabel("           "));
+		JButton refreshButton = new JButton("Refresh");
+		buttonPanel.add(refreshButton);
+		
+		addressesPanel.add(buttonPanel, BorderLayout.SOUTH);
 
 		// Table of transactions
 		lastAddressBalanceData = getAddressBalanceDataFromWallet();
 		addressesPanel.add(addressBalanceTablePane = new JScrollPane(
 				               addressBalanceTable = this.createAddressBalanceTable(lastAddressBalanceData)),
 				           BorderLayout.CENTER);
-
-
-
+		
+		// Button actions
+		refreshButton.addActionListener(new ActionListener() 
+		{	
+			public void actionPerformed(ActionEvent e) 
+			{
+				try
+				{
+					AddressesPanel.this.updateWalletAddressBalanceTable();
+				} catch (Exception ex)
+				{
+					/* TODO: report exceptions to the user */
+					ex.printStackTrace();
+				}
+			}
+		});
+		
+		newTAddressButton.addActionListener(new ActionListener() 
+		{	
+			public void actionPerformed(ActionEvent e) 
+			{
+				createNewAddress(false);
+			}
+		});
+		
+		newZAddressButton.addActionListener(new ActionListener() 
+		{	
+			public void actionPerformed(ActionEvent e) 
+			{
+				createNewAddress(true);
+			}
+		});
 	}
 
+	
+	private void createNewAddress(boolean isZAddress)
+	{
+		try
+		{
+			String address = this.clientCaller.createNewAddress(isZAddress);
+			
+			if (!isZAddress)
+			{
+				this.addCreatedTAddress(address);
+			}
+			
+			JOptionPane.showMessageDialog(
+				this.getRootPane().getParent(), 
+				"A new " + (isZAddress ? "Z (Private)" : "T (Transparent)") 
+				+ " address has been created cuccessfully:\n" + address, 
+				"Title", JOptionPane.INFORMATION_MESSAGE);
+			
+			this.updateWalletAddressBalanceTable();
+		} catch (Exception e)
+		{
+			/* TODO: report exceptions to the user */
+			e.printStackTrace();			
+		}
+	}
+	
 
 	private void updateWalletAddressBalanceTable()
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String[][] newAddressBalanceData = this.getAddressBalanceDataFromWallet();
 
-		if (lastAddressBalanceData.length != newAddressBalanceData.length)
+		//if (lastAddressBalanceData.length != newAddressBalanceData.length) -always refreshed
 		{
 			this.remove(addressBalanceTablePane);
 			this.add(addressBalanceTablePane = new JScrollPane(
@@ -115,13 +197,71 @@ public class AddressesPanel
 	private String[][] getAddressBalanceDataFromWallet()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		return new String[][]
+		String[] zAddresses = clientCaller.getWalletZAddresses();
+		String[] tAddresses = this.getCreatedAndStoredTAddresses();
+		
+		String[][] addressBalances = new String[zAddresses.length + tAddresses.length][];
+		
+		int i = 0;
+
+		for (String address : tAddresses)
 		{
-			{ "0.1", "A1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" },
-			{ "0.2", "A2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" },
-			{ "0.3", "A3AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" },
-			{ "0.4", "A4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" },
-			{ "0.5", "A5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }
-		};
+			addressBalances[i++] = new String[] 
+			{  
+				this.clientCaller.getBalanceForAddress(address),
+				address
+			};
+		}
+		
+		for (String address : zAddresses)
+		{
+			addressBalances[i++] = new String[] 
+			{  
+				this.clientCaller.getBalanceForAddress(address),
+				address
+			};
+		}
+
+		return addressBalances;
+	}
+	
+	
+	private String[] getCreatedAndStoredTAddresses()
+		throws IOException
+	{
+		File tAddressesFile = new File(OSUtil.getSettingsDirectory() + "/" + T_ADDRESSES_FILE);
+		
+		if (!tAddressesFile.exists())
+		{
+			return new String[0];
+		}
+		
+		LineNumberReader lnr = new LineNumberReader(new FileReader(tAddressesFile));
+		Set<String> addressSet = new HashSet<String>();
+		
+		String line;
+		while ((line = lnr.readLine()) != null)
+		{
+			addressSet.add(line.trim());
+		}
+		
+		return addressSet.toArray(new String[0]);
+	}
+	
+	
+	private void addCreatedTAddress(String address)
+		throws IOException
+	{
+		File tAddressesFile = new File(OSUtil.getSettingsDirectory() + "/" + T_ADDRESSES_FILE);
+		if (!tAddressesFile.exists())
+		{
+			tAddressesFile.createNewFile();
+		}
+		
+		 long rafLength = tAddressesFile.length();
+		 RandomAccessFile raf = new RandomAccessFile(tAddressesFile, "rw");
+		 raf.seek(rafLength);
+		 raf.write((address + "\n").getBytes());
+		 raf.close();
 	}
 }
