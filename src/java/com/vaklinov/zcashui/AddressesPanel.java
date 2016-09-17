@@ -197,14 +197,36 @@ public class AddressesPanel
 	private String[][] getAddressBalanceDataFromWallet()
 		throws WalletCallException, IOException, InterruptedException
 	{
+		// Z Addresses - they are OK
 		String[] zAddresses = clientCaller.getWalletZAddresses();
-		String[] tAddresses = this.getCreatedAndStoredTAddresses();
 		
-		String[][] addressBalances = new String[zAddresses.length + tAddresses.length][];
+		// T Addresses created by GUI only
+		// TODO: What if wallet is changed -stored addresses are invalid?!!
+		String[] tAddresses = this.getCreatedAndStoredTAddresses();
+		Set<String> tStoredAddressSet = new HashSet<>();
+		for (String address : tAddresses)
+		{
+			tStoredAddressSet.add(address);
+		}
+		
+		// T addresses with unspent outputs (even if not GUI created)...
+		String[] tAddressesWithUnspentOuts = this.clientCaller.getWalletPublicAddressesWithUnspentOutputs();
+		Set<String> tAddressSetWithUnspentOuts = new HashSet<>();
+		for (String address : tAddressesWithUnspentOuts)
+		{
+			tAddressSetWithUnspentOuts.add(address);
+		}
+		
+		// Combine all known T addresses
+		Set<String> tAddressesCombined = new HashSet<>();
+		tAddressesCombined.addAll(tStoredAddressSet);
+		tAddressesCombined.addAll(tAddressSetWithUnspentOuts);
+		
+		String[][] addressBalances = new String[zAddresses.length + tAddressesCombined.size()][];
 		
 		int i = 0;
 
-		for (String address : tAddresses)
+		for (String address : tAddressesCombined)
 		{
 			addressBalances[i++] = new String[] 
 			{  

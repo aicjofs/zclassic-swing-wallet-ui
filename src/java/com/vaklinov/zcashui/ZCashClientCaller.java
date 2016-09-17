@@ -32,7 +32,9 @@ package com.vaklinov.zcashui;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -272,6 +274,48 @@ public class ZCashClientCaller
 		return zReceivedTransactions.toArray(new String[0][]);
 	}
 
+	
+	// ./src/zcash-cli listunspent only returns T addresses it seems
+	public synchronized String[] getWalletPublicAddressesWithUnspentOutputs()
+		throws WalletCallException, IOException, InterruptedException
+	{
+		CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+	    	this.zcashcli.getCanonicalPath(), "listunspent"
+	    });
+
+	    String strResponse = caller.execute();
+	    if (strResponse.trim().startsWith("error:"))
+	    {
+	    	throw new WalletCallException("Error response from wallet: " + strResponse);
+	    }
+
+	    JsonValue response = null;
+	    try
+	    {
+	    	response = Json.parse(strResponse);
+	    } catch (ParseException pe)
+	    {
+	    	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+	    }
+
+	    if (!response.isArray())
+	    {
+		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
+		}
+
+		JsonArray jsonUnspentOutputs = response.asArray();
+		Set<String> addresses = new HashSet<>();
+	    for (int i = 0; i < jsonUnspentOutputs.size(); i++)
+	    {
+	    	JsonObject outp = jsonUnspentOutputs.get(i).asObject();
+	    	addresses.add(outp.getString("address", "ERROR!"));
+	    }
+
+	    return addresses.toArray(new String[0]);
+     }
+
+	
 	
 	// return UNIX time as tring
 	public synchronized String getWalletTransactionTime(String txID)
