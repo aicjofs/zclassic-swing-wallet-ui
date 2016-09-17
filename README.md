@@ -8,8 +8,7 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
-
-The project is currently a work in progress...
+**The project is currently a work in progress (unfinihsed) and has not yet reached production quality!**
 
 ## Building and installing the Wallet GUI
 
@@ -17,11 +16,11 @@ For security reasons is is recommended to always build the program from source.
 
 1. Operating system and tools
 
-   As of September 2016 this program is only intended to work on Linux (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run the Wallet GUI are Java (JDK7 or later) and Ant. If using Ubuntu Linux they may be installed via command: 
+   As of September 2016 this program is only intended to work on Linux (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK7 or later) and Ant. If using Ubuntu Linux they may be installed via command: 
    ```
    user@ubuntu:~/build-dir$ sudo apt-get install git default-jdk ant
    ``` 
-   If you have another Linux distribution, please check your relevant documentation on installing JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line before proceeding with build.
+   If you have another Linux distribution, please check your relevant documentation on installing Git, JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line before proceeding with build.
 
 2. Building from source code
 
