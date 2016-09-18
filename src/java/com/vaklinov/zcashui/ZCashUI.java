@@ -68,6 +68,7 @@ public class ZCashUI
 
 	private DashboardPanel dashboard;
 	private AddressesPanel addresses;
+	private SendCashPanel  sendPanel;
 	
 	public ZCashUI()
 		throws IOException, InterruptedException, WalletCallException
@@ -82,7 +83,7 @@ public class ZCashUI
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.add("Dashboard", dashboard = new DashboardPanel(installationObserver, clientCaller));
 		tabs.add("Adresses", addresses = new AddressesPanel(clientCaller));
-		tabs.add("Send cash", new JPanel());
+		tabs.add("Send cash", sendPanel = new SendCashPanel(clientCaller));
 		contentPane.add(tabs);
 		
 		this.setSize(new Dimension(800, 400));

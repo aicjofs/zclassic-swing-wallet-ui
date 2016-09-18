@@ -132,6 +132,8 @@ public class AddressesPanel
 				createNewAddress(true);
 			}
 		});
+		
+		// TODO: validate stored t addresses on startup
 	}
 
 	
@@ -237,6 +239,7 @@ public class AddressesPanel
 		
 		for (String address : zAddresses)
 		{
+			// TODO: check for wrong/negative balance, - maybe address does not exist
 			addressBalances[i++] = new String[] 
 			{  
 				this.clientCaller.getBalanceForAddress(address),
@@ -248,7 +251,8 @@ public class AddressesPanel
 	}
 	
 	
-	private String[] getCreatedAndStoredTAddresses()
+	// TODO: move to a utility class - it is reused
+	public static String[] getCreatedAndStoredTAddresses()
 		throws IOException
 	{
 		File tAddressesFile = new File(OSUtil.getSettingsDirectory() + "/" + T_ADDRESSES_FILE);
@@ -270,8 +274,9 @@ public class AddressesPanel
 		return addressSet.toArray(new String[0]);
 	}
 	
-	
-	private void addCreatedTAddress(String address)
+
+	// TODO: move to a utility class - it is reused
+	public static void addCreatedTAddress(String address)
 		throws IOException
 	{
 		File tAddressesFile = new File(OSUtil.getSettingsDirectory() + "/" + T_ADDRESSES_FILE);
