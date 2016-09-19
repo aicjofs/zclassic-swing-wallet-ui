@@ -31,14 +31,18 @@ package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
@@ -57,10 +61,13 @@ public class SendCashPanel
 	
 	private ZCashClientCaller clientCaller;
 	
-	private JComboBox balanceAddressCombo      = null;
+	private JComboBox  balanceAddressCombo     = null;
+	private JPanel     comboBoxParentPanel     = null;
 	private String[][] lastAddressBalanceData  = null;
+	private String[]   comboBoxItems           = null;
 	
 	private JTextField destinationAddressField = null;
+	private JButton    sendButton              = null;
 
 	public SendCashPanel(ZCashClientCaller clientCaller)
 		throws IOException, InterruptedException, WalletCallException
@@ -79,10 +86,11 @@ public class SendCashPanel
 		tempPanel.add(new JLabel("Send cash from:"));
 		sendCashPanel.add(tempPanel);
 
-		balanceAddressCombo = new JComboBox<>(new String[] { "ONE", "TWO", "THREE" });
-		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(balanceAddressCombo);
-		sendCashPanel.add(tempPanel);
+		balanceAddressCombo = new JComboBox<>(new String[] { "" });
+		comboBoxParentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		comboBoxParentPanel.add(balanceAddressCombo);
+		sendCashPanel.add(comboBoxParentPanel);
+		this.updateWalletAddressPositiveBalanceComboBox();
 		
 		sendCashPanel.add(new JLabel("  "));
 
@@ -90,7 +98,7 @@ public class SendCashPanel
 		tempPanel.add(new JLabel("Destination address:"));
 		sendCashPanel.add(tempPanel);
 		
-		destinationAddressField = new JTextField(70);
+		destinationAddressField = new JTextField(75);
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         tempPanel.add(destinationAddressField);
 		sendCashPanel.add(tempPanel);
@@ -98,22 +106,53 @@ public class SendCashPanel
 		sendCashPanel.add(new JLabel("  "));
 
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(new JLabel("TODO: Sending cash is not yet implemented"));
+		tempPanel.add(sendButton = new JButton("Send   \u27A4\u27A4\u27A4"));
 		sendCashPanel.add(tempPanel);
+
+		sendCashPanel.add(new JLabel("  "));
+		sendCashPanel.add(new JLabel("  "));
+
+		// Wire the buttons
+		sendButton.addActionListener(new ActionListener() 
+		{	
+			public void actionPerformed(ActionEvent e) 
+			{
+				// Temporary code
+				try
+			    {
+					JOptionPane.showMessageDialog(
+						SendCashPanel.this.getRootPane().getParent(), 
+						"Sending cash is not yet implemented!", 
+						"Title", JOptionPane.WARNING_MESSAGE);
+
+				} catch (Exception ex)
+				{
+					/* TODO: report exceptions to the user */
+					ex.printStackTrace();
+				}
+			}
+		});
 
 	
 	}
 
 		
-
 	private void updateWalletAddressPositiveBalanceComboBox()
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String[][] newAddressBalanceData = this.getAddressPositiveBalanceDataFromWallet();
-
-		// TODO: do the update
-		
 		lastAddressBalanceData = newAddressBalanceData;
+		
+		comboBoxItems = new String[lastAddressBalanceData.length];
+		for (int i = 0; i < lastAddressBalanceData.length; i++)
+		{
+			comboBoxItems[i] = Double.valueOf(lastAddressBalanceData[i][0]).toString().toString()  + 
+					           " - " + lastAddressBalanceData[i][1];
+		}
+		
+		this.comboBoxParentPanel.remove(balanceAddressCombo);
+		balanceAddressCombo = new JComboBox<>(comboBoxItems);
+		comboBoxParentPanel.add(balanceAddressCombo);
 
 		this.validate();
 		this.repaint();

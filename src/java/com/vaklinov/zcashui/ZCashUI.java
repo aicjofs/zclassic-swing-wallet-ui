@@ -45,6 +45,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
@@ -86,7 +87,7 @@ public class ZCashUI
 		tabs.add("Send cash", sendPanel = new SendCashPanel(clientCaller));
 		contentPane.add(tabs);
 		
-		this.setSize(new Dimension(800, 400));
+		this.setSize(new Dimension(850, 400));
 		
 		// Build menu
 		JMenuBar mb = new JMenuBar();
@@ -129,6 +130,30 @@ public class ZCashUI
 			public void windowClosing(WindowEvent e) 
 			{
 				ZCashUI.this.exit();				
+			}
+		});
+		
+		// Show initial message
+		SwingUtilities.invokeLater(new Runnable() 
+		{	
+			public void run() 
+			{
+				JOptionPane.showMessageDialog(
+					ZCashUI.this.getRootPane().getParent(), 
+					"The ZCash wallet GUI should be considered experimental at this time " +
+					"since there has \nnot been much feedback from the community. It is not " +
+					"advisable to use the GUI wallet \nto send large amounts of cash! " +
+					"Be sure to read the list of issues and limitations at \nthis page: " +
+					"https://github.com/vaklinov/zcash-swing-wallet-ui\n\n" +
+					" THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
+					" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
+					" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
+					" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
+					" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
+					" OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
+					" THE SOFTWARE.\n\n" +
+					"(This message will be shown only once)", 
+					"Disclaimer", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 	}

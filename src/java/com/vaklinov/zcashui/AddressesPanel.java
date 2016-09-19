@@ -152,7 +152,7 @@ public class AddressesPanel
 				this.getRootPane().getParent(), 
 				"A new " + (isZAddress ? "Z (Private)" : "T (Transparent)") 
 				+ " address has been created cuccessfully:\n" + address, 
-				"Title", JOptionPane.INFORMATION_MESSAGE);
+				"Address created", JOptionPane.INFORMATION_MESSAGE);
 			
 			this.updateWalletAddressBalanceTable();
 		} catch (Exception e)

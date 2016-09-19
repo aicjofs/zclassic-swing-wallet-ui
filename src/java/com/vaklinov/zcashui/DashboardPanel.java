@@ -125,7 +125,7 @@ public class DashboardPanel
 		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
 
 		// Start timers to refresh the status
-		ActionListener alQuick = new ActionListener() {
+		ActionListener alDeamonStatus = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
@@ -135,7 +135,7 @@ public class DashboardPanel
 					DashboardPanel.this.updateDaemonStatusLabel();
 					long end = System.currentTimeMillis();
 					
-					System.out.println("Update dashboard quick done in " + (end - start) + "ms." );
+					System.out.println("Update of dashboard daemon status done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
 					/* TODO: report exceptions to the user */
@@ -143,9 +143,9 @@ public class DashboardPanel
 				}
 			}
 		};
-		new Timer(2000, alQuick).start();
+		new Timer(2000, alDeamonStatus).start();
 		
-		ActionListener alSlow = new ActionListener() {
+		ActionListener alWalletBalance = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
@@ -153,10 +153,9 @@ public class DashboardPanel
 				{
 					long start = System.currentTimeMillis();
 					DashboardPanel.this.updateWalletStatusLabel();
-					DashboardPanel.this.updateWalletTransactionsTable();
 					long end = System.currentTimeMillis();
 					
-					System.out.println("Update dashboard transactions done in " + (end - start) + "ms." );
+					System.out.println("Update  of dashboard wallet status done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
 					/* TODO: report exceptions to the user */
@@ -164,8 +163,29 @@ public class DashboardPanel
 				}
 			}
 		};
-		new Timer(8000, alSlow).start();
+		new Timer(8000, alWalletBalance).start();
 
+		ActionListener alTransactions = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					long start = System.currentTimeMillis();
+					DashboardPanel.this.updateWalletTransactionsTable();
+					long end = System.currentTimeMillis();
+					
+					System.out.println("Update of dashboard wallet transactions table done in " + (end - start) + "ms." );
+				} catch (Exception ex)
+				{
+					/* TODO: report exceptions to the user */
+					ex.printStackTrace();
+				}
+			}
+		};
+		new Timer(15000, alTransactions).start();
+
+		
 	}
 
 
