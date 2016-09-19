@@ -138,6 +138,24 @@ public class ZCashUI
 		{	
 			public void run() 
 			{
+				try
+				{
+					String userDir = OSUtil.getSettingsDirectory();
+					File warningFlagFile = new File(userDir + "/initialInfoShown.flag");
+					if (warningFlagFile.exists())
+					{
+						return;
+					} else
+					{
+						warningFlagFile.createNewFile();
+					}
+					
+				} catch (IOException ioe)
+				{
+					/* TODO: report exceptions to the user */
+					ioe.printStackTrace();
+				}
+				
 				JOptionPane.showMessageDialog(
 					ZCashUI.this.getRootPane().getParent(), 
 					"The ZCash wallet GUI should be considered experimental at this time " +
@@ -145,13 +163,13 @@ public class ZCashUI
 					"advisable to use the GUI wallet \nto send large amounts of cash! " +
 					"Be sure to read the list of issues and limitations at \nthis page: " +
 					"https://github.com/vaklinov/zcash-swing-wallet-ui\n\n" +
-					" THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
-					" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
-					" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
-					" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
-					" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
-					" OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
-					" THE SOFTWARE.\n\n" +
+					"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
+					"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
+					"FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
+					"AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
+					"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
+					"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
+					"THE SOFTWARE.\n\n" +
 					"(This message will be shown only once)", 
 					"Disclaimer", JOptionPane.INFORMATION_MESSAGE);
 			}

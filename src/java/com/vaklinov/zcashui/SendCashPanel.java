@@ -31,6 +31,7 @@ package com.vaklinov.zcashui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
@@ -67,6 +69,7 @@ public class SendCashPanel
 	private String[]   comboBoxItems           = null;
 	
 	private JTextField destinationAddressField = null;
+	private JTextField destinationMemoField    = null;	
 	private JButton    sendButton              = null;
 
 	public SendCashPanel(ZCashClientCaller clientCaller)
@@ -90,9 +93,10 @@ public class SendCashPanel
 		comboBoxParentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		comboBoxParentPanel.add(balanceAddressCombo);
 		sendCashPanel.add(comboBoxParentPanel);
-		this.updateWalletAddressPositiveBalanceComboBox();
 		
-		sendCashPanel.add(new JLabel("  "));
+		JLabel dividerLabel = new JLabel("   ");
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
+		sendCashPanel.add(dividerLabel);
 
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(new JLabel("Destination address:"));
@@ -102,15 +106,31 @@ public class SendCashPanel
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         tempPanel.add(destinationAddressField);
 		sendCashPanel.add(tempPanel);
+
+		dividerLabel = new JLabel("   ");
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
+		sendCashPanel.add(dividerLabel);
+
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(new JLabel("Memo (optional):"));
+		sendCashPanel.add(tempPanel);
 		
-		sendCashPanel.add(new JLabel("  "));
+		destinationMemoField = new JTextField(75);
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        tempPanel.add(destinationMemoField);
+		sendCashPanel.add(tempPanel);		
+		
+		dividerLabel = new JLabel("   ");
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
+		sendCashPanel.add(dividerLabel);
 
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(sendButton = new JButton("Send   \u27A4\u27A4\u27A4"));
 		sendCashPanel.add(tempPanel);
 
-		sendCashPanel.add(new JLabel("  "));
-		sendCashPanel.add(new JLabel("  "));
+		dividerLabel = new JLabel("   ");
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
+		sendCashPanel.add(dividerLabel);
 
 		// Wire the buttons
 		sendButton.addActionListener(new ActionListener() 
@@ -133,7 +153,29 @@ public class SendCashPanel
 			}
 		});
 
-	
+		// Update the balances via timer
+		ActionListener alBalancesUpdater = new ActionListener() 
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					long start = System.currentTimeMillis();
+					SendCashPanel.this.updateWalletAddressPositiveBalanceComboBox();
+					long end = System.currentTimeMillis();
+					
+					System.out.println("Update of send cash panel balances done in " + (end - start) + "ms." );
+				} catch (Exception ex)
+				{
+					/* TODO: report exceptions to the user */
+					ex.printStackTrace();
+				}
+			}
+		};
+		Timer timerBalancesUpdater = new Timer(30000, alBalancesUpdater);
+		timerBalancesUpdater.setInitialDelay(1000);
+		timerBalancesUpdater.start();
 	}
 
 		
@@ -150,9 +192,11 @@ public class SendCashPanel
 					           " - " + lastAddressBalanceData[i][1];
 		}
 		
+		int selectedIndex = balanceAddressCombo.getSelectedIndex();
 		this.comboBoxParentPanel.remove(balanceAddressCombo);
 		balanceAddressCombo = new JComboBox<>(comboBoxItems);
 		comboBoxParentPanel.add(balanceAddressCombo);
+		balanceAddressCombo.setSelectedIndex(selectedIndex);
 
 		this.validate();
 		this.repaint();
