@@ -394,5 +394,74 @@ public class ZCashClientCaller
 
 		return strResponse.trim();
 	}
+	
 
+	// Returns OPID
+	public synchronized String sendCash(String from, String to, String amount, String memo)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		JsonObject toArgument = new JsonObject();
+		toArgument.set("address", to);
+		toArgument.set("memo", memo);
+		toArgument.set("amount", amount);
+		
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "z_sendmany", from, toArgument.toString()
+		});
+
+	    String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		return strResponse.trim();
+	}
+	
+	
+	public boolean isSendingOperationComplete(String opID)
+	    throws WalletCallException, IOException, InterruptedException
+	{
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", opID
+		});
+
+		String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		JsonValue response = null;
+		try
+		{
+		  	response = Json.parse(strResponse);
+		} catch (ParseException pe)
+		{
+		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+		}
+
+		if (!response.isObject())
+		{
+		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
+		}
+
+		JsonObject jsonStatus = response.asObject();
+		String status = jsonStatus.getString("status", "ERROR!");
+
+		if (status.equalsIgnoreCase("success") || status.equalsIgnoreCase("error"))
+		{
+			return true;
+		} else if (status.equalsIgnoreCase("executing") || status.equalsIgnoreCase("queued"))
+		{
+			return false;
+		} else
+		{
+			throw new WalletCallException("Unexpected status response from wallet: " + strResponse);
+		}
+	}
+
+	// TODO: Get OP result after it is complete
 }

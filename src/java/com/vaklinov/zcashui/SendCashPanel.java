@@ -69,6 +69,7 @@ public class SendCashPanel
 	private String[]   comboBoxItems           = null;
 	
 	private JTextField destinationAddressField = null;
+	private JTextField destinationAmountField = null;
 	private JTextField destinationMemoField    = null;	
 	private JButton    sendButton              = null;
 
@@ -102,11 +103,11 @@ public class SendCashPanel
 		tempPanel.add(new JLabel("Destination address:"));
 		sendCashPanel.add(tempPanel);
 		
-		destinationAddressField = new JTextField(75);
+		destinationAddressField = new JTextField(73);
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         tempPanel.add(destinationAddressField);
 		sendCashPanel.add(tempPanel);
-
+				
 		dividerLabel = new JLabel("   ");
 		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
 		sendCashPanel.add(dividerLabel);
@@ -115,10 +116,22 @@ public class SendCashPanel
 		tempPanel.add(new JLabel("Memo (optional):"));
 		sendCashPanel.add(tempPanel);
 		
-		destinationMemoField = new JTextField(75);
+		destinationMemoField = new JTextField(73);
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         tempPanel.add(destinationMemoField);
 		sendCashPanel.add(tempPanel);		
+		
+		dividerLabel = new JLabel("   ");
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
+		sendCashPanel.add(dividerLabel);
+
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(new JLabel("Amount to send:"));
+		sendCashPanel.add(tempPanel);
+
+		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		tempPanel.add(destinationAmountField = new JTextField(13));
+		sendCashPanel.add(tempPanel);
 		
 		dividerLabel = new JLabel("   ");
 		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
