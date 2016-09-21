@@ -31,6 +31,7 @@ package com.vaklinov.zcashui;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -400,14 +401,34 @@ public class ZCashClientCaller
 	public synchronized String sendCash(String from, String to, String amount, String memo)
 		throws WalletCallException, IOException, InterruptedException
 	{
+		StringBuilder hexMemo = new StringBuilder();
+		for (byte c : memo.getBytes("UTF-8"))
+		{
+			String hexChar = Integer.toHexString((int)c);
+			if (hexChar.length() < 2)
+			{
+				hexChar = "0" + hashCode();
+			}
+			hexMemo.append(hexChar);
+		}
+		
 		JsonObject toArgument = new JsonObject();
 		toArgument.set("address", to);
-		toArgument.set("memo", memo);
-		toArgument.set("amount", amount);
+		toArgument.set("memo", hexMemo.toString());
+		// The JSON Builder has a problem with double values that have no fractional part
+		// TODO: find a better way to format the amount
+		toArgument.set("amount", "\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF");
+		
+		JsonArray toMany = new JsonArray();
+		toMany.add(toArgument);
 		
 	    CommandExecutor caller = new CommandExecutor(new String[]
 	    {
-		    this.zcashcli.getCanonicalPath(), "z_sendmany", from, toArgument.toString()
+		    this.zcashcli.getCanonicalPath(), "z_sendmany", from,
+		    // This replacement is a hack to make the JSON object have real format 0.00 etc.
+		    // TODO: find a better way to format the amount
+		    toMany.toString().replace("\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"", 
+		    		                  "\"amount\":" + new DecimalFormat("#########.00######").format(Double.valueOf(amount)))
 		});
 
 	    String strResponse = caller.execute();
@@ -451,7 +472,9 @@ public class ZCashClientCaller
 		JsonObject jsonStatus = response.asObject();
 		String status = jsonStatus.getString("status", "ERROR!");
 
-		if (status.equalsIgnoreCase("success") || status.equalsIgnoreCase("error"))
+		if (status.equalsIgnoreCase("success") || 
+			status.equalsIgnoreCase("error") || 
+			status.equalsIgnoreCase("failed"))
 		{
 			return true;
 		} else if (status.equalsIgnoreCase("executing") || status.equalsIgnoreCase("queued"))
@@ -462,6 +485,83 @@ public class ZCashClientCaller
 			throw new WalletCallException("Unexpected status response from wallet: " + strResponse);
 		}
 	}
+	
+	
+	public boolean isCompletedOperationSuccessful(String opID)
+	    throws WalletCallException, IOException, InterruptedException
+	{
+		// TODO: unify methods - code duplication exists
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", opID
+		});
 
-	// TODO: Get OP result after it is complete
+		String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		JsonValue response = null;
+		try
+		{
+		  	response = Json.parse(strResponse);
+		} catch (ParseException pe)
+		{
+		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+		}
+
+		if (!response.isObject())
+		{
+		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
+		}
+
+		JsonObject jsonStatus = response.asObject();
+		String status = jsonStatus.getString("status", "ERROR!");
+
+		if (status.equalsIgnoreCase("success"))
+		{
+			return true;
+		} else if (status.equalsIgnoreCase("error") || status.equalsIgnoreCase("failed"))
+		{
+			return false;
+		} else
+		{
+			throw new WalletCallException("Unexpected final operation status response from wallet: " + strResponse);
+		}
+	}
+
+
+	// May only be caled for already failed operatoins
+	public String getOperationFinalErrorMessage(String opID)
+	    throws WalletCallException, IOException, InterruptedException
+	{
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", opID
+		});
+
+		String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		JsonValue response = null;
+		try
+		{
+		  	response = Json.parse(strResponse);
+		} catch (ParseException pe)
+		{
+		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
+		}
+
+		if (!response.isObject())
+		{
+		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
+		}
+
+		JsonObject jsonError = response.asObject().get("error").asObject();
+		return jsonError.getString("message", "ERROR!");
+	}
 }
