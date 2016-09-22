@@ -72,3 +72,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+### Known issues and limitations
+1. Encrypted wallets are not supported (yet)
+1. The wallet GUI keeps track of transparent (T) addresses created via the GUI in file
+`/home/user/.ZCashSwingWalletUI/CreatedTransparentAddresses.txt` 
+If the wallet file (`wallet.dat`) is manually replaced then file `CreatedTransparentAddresses.txt`
+needs to be manually replaced too (or deleted)! This limitation will be removed in future versions!
+1. The list of transactions does not show all outgoing ones (specifically outgoing Z address transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools (`zcash-cli`).
+1. The wallet GUI may appear to freeze for intervals of 0.5-1 second periodically (this will be fixed soon).
+
+
