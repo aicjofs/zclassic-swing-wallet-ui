@@ -43,7 +43,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -74,7 +73,7 @@ public class ZCashUI
 	public ZCashUI()
 		throws IOException, InterruptedException, WalletCallException
 	{
-		super("ZCash Swing Wallet UI 0.1 (beta)");
+		super("ZCash Swing Wallet UI 0.11 (beta)");
 		Container contentPane = this.getContentPane();
 		
 		installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
@@ -83,7 +82,7 @@ public class ZCashUI
 		// Build content
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.add("Dashboard", dashboard = new DashboardPanel(installationObserver, clientCaller));
-		tabs.add("Adresses", addresses = new AddressesPanel(clientCaller));
+		tabs.add("Own addresses", addresses = new AddressesPanel(clientCaller));
 		tabs.add("Send cash", sendPanel = new SendCashPanel(clientCaller));
 		contentPane.add(tabs);
 		

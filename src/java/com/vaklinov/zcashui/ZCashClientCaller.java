@@ -414,7 +414,11 @@ public class ZCashClientCaller
 		
 		JsonObject toArgument = new JsonObject();
 		toArgument.set("address", to);
-		toArgument.set("memo", hexMemo.toString());
+		if (hexMemo.length() >= 2)
+		{
+			toArgument.set("memo", hexMemo.toString());
+		}
+		
 		// The JSON Builder has a problem with double values that have no fractional part
 		// TODO: find a better way to format the amount
 		toArgument.set("amount", "\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF");
@@ -422,16 +426,21 @@ public class ZCashClientCaller
 		JsonArray toMany = new JsonArray();
 		toMany.add(toArgument);
 		
-	    CommandExecutor caller = new CommandExecutor(new String[]
+		String[] sendCashParameters = new String[]
 	    {
 		    this.zcashcli.getCanonicalPath(), "z_sendmany", from,
 		    // This replacement is a hack to make the JSON object have real format 0.00 etc.
 		    // TODO: find a better way to format the amount
 		    toMany.toString().replace("\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"", 
-		    		                  "\"amount\":" + new DecimalFormat("#########.00######").format(Double.valueOf(amount)))
-		});
-
+		    		                  "\"amount\":" + new DecimalFormat("########0.00######").format(Double.valueOf(amount)))
+		};
+		System.out.println("Sending cash with the following command: " + 
+		                   sendCashParameters[0] + " " + sendCashParameters[1] + " " + 
+		                   sendCashParameters[2] + " " + sendCashParameters[3] + ".");
+		
+	    CommandExecutor caller = new CommandExecutor(sendCashParameters);
 	    String strResponse = caller.execute();
+	    
 		if (strResponse.trim().startsWith("error:"))
 		{
 		  	throw new WalletCallException("Error response from wallet: " + strResponse);
@@ -446,7 +455,7 @@ public class ZCashClientCaller
 	{
 	    CommandExecutor caller = new CommandExecutor(new String[]
 	    {
-		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", opID
+		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", "[\"" + opID + "\"]"
 		});
 
 		String strResponse = caller.execute();
@@ -464,12 +473,12 @@ public class ZCashClientCaller
 		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
 		}
 
-		if (!response.isObject())
+		if (!response.isArray())
 		{
 		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
 		}
 
-		JsonObject jsonStatus = response.asObject();
+		JsonObject jsonStatus = response.asArray().get(0).asObject();
 		String status = jsonStatus.getString("status", "ERROR!");
 
 		if (status.equalsIgnoreCase("success") || 
@@ -493,7 +502,7 @@ public class ZCashClientCaller
 		// TODO: unify methods - code duplication exists
 	    CommandExecutor caller = new CommandExecutor(new String[]
 	    {
-		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", opID
+		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", "[\"" + opID + "\"]"
 		});
 
 		String strResponse = caller.execute();
@@ -511,12 +520,12 @@ public class ZCashClientCaller
 		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
 		}
 
-		if (!response.isObject())
+		if (!response.isArray())
 		{
 		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
 		}
 
-		JsonObject jsonStatus = response.asObject();
+		JsonObject jsonStatus = response.asArray().get(0).asObject();
 		String status = jsonStatus.getString("status", "ERROR!");
 
 		if (status.equalsIgnoreCase("success"))
@@ -538,7 +547,7 @@ public class ZCashClientCaller
 	{
 	    CommandExecutor caller = new CommandExecutor(new String[]
 	    {
-		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", opID
+		    this.zcashcli.getCanonicalPath(), "z_getoperationstatus", "[\"" + opID + "\"]"
 		});
 
 		String strResponse = caller.execute();
@@ -556,12 +565,13 @@ public class ZCashClientCaller
 		  	throw new WalletCallException(strResponse + "\n" + pe.getMessage() + "\n", pe);
 		}
 
-		if (!response.isObject())
+		if (!response.isArray())
 		{
 		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
 		}
 
-		JsonObject jsonError = response.asObject().get("error").asObject();
+		JsonObject jsonStatus = response.asArray().get(0).asObject();
+		JsonObject jsonError = jsonStatus.get("error").asObject();
 		return jsonError.getString("message", "ERROR!");
 	}
 }

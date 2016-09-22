@@ -36,6 +36,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Random;
 
@@ -287,6 +289,32 @@ public class DashboardPanel
 		{
 			allTransactions[i++] = t;
 		}
+		
+		// Sort transactions by date
+		Arrays.sort(allTransactions, new Comparator<String[]>() {
+			public int compare(String[] o1, String[] o2)
+			{
+				Date d1 = new Date(0);
+				if (!o1[3].equals("N/A"))
+				{
+					d1 = new Date(Long.valueOf(o1[3]).longValue() * 1000L);
+				}
+
+				Date d2 = new Date(0);
+				if (!o2[3].equals("N/A"))
+				{
+					d2 = new Date(Long.valueOf(o2[3]).longValue() * 1000L);
+				}
+
+				if (d1.equals(d2))
+				{
+					return 0;
+				} else
+				{
+					return d2.compareTo(d1);
+				}
+			}
+		});
 
 		// Change the direction and date attributes for presentation purposes
 		for (String[] t : allTransactions)
@@ -301,7 +329,7 @@ public class DashboardPanel
 
 			if (!t[3].equals("N/A"))
 			{
-				t[3] = new Date(Long.valueOf(t[3]).longValue() * 1000L).toGMTString();
+				t[3] = new Date(Long.valueOf(t[3]).longValue() * 1000L).toLocaleString();
 			}
 		}
 

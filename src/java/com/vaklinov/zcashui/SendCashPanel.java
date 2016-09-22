@@ -30,6 +30,7 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -76,7 +77,9 @@ public class SendCashPanel
 	private JPanel       operationStatusPanel        = null;
 	private JLabel       operationStatusLabel        = null;
 	private JProgressBar operationStatusProhgressBar = null;
-	
+	private Timer        operationStatusTimer        = null;
+	private String       operationStatusID           = null;
+	private int          operationStatusCounter      = 0;
 
 	public SendCashPanel(ZCashClientCaller clientCaller)
 		throws IOException, InterruptedException, WalletCallException
@@ -163,21 +166,18 @@ public class SendCashPanel
         operationStatusPanel.add(tempPanel);		
 		
 		dividerLabel = new JLabel("   ");
-		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 10));
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 6));
 		operationStatusPanel.add(dividerLabel);
 
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(new JLabel("Progress: "));
         tempPanel.add(operationStatusProhgressBar = new JProgressBar(0, 200));
+        operationStatusProhgressBar.setPreferredSize(new Dimension(250, 17));
         operationStatusPanel.add(tempPanel);		
         
 		dividerLabel = new JLabel("   ");
-		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 3));
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 13));
 		operationStatusPanel.add(dividerLabel);
-
-
-		// TEMPORARY TILL FULLY IMPLEMENTED
-		sendButton.setEnabled(false);
 		
 		// Wire the buttons
 		sendButton.addActionListener(new ActionListener() 
@@ -195,7 +195,7 @@ public class SendCashPanel
 					String errMessage = "";
 					if (ex instanceof WalletCallException)
 					{
-						errMessage = ((WalletCallException)ex).getMessage();
+						errMessage = ((WalletCallException)ex).getMessage().replace(",", ",\n");
 					}
 					
 					JOptionPane.showMessageDialog(
@@ -289,10 +289,76 @@ public class SendCashPanel
 		}
 		
 		// Call the wallet send method
-		String opid = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo);
+		operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo);
 		
+		// Disable controls after send
+		sendButton.setEnabled(false);
+		balanceAddressCombo.setEnabled(false);
+		destinationAddressField.setEnabled(false);
+		destinationAmountField.setEnabled(false);
+		destinationMemoField.setEnabled(false);
 		
-		
+		// Start a timer to update the progress of the operation
+		operationStatusCounter = 0;
+		operationStatusTimer = new Timer(2000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				try
+				{
+					if (clientCaller.isSendingOperationComplete(operationStatusID))
+					{
+						if (clientCaller.isCompletedOperationSuccessful(operationStatusID))
+						{
+							operationStatusLabel.setText(
+								"<html><span style=\"color:green;font-weight:bold\">SUCCESSFUL</span></html>");
+						} else
+						{
+							String errorMessage = clientCaller.getOperationFinalErrorMessage(operationStatusID); 
+							operationStatusLabel.setText(
+								"<html><span style=\"color:red;font-weight:bold\">ERROR: " + errorMessage + "</span></html>");
+
+						}
+						
+						// Restore controls etc.
+						operationStatusCounter = 0;
+						operationStatusID      = null;
+						operationStatusTimer.stop();
+						operationStatusTimer = null;
+						operationStatusProhgressBar.setValue(0);
+						
+						sendButton.setEnabled(true);
+						balanceAddressCombo.setEnabled(true);
+						destinationAddressField.setEnabled(true);
+						destinationAmountField.setEnabled(true);
+						destinationMemoField.setEnabled(true);
+					} else
+					{
+						// Update the progress
+						operationStatusLabel.setText(
+							"<html><span style=\"color:orange;font-weight:bold\">IN PROGRESS</span></html>");
+						operationStatusCounter += 2;
+						int progress = 0;
+						if (operationStatusCounter <= 100)
+						{
+							progress = operationStatusCounter;
+						} else
+						{
+							progress = 100 + (((operationStatusCounter - 100) * 6) / 10);
+						}
+						operationStatusProhgressBar.setValue(progress);
+					}
+					
+					SendCashPanel.this.repaint();
+				} catch (Exception ex)
+				{
+					ex.printStackTrace();
+					// TODO: report error to the user
+				}
+			}
+		});
+		operationStatusTimer.setInitialDelay(0);
+		operationStatusTimer.start();
 	}
 
 		
@@ -310,10 +376,12 @@ public class SendCashPanel
 		}
 		
 		int selectedIndex = balanceAddressCombo.getSelectedIndex();
+		boolean isEnabled = balanceAddressCombo.isEnabled();
 		this.comboBoxParentPanel.remove(balanceAddressCombo);
 		balanceAddressCombo = new JComboBox<>(comboBoxItems);
 		comboBoxParentPanel.add(balanceAddressCombo);
 		balanceAddressCombo.setSelectedIndex(selectedIndex);
+		balanceAddressCombo.setEnabled(isEnabled);
 
 		this.validate();
 		this.repaint();

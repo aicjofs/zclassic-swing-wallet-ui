@@ -8,7 +8,7 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
-**The project is currently a work in progress (unfinihsed) and has not yet reached production quality!**
+**The project is currently a work in progress and has not yet reached production quality!**
 
 ## Building, installing and running the Wallet GUI
 
@@ -46,7 +46,7 @@ For security reasons is is recommended to always build the program from source.
 
    Assuming you have already installed [ZCash](https://z.cash/) in directory `/home/user/zcash/bin` (for example) which contains the command line tools `zcash-cli` and `zcashd` you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it to diretcory `/home/user/zcash/bin` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
    ```
-   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ cp ./build/jars/ZCashSwingWalletUI.jar /home/user/zcash/bin
+   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ cp ./build/jars/ZCashSwingWalletUI.jar /home/user/zcash/bin    
    ```
 
 3. Running the installed ZCash GUI wallet
