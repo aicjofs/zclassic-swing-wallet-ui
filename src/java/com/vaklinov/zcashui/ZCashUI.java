@@ -219,6 +219,7 @@ public class ZCashUI
                 "See the console output for more detailed error information!",
                 "Installation error",
                 JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         } catch (WalletCallException wce) 
         {
             wce.printStackTrace();
@@ -244,6 +245,8 @@ public class ZCashUI
                     "Wallet communication error",
                     JOptionPane.ERROR_MESSAGE);
             }
+            
+            System.exit(2);
         } catch (Exception e) 
         {
             e.printStackTrace();
@@ -253,6 +256,7 @@ public class ZCashUI
                 "See the console output for more detailed error information!",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
+            System.exit(3);
         }     
     }
 }

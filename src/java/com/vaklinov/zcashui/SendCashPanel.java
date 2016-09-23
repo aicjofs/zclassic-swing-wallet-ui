@@ -239,6 +239,26 @@ public class SendCashPanel
 	private void sendCash()
 		throws WalletCallException, IOException, InterruptedException
 	{
+		if (balanceAddressCombo.getItemCount() <= 0)
+		{
+			JOptionPane.showMessageDialog(
+				SendCashPanel.this.getRootPane().getParent(), 
+				"There are no addresses with a positive balance to send\n" +
+				"cash from!", 
+				"No funds available", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		if (this.balanceAddressCombo.getSelectedIndex() <= 0)
+		{
+			JOptionPane.showMessageDialog(
+				SendCashPanel.this.getRootPane().getParent(), 
+				"Please select a source address with a current positive\n" +
+				"balance to send cash from!", 
+				"Please select source address", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
 		String sourceAddress = this.lastAddressBalanceData[this.balanceAddressCombo.getSelectedIndex()][1];
 		String destinationAddress = this.destinationAddressField.getText();
 		String memo = this.destinationMemoField.getText();
@@ -255,7 +275,7 @@ public class SendCashPanel
 			errorMessage = "Source address is invalid; it is too long.";
 		}
 		
-		// TODO: full addres svalidation
+		// TODO: full address validation
 		if ((destinationAddress == null) || (destinationAddress.trim().length() <= 0))
 		{
 			errorMessage = "Destination address is invalid; it is missing.";
