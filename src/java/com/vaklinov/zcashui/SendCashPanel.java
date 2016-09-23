@@ -381,7 +381,10 @@ public class SendCashPanel
 		this.comboBoxParentPanel.remove(balanceAddressCombo);
 		balanceAddressCombo = new JComboBox<>(comboBoxItems);
 		comboBoxParentPanel.add(balanceAddressCombo);
-		balanceAddressCombo.setSelectedIndex(selectedIndex);
+		if (balanceAddressCombo.getItemCount() > 0)
+		{
+			balanceAddressCombo.setSelectedIndex(selectedIndex);
+		}
 		balanceAddressCombo.setEnabled(isEnabled);
 
 		this.validate();
