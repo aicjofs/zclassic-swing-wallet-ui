@@ -63,6 +63,7 @@ public class SendCashPanel
 	extends JPanel
 {
 	private ZCashClientCaller clientCaller;
+	private StatusUpdateErrorReporter errorReporter;
 	
 	private JComboBox  balanceAddressCombo     = null;
 	private JPanel     comboBoxParentPanel     = null;
@@ -81,10 +82,11 @@ public class SendCashPanel
 	private String       operationStatusID           = null;
 	private int          operationStatusCounter      = 0;
 
-	public SendCashPanel(ZCashClientCaller clientCaller)
+	public SendCashPanel(ZCashClientCaller clientCaller,  StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.clientCaller = clientCaller;
+		this.errorReporter = errorReporter;
 
 		// Build content
 		this.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
@@ -184,7 +186,6 @@ public class SendCashPanel
 		{	
 			public void actionPerformed(ActionEvent e) 
 			{
-				// Temporary code
 				try
 			    {
 					SendCashPanel.this.sendCash();
@@ -224,8 +225,8 @@ public class SendCashPanel
 					System.out.println("Update of send cash panel balances done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
-					/* TODO: report exceptions to the user */
 					ex.printStackTrace();
+					SendCashPanel.this.errorReporter.reportError(ex);
 				}
 			}
 		};
@@ -353,7 +354,7 @@ public class SendCashPanel
 				} catch (Exception ex)
 				{
 					ex.printStackTrace();
-					// TODO: report error to the user
+					SendCashPanel.this.errorReporter.reportError(ex);
 				}
 			}
 		});

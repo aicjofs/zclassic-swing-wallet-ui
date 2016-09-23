@@ -117,19 +117,19 @@ public class ZCashInstallationObserver
 					try
 					{
 						info.cpuPercentage = Double.valueOf(token);
-					} catch (NumberFormatException nfe) { };
+					} catch (NumberFormatException nfe) { /* TODO: Log or handle exception */ };
 				} else if (i == 4)
 				{
 					try
 					{
 						info.virtualSizeMB = Double.valueOf(token) / 1000;
-					} catch (NumberFormatException nfe) { };
+					} catch (NumberFormatException nfe) { /* TODO: Log or handle exception */ };
 				} else if (i == 5)
 				{
 					try
 					{
 					    info.residentSizeMB = Double.valueOf(token) / 1000;
-					} catch (NumberFormatException nfe) { };
+					} catch (NumberFormatException nfe) { /* TODO: Log or handle exception */ };
 				} else if (i == 10)
 				{
 					if ((token.equals("zcashd")) || (token.endsWith("/zcashd")))

@@ -65,6 +65,7 @@ public class DashboardPanel
 {
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
+	private StatusUpdateErrorReporter errorReporter;
 
 	private JLabel daemonStatusLabel   = null;
 	private JLabel walletBalanceLabel  = null;
@@ -75,11 +76,13 @@ public class DashboardPanel
 
 
 	public DashboardPanel(ZCashInstallationObserver installationObserver,
-			              ZCashClientCaller clientCaller)
+			              ZCashClientCaller clientCaller,
+			              StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.installationObserver = installationObserver;
 		this.clientCaller = clientCaller;
+		this.errorReporter = errorReporter;
 
 		// Build content
 		JPanel dashboard = this;
@@ -140,8 +143,8 @@ public class DashboardPanel
 					System.out.println("Update of dashboard daemon status done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
-					/* TODO: report exceptions to the user */
 					ex.printStackTrace();
+					DashboardPanel.this.errorReporter.reportError(ex);
 				}
 			}
 		};
@@ -160,8 +163,8 @@ public class DashboardPanel
 					System.out.println("Update  of dashboard wallet status done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
-					/* TODO: report exceptions to the user */
 					ex.printStackTrace();
+					DashboardPanel.this.errorReporter.reportError(ex);
 				}
 			}
 		};
@@ -180,12 +183,12 @@ public class DashboardPanel
 					System.out.println("Update of dashboard wallet transactions table done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
-					/* TODO: report exceptions to the user */
 					ex.printStackTrace();
+					DashboardPanel.this.errorReporter.reportError(ex);
 				}
 			}
 		};
-		new Timer(15000, alTransactions).start();
+		new Timer(25000, alTransactions).start();
 
 		
 	}

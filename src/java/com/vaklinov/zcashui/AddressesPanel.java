@@ -64,16 +64,18 @@ public class AddressesPanel
 	private static final String T_ADDRESSES_FILE = "CreatedTransparentAddresses.txt";
 	
 	private ZCashClientCaller clientCaller;
+	private StatusUpdateErrorReporter errorReporter;
 
 	private JTable addressBalanceTable   = null;
 	private JScrollPane addressBalanceTablePane  = null;
 	
 	String[][] lastAddressBalanceData = null;
 
-	public AddressesPanel(ZCashClientCaller clientCaller)
+	public AddressesPanel(ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.clientCaller = clientCaller;
+		this.errorReporter = errorReporter;
 
 		// Build content
 		JPanel addressesPanel = this;
@@ -111,8 +113,8 @@ public class AddressesPanel
 					AddressesPanel.this.updateWalletAddressBalanceTable();
 				} catch (Exception ex)
 				{
-					/* TODO: report exceptions to the user */
 					ex.printStackTrace();
+					AddressesPanel.this.errorReporter.reportError(ex, false);
 				}
 			}
 		});
@@ -157,8 +159,8 @@ public class AddressesPanel
 			this.updateWalletAddressBalanceTable();
 		} catch (Exception e)
 		{
-			/* TODO: report exceptions to the user */
 			e.printStackTrace();			
+			AddressesPanel.this.errorReporter.reportError(e, false);
 		}
 	}
 	
@@ -203,7 +205,7 @@ public class AddressesPanel
 		String[] zAddresses = clientCaller.getWalletZAddresses();
 		
 		// T Addresses created by GUI only
-		// TODO: What if wallet is changed -stored addresses are invalid?!!
+		// TODO: What if wallet.dat is changed -stored addresses are invalid?!!
 		String[] tAddresses = this.getCreatedAndStoredTAddresses();
 		Set<String> tStoredAddressSet = new HashSet<>();
 		for (String address : tAddresses)

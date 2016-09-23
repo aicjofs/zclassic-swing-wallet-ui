@@ -58,185 +58,201 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionExcep
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
 public class ZCashUI 
-	extends JFrame
+    extends JFrame
 {
-	private ZCashInstallationObserver installationObserver;
-	private ZCashClientCaller clientCaller;
-	
-	private JMenuItem menuItemExit;
-	private JMenuItem menuItemAbout;
+    private ZCashInstallationObserver installationObserver;
+    private ZCashClientCaller clientCaller;
+    private StatusUpdateErrorReporter errorReporter;
+    
+    private JMenuItem menuItemExit;
+    private JMenuItem menuItemAbout;
 
-	private DashboardPanel dashboard;
-	private AddressesPanel addresses;
-	private SendCashPanel  sendPanel;
-	
-	public ZCashUI()
-		throws IOException, InterruptedException, WalletCallException
-	{
-		super("ZCash Swing Wallet UI 0.11 (beta)");
-		Container contentPane = this.getContentPane();
-		
-		installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
-		clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
-		
-		// Build content
-		JTabbedPane tabs = new JTabbedPane();
-		tabs.add("Dashboard", dashboard = new DashboardPanel(installationObserver, clientCaller));
-		tabs.add("Own addresses", addresses = new AddressesPanel(clientCaller));
-		tabs.add("Send cash", sendPanel = new SendCashPanel(clientCaller));
-		contentPane.add(tabs);
-		
-		this.setSize(new Dimension(850, 400));
-		
-		// Build menu
-		JMenuBar mb = new JMenuBar();
-		JMenu file = new JMenu("File");
-		file.add(menuItemAbout = new JMenuItem("About..."));
-		file.addSeparator();
-		file.add(menuItemExit = new JMenuItem("Exit"));
-		mb.add(file);
-		this.setJMenuBar(mb);
-		
-		// Add listeners etc.
-		menuItemExit.addActionListener(
-			new ActionListener() 
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					ZCashUI.this.exit();
-				}
-			}
-		);
-		
-		menuItemAbout.addActionListener(
-			new ActionListener() 
-			{
-				@Override
-				public void actionPerformed(ActionEvent e) 
-				{
-					AboutDialog ad = new AboutDialog(ZCashUI.this);
-					ad.setVisible(true);
-				}
-			}
-		);
-		
-		// Close operation
-		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		this.addWindowListener(new WindowAdapter() 
-		{	
-			@Override
-			public void windowClosing(WindowEvent e) 
-			{
-				ZCashUI.this.exit();				
-			}
-		});
-		
-		// Show initial message
-		SwingUtilities.invokeLater(new Runnable() 
-		{	
-			public void run() 
-			{
-				try
-				{
-					String userDir = OSUtil.getSettingsDirectory();
-					File warningFlagFile = new File(userDir + "/initialInfoShown.flag");
-					if (warningFlagFile.exists())
-					{
-						return;
-					} else
-					{
-						warningFlagFile.createNewFile();
-					}
-					
-				} catch (IOException ioe)
-				{
-					/* TODO: report exceptions to the user */
-					ioe.printStackTrace();
-				}
-				
-				JOptionPane.showMessageDialog(
-					ZCashUI.this.getRootPane().getParent(), 
-					"The ZCash wallet GUI should be considered experimental at this time " +
-					"since there has \nnot been much feedback from the community. It is not " +
-					"advisable to use the GUI wallet \nto send large amounts of cash! " +
-					"Be sure to read the list of issues and limitations at \nthis page: " +
-					"https://github.com/vaklinov/zcash-swing-wallet-ui\n\n" +
-					"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
-					"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
-					"FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
-					"AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
-					"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
-					"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
-					"THE SOFTWARE.\n\n" +
-					"(This message will be shown only once)", 
-					"Disclaimer", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-	}
-	
-	private void exit()
-	{
-		System.out.println("Exiting ...");
-		ZCashUI.this.setVisible(false);
-		ZCashUI.this.dispose();
-		System.exit(0);
-	}
-	
-	public static void main(String argv[])
-		throws IOException
-	{		
-		try 
-		{
-			System.out.println("Starting ZCash Swing Wallet ...");
-			System.out.println("Current directory: " + new File(".").getCanonicalPath());
-			//System.out.println("System properties: " + System.getProperties().toString().replace(",", "\n"));
-						
-			////////////////////////////////////////////////////////////
-		    for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels()) 
-		    {
-		    	System.out.println("Available look and feel: " + ui.getName() + " " + ui.getClassName());
-		        if (ui.getName().equals("Nimbus")) 
-		        {
-		            UIManager.setLookAndFeel(ui.getClassName());
-		            break;
-		        }
-		    }
-		    
-		    /////////////////////////////////////////////////////
-			ZCashUI ui = new ZCashUI();
-			ui.setVisible(true);
+    private DashboardPanel dashboard;
+    private AddressesPanel addresses;
+    private SendCashPanel  sendPanel;
+    
+    public ZCashUI()
+        throws IOException, InterruptedException, WalletCallException
+    {
+        super("ZCash Swing Wallet UI 0.12 (beta)");
+        Container contentPane = this.getContentPane();
+        
+        errorReporter = new StatusUpdateErrorReporter(this);
+        installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
+        clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
+        
+        // Build content
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.add("Dashboard", dashboard = new DashboardPanel(installationObserver, clientCaller, errorReporter));
+        tabs.add("Own addresses", addresses = new AddressesPanel(clientCaller, errorReporter));
+        tabs.add("Send cash", sendPanel = new SendCashPanel(clientCaller, errorReporter));
+        contentPane.add(tabs);
+        
+        this.setSize(new Dimension(850, 400));
+        
+        // Build menu
+        JMenuBar mb = new JMenuBar();
+        JMenu file = new JMenu("File");
+        file.add(menuItemAbout = new JMenuItem("About..."));
+        file.addSeparator();
+        file.add(menuItemExit = new JMenuItem("Exit"));
+        mb.add(file);
+        this.setJMenuBar(mb);
+        
+        // Add listeners etc.
+        menuItemExit.addActionListener(
+            new ActionListener() 
+            {
+                @Override
+                public void actionPerformed(ActionEvent e) 
+                {
+                    ZCashUI.this.exit();
+                }
+            }
+        );
+        
+        menuItemAbout.addActionListener(
+            new ActionListener() 
+            {
+                @Override
+                public void actionPerformed(ActionEvent e) 
+                {
+                    AboutDialog ad = new AboutDialog(ZCashUI.this);
+                    ad.setVisible(true);
+                }
+            }
+        );
+        
+        // Close operation
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() 
+        {    
+            @Override
+            public void windowClosing(WindowEvent e) 
+            {
+                ZCashUI.this.exit();                
+            }
+        });
+        
+        // Show initial message
+        SwingUtilities.invokeLater(new Runnable() 
+        {    
+            public void run() 
+            {
+                try
+                {
+                    String userDir = OSUtil.getSettingsDirectory();
+                    File warningFlagFile = new File(userDir + "/initialInfoShown.flag");
+                    if (warningFlagFile.exists())
+                    {
+                        return;
+                    } else
+                    {
+                        warningFlagFile.createNewFile();
+                    }
+                    
+                } catch (IOException ioe)
+                {
+                    /* TODO: report exceptions to the user */
+                    ioe.printStackTrace();
+                }
+                
+                JOptionPane.showMessageDialog(
+                    ZCashUI.this.getRootPane().getParent(), 
+                    "The ZCash wallet GUI should be considered experimental at this time " +
+                    "since there has \nnot been much feedback from the community. It is not " +
+                    "advisable to use the GUI wallet \nto send large amounts of cash! " +
+                    "Be sure to read the list of issues and limitations at \nthis page: " +
+                    "https://github.com/vaklinov/zcash-swing-wallet-ui\n\n" +
+                    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
+                    "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
+                    "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
+                    "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
+                    "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
+                    "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
+                    "THE SOFTWARE.\n\n" +
+                    "(This message will be shown only once)", 
+                    "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+    }
+    
+    private void exit()
+    {
+        System.out.println("Exiting ...");
+        ZCashUI.this.setVisible(false);
+        ZCashUI.this.dispose();
+        System.exit(0);
+    }
+    
+    public static void main(String argv[])
+        throws IOException
+    {        
+        try 
+        {
+            System.out.println("Starting ZCash Swing Wallet ...");
+            System.out.println("Current directory: " + new File(".").getCanonicalPath());
+            //System.out.println("System properties: " + System.getProperties().toString().replace(",", "\n"));
+                        
+            ////////////////////////////////////////////////////////////
+            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels()) 
+            {
+                System.out.println("Available look and feel: " + ui.getName() + " " + ui.getClassName());
+                if (ui.getName().equals("Nimbus")) 
+                {
+                    UIManager.setLookAndFeel(ui.getClassName());
+                    break;
+                }
+            }
+            
+            /////////////////////////////////////////////////////
+            ZCashUI ui = new ZCashUI();
+            ui.setVisible(true);
 
-		} catch (InstallationDetectionException ide) 
-		{
-			ide.printStackTrace();
-			JOptionPane.showMessageDialog(
-				null,
-				"This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
-				ide.getMessage() + "\n" +
-				"See the console output for more detailed error information!",
-				"Installation error",
-				JOptionPane.ERROR_MESSAGE);
-		} catch (WalletCallException wce) 
-		{
-			wce.printStackTrace();
-			JOptionPane.showMessageDialog(
-				null,
-				"There was a problem communicating with the ZCash daemon/wallet. \n" +
-				"Please ensure that zcashd is started. Error message is: \n" +		
-				 wce.getMessage() +
-				"See the console output for more detailed error information!",
-				"Wallet communication error",
-				JOptionPane.ERROR_MESSAGE);
-		} catch (Exception e) 
-		{
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(
-				null,
-				"A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
-				"See the console output for more detailed error information!",
-				"Error",
-				JOptionPane.ERROR_MESSAGE);
-		} 	
-	}
+        } catch (InstallationDetectionException ide) 
+        {
+            ide.printStackTrace();
+            JOptionPane.showMessageDialog(
+                null,
+                "This program was started in directory: " + OSUtil.getProgramDirectory() + "\n" +
+                ide.getMessage() + "\n" +
+                "See the console output for more detailed error information!",
+                "Installation error",
+                JOptionPane.ERROR_MESSAGE);
+        } catch (WalletCallException wce) 
+        {
+            wce.printStackTrace();
+            
+            // TODO: also - {"code":-28,"message":"Loading wallet..."}
+            if (wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks") != -1)
+            {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "It appars that zcashd has been started but is not ready to accept wallet\n" +
+                        "connections. It is still verifying the blcokchain blocks. Please try to start\n" +
+                        "the GUI wallet later...",
+                        "Wallet communication error",
+                        JOptionPane.ERROR_MESSAGE);                
+            } else
+            {
+                JOptionPane.showMessageDialog(
+                    null,
+                    "There was a problem communicating with the ZCash daemon/wallet. \n" +
+                    "Please ensure that zcashd is started. Error message is: \n" +        
+                     wce.getMessage() +
+                    "See the console output for more detailed error information!",
+                    "Wallet communication error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) 
+        {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                null,
+                "A general unexpected critical error has occurred: \n" + e.getMessage() + "\n" +
+                "See the console output for more detailed error information!",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }     
+    }
 }
