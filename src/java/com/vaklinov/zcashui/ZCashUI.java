@@ -74,7 +74,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.12 (beta)");
+        super("ZCash Swing Wallet UI 0.13 (beta)");
         Container contentPane = this.getContentPane();
         
         errorReporter = new StatusUpdateErrorReporter(this);
@@ -88,7 +88,7 @@ public class ZCashUI
         tabs.add("Send cash", sendPanel = new SendCashPanel(clientCaller, errorReporter));
         contentPane.add(tabs);
         
-        this.setSize(new Dimension(850, 400));
+        this.setSize(new Dimension(870, 400));
         
         // Build menu
         JMenuBar mb = new JMenuBar();
@@ -161,9 +161,10 @@ public class ZCashUI
                     ZCashUI.this.getRootPane().getParent(), 
                     "The ZCash wallet GUI should be considered experimental at this time " +
                     "since there has \nnot been much feedback from the community. It is not " +
-                    "advisable to use the GUI wallet \nto send large amounts of cash! " +
-                    "Be sure to read the list of issues and limitations at \nthis page: " +
-                    "https://github.com/vaklinov/zcash-swing-wallet-ui\n\n" +
+                    "advisable to use the GUI wallet \nto send large amounts of cash! Use of " +
+                    "this software is at your own risk! Be sure to\n" +
+                    "read the list of known issues and limitations at this page: \n" +
+                    "https://github.com/vaklinov/zcash-swing-wallet-ui#known-issues-and-limitations\n\n" +
                     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
                     "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
                     "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
@@ -225,6 +226,7 @@ public class ZCashUI
             wce.printStackTrace();
             
             // TODO: also - {"code":-28,"message":"Loading wallet..."}
+            //              {"code":-28,"message":"Rescanning..."}
             if (wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks") != -1)
             {
                 JOptionPane.showMessageDialog(

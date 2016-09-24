@@ -69,10 +69,11 @@ public class DashboardPanel
 
 	private JLabel daemonStatusLabel   = null;
 	private JLabel walletBalanceLabel  = null;
+	
 	private JTable transactionsTable   = null;
 	private JScrollPane transactionsTablePane  = null;
-
 	private String[][] lastTransactionsData = null;
+	private DataGatheringThread<String[][]> transactionGatheringThread = null;
 
 
 	public DashboardPanel(ZCashInstallationObserver installationObserver,
@@ -91,17 +92,14 @@ public class DashboardPanel
 
 		// Upper panel with wallet balance
 		JPanel balanceStatusPanel = new JPanel();
+		// TODO: maybe use border layout to have balances to the left
 		balanceStatusPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
 		balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
 		JLabel zcLabel = new JLabel("ZCash Wallet    ");
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 35));
 		balanceStatusPanel.add(zcLabel);
-		
-//		JLabel arrowLabel = new JLabel("\u2193");
-//		arrowLabel.setFont(new Font("Helvetica", Font.BOLD, 35));
-//		balanceStatusPanel.add(arrowLabel);
-		
+				
 		JLabel transactionHeadingLabel = new JLabel("<html><br/>Transactions:</html>");
 		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 20));
 		balanceStatusPanel.add(transactionHeadingLabel);
@@ -170,17 +168,30 @@ public class DashboardPanel
 		};
 		new Timer(8000, alWalletBalance).start();
 
+		// Thread and timer to update the transactions table
+		this.transactionGatheringThread = new DataGatheringThread<String[][]>(
+			new DataGatheringThread.DataGatherer<String[][]>() 
+			{
+				public String[][] gatherData()
+					throws Exception
+				{
+					long start = System.currentTimeMillis();
+					String[][] data =  DashboardPanel.this.getTransactionsDataFromWallet();
+					long end = System.currentTimeMillis();
+					System.out.println("Gathering of dashboard wallet transactions table data done in " + (end - start) + "ms." );
+					
+					return data;
+				}
+			}, 
+			this.errorReporter, 25000);
+		
 		ActionListener alTransactions = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				try
-				{
-					long start = System.currentTimeMillis();
+				{					
 					DashboardPanel.this.updateWalletTransactionsTable();
-					long end = System.currentTimeMillis();
-					
-					System.out.println("Update of dashboard wallet transactions table done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
 					ex.printStackTrace();
@@ -188,7 +199,7 @@ public class DashboardPanel
 				}
 			}
 		};
-		new Timer(25000, alTransactions).start();
+		new Timer(5000, alTransactions).start();
 
 		
 	}
@@ -239,7 +250,13 @@ public class DashboardPanel
 	private void updateWalletTransactionsTable()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String[][] newTransactionsData = this.getTransactionsDataFromWallet();
+		String[][] newTransactionsData = this.transactionGatheringThread.getLastData();
+		
+		// May be null - not even gathered once
+		if (newTransactionsData == null)
+		{
+			return;
+		}
 
 		if (lastTransactionsData.length != newTransactionsData.length)
 		{

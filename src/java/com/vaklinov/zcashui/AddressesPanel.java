@@ -110,6 +110,7 @@ public class AddressesPanel
 			{
 				try
 				{
+					// TODO: Hourglass cursor + dummy progress bar ...
 					AddressesPanel.this.updateWalletAddressBalanceTable();
 				} catch (Exception ex)
 				{

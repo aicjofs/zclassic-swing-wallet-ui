@@ -69,6 +69,7 @@ public class SendCashPanel
 	private JPanel     comboBoxParentPanel     = null;
 	private String[][] lastAddressBalanceData  = null;
 	private String[]   comboBoxItems           = null;
+	private DataGatheringThread<String[][]> addressBalanceGatheringThread = null;
 	
 	private JTextField destinationAddressField = null;
 	private JTextField destinationAmountField  = null;
@@ -210,7 +211,23 @@ public class SendCashPanel
 			}
 		});
 
-		// Update the balances via timer
+		// Update the balances via timer and data gathering thread
+		this.addressBalanceGatheringThread = new DataGatheringThread<String[][]>(
+			new DataGatheringThread.DataGatherer<String[][]>() 
+			{
+				public String[][] gatherData()
+					throws Exception
+				{
+					long start = System.currentTimeMillis();
+					String[][] data = SendCashPanel.this.getAddressPositiveBalanceDataFromWallet();
+					long end = System.currentTimeMillis();
+					System.out.println("Gathering of address/balance table data done in " + (end - start) + "ms." );
+					
+					return data;
+				}
+			}, 
+			this.errorReporter, 25000, true);
+		
 		ActionListener alBalancesUpdater = new ActionListener() 
 		{
 			@Override
@@ -218,11 +235,8 @@ public class SendCashPanel
 			{
 				try
 				{
-					long start = System.currentTimeMillis();
+					// TODO: if the user has opened the combo box - this closes it (maybe fix)
 					SendCashPanel.this.updateWalletAddressPositiveBalanceComboBox();
-					long end = System.currentTimeMillis();
-					
-					System.out.println("Update of send cash panel balances done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
 					ex.printStackTrace();
@@ -230,8 +244,8 @@ public class SendCashPanel
 				}
 			}
 		};
-		Timer timerBalancesUpdater = new Timer(30000, alBalancesUpdater);
-		timerBalancesUpdater.setInitialDelay(1000);
+		Timer timerBalancesUpdater = new Timer(15000, alBalancesUpdater);
+		timerBalancesUpdater.setInitialDelay(3000);
 		timerBalancesUpdater.start();
 	}
 	
@@ -249,7 +263,7 @@ public class SendCashPanel
 			return;
 		}
 		
-		if (this.balanceAddressCombo.getSelectedIndex() <= 0)
+		if (this.balanceAddressCombo.getSelectedIndex() < 0)
 		{
 			JOptionPane.showMessageDialog(
 				SendCashPanel.this.getRootPane().getParent(), 
@@ -327,6 +341,7 @@ public class SendCashPanel
 			{
 				try
 				{
+					// TODO: Handle errors in case of restarted server while wallet is sending ...
 					if (clientCaller.isSendingOperationComplete(operationStatusID))
 					{
 						if (clientCaller.isCompletedOperationSuccessful(operationStatusID))
@@ -386,12 +401,20 @@ public class SendCashPanel
 	private void updateWalletAddressPositiveBalanceComboBox()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String[][] newAddressBalanceData = this.getAddressPositiveBalanceDataFromWallet();
+		String[][] newAddressBalanceData = this.addressBalanceGatheringThread.getLastData();
+		
+		// The data may be null if nothing is yet obtained
+		if (newAddressBalanceData == null)
+		{
+			return;
+		}
+		
 		lastAddressBalanceData = newAddressBalanceData;
 		
 		comboBoxItems = new String[lastAddressBalanceData.length];
 		for (int i = 0; i < lastAddressBalanceData.length; i++)
 		{
+			// TODO: do numeric formatting or elese we may get 1.1111E-5
 			comboBoxItems[i] = Double.valueOf(lastAddressBalanceData[i][0]).toString().toString()  + 
 					           " - " + lastAddressBalanceData[i][1];
 		}
