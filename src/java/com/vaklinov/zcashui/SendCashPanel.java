@@ -36,6 +36,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -414,9 +415,10 @@ public class SendCashPanel
 		comboBoxItems = new String[lastAddressBalanceData.length];
 		for (int i = 0; i < lastAddressBalanceData.length; i++)
 		{
-			// TODO: do numeric formatting or elese we may get 1.1111E-5
-			comboBoxItems[i] = Double.valueOf(lastAddressBalanceData[i][0]).toString().toString()  + 
-					           " - " + lastAddressBalanceData[i][1];
+			// Do numeric formatting or else we may get 1.1111E-5
+			comboBoxItems[i] = 
+				new DecimalFormat("########0.00######").format(Double.valueOf(lastAddressBalanceData[i][0]))  + 
+				" - " + lastAddressBalanceData[i][1];
 		}
 		
 		int selectedIndex = balanceAddressCombo.getSelectedIndex();
@@ -424,7 +426,9 @@ public class SendCashPanel
 		this.comboBoxParentPanel.remove(balanceAddressCombo);
 		balanceAddressCombo = new JComboBox<>(comboBoxItems);
 		comboBoxParentPanel.add(balanceAddressCombo);
-		if (balanceAddressCombo.getItemCount() > 0)
+		if ((balanceAddressCombo.getItemCount() > 0) &&
+			(selectedIndex >= 0) &&
+			(balanceAddressCombo.getItemCount() > selectedIndex))
 		{
 			balanceAddressCombo.setSelectedIndex(selectedIndex);
 		}

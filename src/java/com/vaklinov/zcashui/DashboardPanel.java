@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -68,7 +67,10 @@ public class DashboardPanel
 	private StatusUpdateErrorReporter errorReporter;
 
 	private JLabel daemonStatusLabel   = null;
+	private DataGatheringThread<DaemonInfo> daemonInfoGatheringThread = null;
+	
 	private JLabel walletBalanceLabel  = null;
+	private DataGatheringThread<WalletBalance> walletBalanceGatheringThread = null;
 	
 	private JTable transactionsTable   = null;
 	private JScrollPane transactionsTablePane  = null;
@@ -92,24 +94,19 @@ public class DashboardPanel
 
 		// Upper panel with wallet balance
 		JPanel balanceStatusPanel = new JPanel();
-		// TODO: maybe use border layout to have balances to the left
-		balanceStatusPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+		// Use border layout to have balances to the left
+		balanceStatusPanel.setLayout(new BorderLayout(3, 3)); 
 		balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
-		JLabel zcLabel = new JLabel("ZCash Wallet    ");
+		JLabel zcLabel = new JLabel("ZCash Wallet       ");
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 35));
-		balanceStatusPanel.add(zcLabel);
+		balanceStatusPanel.add(zcLabel, BorderLayout.WEST);
 				
 		JLabel transactionHeadingLabel = new JLabel("<html><br/>Transactions:</html>");
 		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 20));
-		balanceStatusPanel.add(transactionHeadingLabel);
-				
-		JLabel divider = new JLabel("      ");
-		divider.setFont(new Font("Helvetica", Font.BOLD, 35));
-		balanceStatusPanel.add(divider);
-		
-		balanceStatusPanel.add(walletBalanceLabel = new JLabel());
-		this.updateWalletStatusLabel();
+		balanceStatusPanel.add(transactionHeadingLabel, BorderLayout.CENTER);
+						
+		balanceStatusPanel.add(walletBalanceLabel = new JLabel(), BorderLayout.EAST);
 		
 		dashboard.add(balanceStatusPanel, BorderLayout.NORTH);
 
@@ -124,21 +121,32 @@ public class DashboardPanel
 		installationStatusPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
 		installationStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		installationStatusPanel.add(daemonStatusLabel = new JLabel());
-		this.updateDaemonStatusLabel();
 		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
 
-		// Start timers to refresh the status
+		// Thread and timer to update the daemon status
+		this.daemonInfoGatheringThread = new DataGatheringThread<DaemonInfo>(
+			new DataGatheringThread.DataGatherer<DaemonInfo>() 
+			{
+				public DaemonInfo gatherData()
+					throws Exception
+				{
+					long start = System.currentTimeMillis();
+					DaemonInfo daemonInfo = DashboardPanel.this.installationObserver.getDaemonInfo();
+					long end = System.currentTimeMillis();
+					System.out.println("Gathering of dashboard daemon status data done in " + (end - start) + "ms." );
+					
+					return daemonInfo;
+				}
+			}, 
+			this.errorReporter, 2000, true);
+		
 		ActionListener alDeamonStatus = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				try
 				{
-					long start = System.currentTimeMillis();
 					DashboardPanel.this.updateDaemonStatusLabel();
-					long end = System.currentTimeMillis();
-					
-					System.out.println("Update of dashboard daemon status done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
 					ex.printStackTrace();
@@ -146,7 +154,24 @@ public class DashboardPanel
 				}
 			}
 		};
-		new Timer(2000, alDeamonStatus).start();
+		new Timer(1000, alDeamonStatus).start();
+		
+		// Thread and timer to update the wallet balance
+		this.walletBalanceGatheringThread = new DataGatheringThread<WalletBalance>(
+			new DataGatheringThread.DataGatherer<WalletBalance>() 
+			{
+				public WalletBalance gatherData()
+					throws Exception
+				{
+					long start = System.currentTimeMillis();
+					WalletBalance balance = DashboardPanel.this.clientCaller.getWalletInfo();
+					long end = System.currentTimeMillis();
+					System.out.println("Gathering of dashboard wallet balance data done in " + (end - start) + "ms." );
+					
+					return balance;
+				}
+			}, 
+			this.errorReporter, 8000, true);
 		
 		ActionListener alWalletBalance = new ActionListener() {
 			@Override
@@ -154,11 +179,7 @@ public class DashboardPanel
 			{
 				try
 				{
-					long start = System.currentTimeMillis();
 					DashboardPanel.this.updateWalletStatusLabel();
-					long end = System.currentTimeMillis();
-					
-					System.out.println("Update  of dashboard wallet status done in " + (end - start) + "ms." );
 				} catch (Exception ex)
 				{
 					ex.printStackTrace();
@@ -166,7 +187,9 @@ public class DashboardPanel
 				}
 			}
 		};
-		new Timer(8000, alWalletBalance).start();
+		Timer walletBalanceTimer =  new Timer(2000, alWalletBalance);
+		walletBalanceTimer.setInitialDelay(1000);
+		walletBalanceTimer.start();
 
 		// Thread and timer to update the transactions table
 		this.transactionGatheringThread = new DataGatheringThread<String[][]>(
@@ -208,7 +231,14 @@ public class DashboardPanel
 	private void updateDaemonStatusLabel()
 		throws IOException, InterruptedException
 	{
-		DaemonInfo daemonInfo = installationObserver.getDaemonInfo();
+		DaemonInfo daemonInfo = this.daemonInfoGatheringThread.getLastData();
+		
+		// It is possible there has been no gathering initially
+		if (daemonInfo == null)
+		{
+			return;
+		}
+		
 		String daemonStatus = "<span style=\"color:green;font-weight:bold\">RUNNING</span>";
 		if (daemonInfo.status != DAEMON_STATUS.RUNNING)
 		{
@@ -237,12 +267,18 @@ public class DashboardPanel
 	private void updateWalletStatusLabel()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		WalletBalance balance = this.clientCaller.getWalletInfo();
+		WalletBalance balance = this.walletBalanceGatheringThread.getLastData();
+		
+		// It is possible there has been no gathering initially
+		if (balance == null)
+		{
+			return;
+		}
 
 		String text =
-			"<html><span style=\"\">Transparent balance: " + balance.transparentBalance + "</span><br/> " +
-			"Private ( Z ) balance: <span style=\"font-weight:bold\">" + balance.privateBalance + "</span><br/> " +
-			"Total ( Z+T ) balance: <span style=\"font-weight:bold\">" + balance.totalBalance + "</span> <br/>  </html>";
+			"<html><span style=\"\">Transparent balance: " + balance.transparentBalance + " ZEC </span><br/> " +
+			"Private ( Z ) balance: <span style=\"font-weight:bold\">" + balance.privateBalance + " ZEC </span><br/> " +
+			"Total ( Z+T ) balance: <span style=\"font-weight:bold\">" + balance.totalBalance + " ZEC </span> <br/>  </html>";
 		this.walletBalanceLabel.setText(text);
 	}
 
