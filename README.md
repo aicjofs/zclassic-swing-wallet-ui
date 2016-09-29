@@ -1,6 +1,6 @@
-# zcash-swing-wallet-ui
+# [ZCash](https://z.cash/) Desktop GUI Wallet
 
-## Graphical user interface (GUI) wrapper for the [ZCash](https://z.cash/) command line tools
+## Graphical user interface wrapper for the [ZCash](https://z.cash/) command line tools
 
 This program is intended to make it easy to work with the ZCash client tools
 by providing a Graphical User Interface (GUI) that acts as a wrapper and 
@@ -12,7 +12,10 @@ presents the information in a user-friendly manner.
 
 ## Building, installing and running the Wallet GUI
 
-For security reasons is is recommended to always build the program from source. 
+**For security reasons it is recommended to always build the program from GitHub **
+**[source](https://github.com/vaklinov/zcash-swing-wallet-ui/archive/master.zip) . **
+**The details of how to build it are described below (easy to follow).**
+**There is no plan as of now to distribute binary versions due to the risk of hacking attacks!**
 
 1. Operating system and tools
 
@@ -83,7 +86,9 @@ in the wallet. However the wallet total balance does not immediately reflect thi
 1. Limitation: The wallet GUI keeps track of transparent (T) addresses created via the GUI in file
 `/home/user/.ZCashSwingWalletUI/CreatedTransparentAddresses.txt` 
 If the wallet file (`wallet.dat`) is manually replaced then file `CreatedTransparentAddresses.txt`
-needs to be manually replaced too (or deleted)! This limitation will be removed in future versions!
+needs to be manually replaced too (or deleted)! 
+**If this is not done, the wallet may show transparent (T) addresses that do not belong to it!** 
+This limitation will be removed in future versions!
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools (`zcash-cli`).
 1. Issue: The wallet GUI may appear to freeze for intervals of 0.5-2 second periodically (this will be fixed soon).
 
