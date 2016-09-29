@@ -12,8 +12,8 @@ presents the information in a user-friendly manner.
 
 ## Building, installing and running the Wallet GUI
 
-**For security reasons it is recommended to always build the program from GitHub **
-**[source](https://github.com/vaklinov/zcash-swing-wallet-ui/archive/master.zip) . **
+**For security reasons it is recommended to always build the program from GitHub**
+**[source](https://github.com/vaklinov/zcash-swing-wallet-ui/archive/master.zip).**
 **The details of how to build it are described below (easy to follow).**
 **There is no plan as of now to distribute binary versions due to the risk of hacking attacks!**
 
