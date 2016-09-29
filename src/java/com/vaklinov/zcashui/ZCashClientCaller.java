@@ -31,6 +31,7 @@ package com.vaklinov.zcashui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,6 +58,14 @@ public class ZCashClientCaller
 		public double privateBalance;
 		public double totalBalance;
 	}
+	
+	
+	public static class NetworkAndBlockchainInfo
+	{
+		public int numConnections;
+		public Date lastBlockDate;
+	}
+	
 
 	public static class WalletCallException
 		extends Exception
@@ -72,8 +81,11 @@ public class ZCashClientCaller
 		}
 	}
 
+	
+	// ZCash client program
 	private File zcashcli;
 
+	
 	public ZCashClientCaller(String installDir)
 		throws IOException
 	{
@@ -434,9 +446,6 @@ public class ZCashClientCaller
 		    toMany.toString().replace("\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"", 
 		    		                  "\"amount\":" + new DecimalFormat("########0.00######").format(Double.valueOf(amount)))
 		};
-		System.out.println("Sending cash with the following command: " + 
-		                   sendCashParameters[0] + " " + sendCashParameters[1] + " " + 
-		                   sendCashParameters[2] + " " + sendCashParameters[3] + ".");
 		
 	    CommandExecutor caller = new CommandExecutor(sendCashParameters);
 	    String strResponse = caller.execute();
@@ -445,6 +454,11 @@ public class ZCashClientCaller
 		{
 		  	throw new WalletCallException("Error response from wallet: " + strResponse);
 		}
+		
+		System.out.println("Sending cash with the following command: " + 
+                sendCashParameters[0] + " " + sendCashParameters[1] + " " + 
+                sendCashParameters[2] + " " + sendCashParameters[3] + "." + 
+                " Got result: [" + strResponse + "]");
 
 		return strResponse.trim();
 	}
@@ -480,6 +494,8 @@ public class ZCashClientCaller
 
 		JsonObject jsonStatus = response.asArray().get(0).asObject();
 		String status = jsonStatus.getString("status", "ERROR!");
+		
+		System.out.println("Operation " + opID + " status is " + response + "."); 
 
 		if (status.equalsIgnoreCase("success") || 
 			status.equalsIgnoreCase("error") || 
@@ -527,6 +543,8 @@ public class ZCashClientCaller
 
 		JsonObject jsonStatus = response.asArray().get(0).asObject();
 		String status = jsonStatus.getString("status", "ERROR!");
+		
+		System.out.println("Operation " + opID + " status is " + response + "."); 
 
 		if (status.equalsIgnoreCase("success"))
 		{
@@ -569,9 +587,36 @@ public class ZCashClientCaller
 		{
 		   	throw new WalletCallException("Unexpected response from wallet: " + strResponse);
 		}
+		
+		System.out.println("Operation " + opID + " status is " + response + "."); 
 
 		JsonObject jsonStatus = response.asArray().get(0).asObject();
 		JsonObject jsonError = jsonStatus.get("error").asObject();
 		return jsonError.getString("message", "ERROR!");
 	}
+	
+	
+	public NetworkAndBlockchainInfo getNetworkAndBlockchainInfo()
+		throws WalletCallException, IOException, InterruptedException
+	{
+		NetworkAndBlockchainInfo info = new NetworkAndBlockchainInfo();
+		
+	    CommandExecutor caller = new CommandExecutor(new String[]
+	    {
+		    this.zcashcli.getCanonicalPath(), "getconnectioncount"
+		});
+
+		String strResponse = caller.execute();
+		if (strResponse.trim().startsWith("error:"))
+		{
+		  	throw new WalletCallException("Error response from wallet: " + strResponse);
+		}
+
+		// TODO: Blockchain information
+		
+		info.numConnections = Integer.valueOf(strResponse.trim());
+		
+		return info;
+	}
+	
 }

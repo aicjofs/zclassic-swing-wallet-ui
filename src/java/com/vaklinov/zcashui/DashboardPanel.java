@@ -30,7 +30,6 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,6 +47,7 @@ import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
+import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletBalance;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.ZCashInstallationObserver.DAEMON_STATUS;
@@ -65,7 +65,11 @@ public class DashboardPanel
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
+	
+	private JLabel networkAndBlockchainLabel = null;
+	private DataGatheringThread<NetworkAndBlockchainInfo> netInfoGatheringThread = null;
 
+	private String OSInfo              = null;
 	private JLabel daemonStatusLabel   = null;
 	private DataGatheringThread<DaemonInfo> daemonInfoGatheringThread = null;
 	
@@ -118,9 +122,10 @@ public class DashboardPanel
 
 		// Lower panel with installation status
 		JPanel installationStatusPanel = new JPanel();
-		installationStatusPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 3, 3));
+		installationStatusPanel.setLayout(new BorderLayout(3, 3));
 		installationStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		installationStatusPanel.add(daemonStatusLabel = new JLabel());
+		installationStatusPanel.add(daemonStatusLabel = new JLabel(), BorderLayout.WEST);
+		installationStatusPanel.add(networkAndBlockchainLabel = new JLabel(), BorderLayout.EAST);		
 		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
 
 		// Thread and timer to update the daemon status
@@ -224,7 +229,40 @@ public class DashboardPanel
 		};
 		new Timer(5000, alTransactions).start();
 
+		// Thread and timer to update the network and blockchain details
+		this.netInfoGatheringThread = new DataGatheringThread<NetworkAndBlockchainInfo>(
+			new DataGatheringThread.DataGatherer<NetworkAndBlockchainInfo>() 
+			{
+				public NetworkAndBlockchainInfo gatherData()
+					throws Exception
+				{
+					long start = System.currentTimeMillis();
+					NetworkAndBlockchainInfo data =  DashboardPanel.this.clientCaller.getNetworkAndBlockchainInfo();
+					long end = System.currentTimeMillis();
+					System.out.println("Gathering of network and blockchain info data done in " + (end - start) + "ms." );
+					
+					return data;
+				}
+			}, 
+			this.errorReporter, 10000, true);
 		
+		ActionListener alNetAndBlockchain = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					DashboardPanel.this.updateNetworkAndBlockchainLabel();
+				} catch (Exception ex)
+				{
+					ex.printStackTrace();
+					DashboardPanel.this.errorReporter.reportError(ex);
+				}
+			}
+		};
+		Timer netAndBlockchainTimer = new Timer(5000, alNetAndBlockchain);
+		netAndBlockchainTimer.setInitialDelay(1000);
+		netAndBlockchainTimer.start();
 	}
 
 
@@ -248,21 +286,44 @@ public class DashboardPanel
 		if (daemonInfo.status == DAEMON_STATUS.RUNNING)
 		{
 			runtimeInfo = "Resident: " + daemonInfo.residentSizeMB + " MB, Virtual: " + daemonInfo.virtualSizeMB +
-					      " MB, CPU Usage: " + daemonInfo.cpuPercentage + "%";
+					      " MB, CPU: " + daemonInfo.cpuPercentage + "%";
 		}
 
 		File walletDAT = new File(OSUtil.getBlockchainDirectory() + "/wallet.dat");
 		
+		if (this.OSInfo == null)
+		{
+			this.OSInfo = OSUtil.getSystemInfo();
+		}
+		
 		String text =
-			"<html>Daemon status: " + daemonStatus + ",   " + runtimeInfo + " <br/>" +
+			"<html><span style=\"font-weight:bold\">zcashd</span> status: " + 
+		    daemonStatus + ",  " + runtimeInfo + " <br/>" +
 			"Installation directory: " + OSUtil.getProgramDirectory() + " <br/> " +
 	        "Blockchain directory: " + OSUtil.getBlockchainDirectory() + ", " +
 			"Wallet file: " + walletDAT.getCanonicalPath() + " <br/> " +
-		    "System: " + OSUtil.getSystemInfo() +
-			"</html>";
+		    "System: " + this.OSInfo + "</html>";
 		this.daemonStatusLabel.setText(text);
 	}
 
+	
+	private void updateNetworkAndBlockchainLabel()
+		throws IOException, InterruptedException
+	{
+		NetworkAndBlockchainInfo info = this.netInfoGatheringThread.getLastData();
+			
+		// It is possible there has been no gathering initially
+		if (info == null)
+		{
+			return;
+		}
+				
+		String text =
+			"<html> <br/> <br/> <br/> " +
+			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections </span>";
+		this.networkAndBlockchainLabel.setText(text);
+	}
+	
 
 	private void updateWalletStatusLabel()
 		throws WalletCallException, IOException, InterruptedException
