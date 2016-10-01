@@ -74,7 +74,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.13 (beta)");
+        super("ZCash Swing Wallet UI 0.14 (beta)");
         Container contentPane = this.getContentPane();
         
         errorReporter = new StatusUpdateErrorReporter(this);

@@ -90,6 +90,5 @@ needs to be manually replaced too (or deleted)!
 **If this is not done, the wallet may show transparent (T) addresses that do not belong to it!** 
 This limitation will be removed in future versions!
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools (`zcash-cli`).
-1. Issue: The wallet GUI may appear to freeze for intervals of 0.5-2 second periodically (this will be fixed soon).
-
-
+1. Limitation: The CPU percentage shown to be taken by zcashd is the average for the entire lifetime of the process. This is not very
+useful. This will be improved in future versions.

@@ -319,7 +319,9 @@ public class DashboardPanel
 		}
 				
 		String text =
-			"<html> <br/> <br/> <br/> " +
+			"<html> " +
+		    "Blockchain synchronized until: &#x20;<br/> <span style=\"font-weight:bold\">" + 
+			info.lastBlockDate.toLocaleString() + "  </span> <br/> <br/>" + 
 			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections </span>";
 		this.networkAndBlockchainLabel.setText(text);
 	}
