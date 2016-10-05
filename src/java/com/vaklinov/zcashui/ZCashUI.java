@@ -74,7 +74,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.14 (beta)");
+        super("ZCash Swing Wallet UI 0.15 (beta)");
         Container contentPane = this.getContentPane();
         
         errorReporter = new StatusUpdateErrorReporter(this);
@@ -225,15 +225,15 @@ public class ZCashUI
         {
             wce.printStackTrace();
             
-            // TODO: also - {"code":-28,"message":"Loading wallet..."}
-            //              {"code":-28,"message":"Rescanning..."}
-            if (wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks") != -1)
+            if ((wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks") != -1)  ||
+            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Rescanning")       != -1)  ||
+            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Loading wallet")   != -1))
             {
                 JOptionPane.showMessageDialog(
                         null,
-                        "It appars that zcashd has been started but is not ready to accept wallet\n" +
-                        "connections. It is still verifying the blcokchain blocks. Please try to start\n" +
-                        "the GUI wallet later...",
+                        "It appears that zcashd has been started but is not ready to accept wallet\n" +
+                        "connections. It is still loading the wallet and blockcgain. Please try to \n" +
+                        "start the GUI wallet later...",
                         "Wallet communication error",
                         JOptionPane.ERROR_MESSAGE);                
             } else

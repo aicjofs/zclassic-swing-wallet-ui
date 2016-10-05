@@ -205,7 +205,7 @@ public class SendCashPanel
 							SendCashPanel.this.getRootPane().getParent(), 
 							"An unexpected error occurred when sending cash!\n" + 
 							"Please ensure that the ZCaash daemon is running and\n" +
-							"parameters are correct. You may again later...\n" +
+							"parameters are correct. You may try again later...\n" +
 							errMessage, 
 							"Error in sending cash", JOptionPane.ERROR_MESSAGE);
 				}

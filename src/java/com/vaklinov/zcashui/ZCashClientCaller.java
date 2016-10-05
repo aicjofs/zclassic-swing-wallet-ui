@@ -363,6 +363,79 @@ public class ZCashClientCaller
 	}
 	
 	
+	public void lockWallet()
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String response = this.executeCommandAndGetSingleStringResponse("walletlock");
+		
+		// Response is expected to be empty
+		if (response.trim().length() > 0)
+		{
+			throw new WalletCallException("Unexpected response from wallet: " + response);
+		}
+	}
+	
+	
+	// Unlocks the wallet for 5 minutes - meant to be followed shortly by lock!
+	// TODO: tests with a password containing spaces
+	public void unlockWallet(String password)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String response = this.executeCommandAndGetSingleStringResponse(
+			"walletpassphrase", password, "300");
+		
+		// Response is expected to be empty
+		if (response.trim().length() > 0)
+		{
+			throw new WalletCallException("Unexpected response from wallet: " + response);
+		}
+	}
+	
+	
+    // Wallet locks check - an unencrypted wallet will give an error
+	// zcash-cli walletlock
+	// error: {"code":-15,"message":"Error: running with an unencrypted wallet, but walletlock was called."}
+	public boolean isWalletEncrypted()
+   		throws WalletCallException, IOException, InterruptedException	
+    {
+		String[] params = new String[] { this.zcashcli.getCanonicalPath(), "walletlock" };
+		CommandExecutor caller = new CommandExecutor(params);
+    	String strResult = caller.execute();
+    
+    	 if (strResult.trim().length() <= 0)
+    	 {
+    		 // If it could be locked with no result - obviously encrypted
+    		 return true;
+    	 } else if (strResult.trim().startsWith("error:"))
+    	 {
+    		 // Expecting an error of an unencrypted wallet
+    		 String jsonPart = strResult.substring(strResult.indexOf("{"));
+   			 JsonValue response = null;
+   			 try
+   			 {
+   			   	response = Json.parse(jsonPart);
+   		 	 } catch (ParseException pe)
+   			 {
+   			   	 throw new WalletCallException(jsonPart + "\n" + pe.getMessage() + "\n", pe);
+   			 }
+
+   			 JsonObject respObject = response.asObject(); 
+   			 if ((respObject.getDouble("code", -1) == -15) &&
+   				 (respObject.getString("message", "ERR").indexOf("unencrypted wallet") != -1))
+   			 {
+   				 // Obviously unencrupted
+   				 return false;
+   			 } else
+   			 {
+   	    		 throw new WalletCallException("Unexpected response from wallet: " + strResult); 
+   			 }
+    	 } else
+    	 {
+    		 throw new WalletCallException("Unexpected response from wallet: " + strResult);
+    	 }
+    }
+	
+	
 	private JsonObject executeCommandAndGetJsonObject(String command1, String command2)
 		throws WalletCallException, IOException, InterruptedException	
 	{
@@ -422,10 +495,25 @@ public class ZCashClientCaller
 	private String executeCommandAndGetSingleStringResponse(String command1, String command2)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String[] params = (command2 != null) ?
-		   new String[] { this.zcashcli.getCanonicalPath(), command1, command2 } : 
-		   new String[] { this.zcashcli.getCanonicalPath(), command1 };
-		
+		return this.executeCommandAndGetSingleStringResponse(command1, command2, null);
+	}
+
+	
+	private String executeCommandAndGetSingleStringResponse(String command1, String command2, String command3)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String[] params;
+		if (command3 != null)
+		{
+			params = new String[] { this.zcashcli.getCanonicalPath(), command1, command2, command3 };
+		} else if (command2 != null)
+		{
+			params = new String[] { this.zcashcli.getCanonicalPath(), command1, command2 };
+		} else
+		{
+			params = new String[] { this.zcashcli.getCanonicalPath(), command1 };
+		}
+				
 	    CommandExecutor caller = new CommandExecutor(params);
 
 		String strResponse = caller.execute();

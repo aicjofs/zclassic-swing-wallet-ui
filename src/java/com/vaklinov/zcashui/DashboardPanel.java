@@ -35,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
@@ -69,6 +70,8 @@ public class DashboardPanel
 	private JLabel networkAndBlockchainLabel = null;
 	private DataGatheringThread<NetworkAndBlockchainInfo> netInfoGatheringThread = null;
 
+	private Boolean walletIsEncrypted  = null;
+	
 	private String OSInfo              = null;
 	private JLabel daemonStatusLabel   = null;
 	private DataGatheringThread<DaemonInfo> daemonInfoGatheringThread = null;
@@ -171,6 +174,13 @@ public class DashboardPanel
 					long start = System.currentTimeMillis();
 					WalletBalance balance = DashboardPanel.this.clientCaller.getWalletInfo();
 					long end = System.currentTimeMillis();
+					
+					// TODO: move this call to a dedicated one-off gathering thread - this is the wrong place
+					if (DashboardPanel.this.walletIsEncrypted == null)
+					{
+					    DashboardPanel.this.walletIsEncrypted = DashboardPanel.this.clientCaller.isWalletEncrypted();
+					}
+					
 					System.out.println("Gathering of dashboard wallet balance data done in " + (end - start) + "ms." );
 					
 					return balance;
@@ -267,7 +277,7 @@ public class DashboardPanel
 
 
 	private void updateDaemonStatusLabel()
-		throws IOException, InterruptedException
+		throws IOException, InterruptedException, WalletCallException
 	{
 		DaemonInfo daemonInfo = this.daemonInfoGatheringThread.getLastData();
 		
@@ -289,6 +299,7 @@ public class DashboardPanel
 					      " MB, CPU: " + daemonInfo.cpuPercentage + "%";
 		}
 
+		// TODO: what if directory is non-default...
 		File walletDAT = new File(OSUtil.getBlockchainDirectory() + "/wallet.dat");
 		
 		if (this.OSInfo == null)
@@ -296,12 +307,19 @@ public class DashboardPanel
 			this.OSInfo = OSUtil.getSystemInfo();
 		}
 		
+		String walletEncryption = "";
+		// TODO: Use a one-off data gathering thread
+		if (this.walletIsEncrypted != null)
+		{
+			walletEncryption = " (" + (this.walletIsEncrypted ? "" : "not ") + "encrypted)";
+		}
+		
 		String text =
 			"<html><span style=\"font-weight:bold\">zcashd</span> status: " + 
 		    daemonStatus + ",  " + runtimeInfo + " <br/>" +
 			"Installation directory: " + OSUtil.getProgramDirectory() + " <br/> " +
-	        "Blockchain directory: " + OSUtil.getBlockchainDirectory() + ", " +
-			"Wallet file: " + walletDAT.getCanonicalPath() + " <br/> " +
+	        "Blockchain: " + OSUtil.getBlockchainDirectory() + ", " +
+			"Wallet: " + walletDAT.getCanonicalPath() + walletEncryption + " <br/> " +
 		    "System: " + this.OSInfo + "</html>";
 		this.daemonStatusLabel.setText(text);
 	}
@@ -337,11 +355,18 @@ public class DashboardPanel
 		{
 			return;
 		}
+		
+		// Format double numbers - else sometimes we get exponential notation 1E-4 ZEC
+		DecimalFormat df = new DecimalFormat("########0.00######");
+		
+		String transparentBalance = df.format(balance.transparentBalance);
+		String privateBalance = df.format(balance.privateBalance);
+		String totalBalance = df.format(balance.totalBalance);
 
 		String text =
-			"<html><span style=\"\">Transparent balance: " + balance.transparentBalance + " ZEC </span><br/> " +
-			"Private ( Z ) balance: <span style=\"font-weight:bold\">" + balance.privateBalance + " ZEC </span><br/> " +
-			"Total ( Z+T ) balance: <span style=\"font-weight:bold\">" + balance.totalBalance + " ZEC </span> <br/>  </html>";
+			"<html><span style=\"\">Transparent balance: " + transparentBalance + " ZEC </span><br/> " +
+			"Private ( Z ) balance: <span style=\"font-weight:bold\">" + privateBalance + " ZEC </span><br/> " +
+			"Total ( Z+T ) balance: <span style=\"font-weight:bold\">" + totalBalance + " ZEC </span> <br/>  </html>";
 		this.walletBalanceLabel.setText(text);
 	}
 
