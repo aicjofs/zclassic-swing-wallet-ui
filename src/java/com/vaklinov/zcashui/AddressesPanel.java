@@ -43,6 +43,7 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -144,7 +145,28 @@ public class AddressesPanel
 	{
 		try
 		{
+			// Check for encrypted wallet
+			final boolean bEncryptedWallet = this.clientCaller.isWalletEncrypted();
+			if (bEncryptedWallet && isZAddress)
+			{
+				PasswordDialog pd = new PasswordDialog((JFrame)(this.getRootPane().getParent()));
+				pd.setVisible(true);
+				
+				if (!pd.isOKPressed())
+				{
+					return;
+				}
+				
+				this.clientCaller.unlockWallet(pd.getPassword());
+			}
+
 			String address = this.clientCaller.createNewAddress(isZAddress);
+			
+			// Lock the wallet again 
+			if (bEncryptedWallet && isZAddress)
+			{
+				this.clientCaller.lockWallet();
+			}
 			
 			if (!isZAddress)
 			{

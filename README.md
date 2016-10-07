@@ -80,7 +80,6 @@ SOFTWARE.
 
 1. Issue: the GUI wallet does not work correctly if zcashd is started with a custom data directory, like:
 `zcashd -datadir=/home/data/whatever` This will be fixed in later versions.
-1. Limitation: Encrypted wallets are not supported (yet) in the GUI
 1. Issue: When sending cash from an address without spending its entire available balance, the remaining balance remains 
 in the wallet. However the wallet total balance does not immediately reflect this and it **appears for a few minutes**
 **that the entire address balance has been sent/spent!** This behavior comes from the underlying ZCash implementation.

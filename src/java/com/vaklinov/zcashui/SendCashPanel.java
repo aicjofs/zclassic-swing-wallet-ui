@@ -44,6 +44,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -324,9 +325,24 @@ public class SendCashPanel
 			return;
 		}
 		
+		// Check for encrypted wallet
+		final boolean bEncryptedWallet = this.clientCaller.isWalletEncrypted();
+		if (bEncryptedWallet)
+		{
+			PasswordDialog pd = new PasswordDialog((JFrame)(SendCashPanel.this.getRootPane().getParent()));
+			pd.setVisible(true);
+			
+			if (!pd.isOKPressed())
+			{
+				return;
+			}
+			
+			this.clientCaller.unlockWallet(pd.getPassword());
+		}
+		
 		// Call the wallet send method
 		operationStatusID = this.clientCaller.sendCash(sourceAddress, destinationAddress, amount, memo);
-		
+				
 		// Disable controls after send
 		sendButton.setEnabled(false);
 		balanceAddressCombo.setEnabled(false);
@@ -355,6 +371,12 @@ public class SendCashPanel
 							operationStatusLabel.setText(
 								"<html><span style=\"color:red;font-weight:bold\">ERROR: " + errorMessage + "</span></html>");
 
+						}
+						
+						// Lock the wallet again 
+						if (bEncryptedWallet)
+						{
+							SendCashPanel.this.clientCaller.lockWallet();
 						}
 						
 						// Restore controls etc.
