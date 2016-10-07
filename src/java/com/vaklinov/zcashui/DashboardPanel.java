@@ -30,6 +30,7 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,6 +42,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -105,9 +107,16 @@ public class DashboardPanel
 		balanceStatusPanel.setLayout(new BorderLayout(3, 3)); 
 		balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
-		JLabel zcLabel = new JLabel("ZCash Wallet       ");
-		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 35));
-		balanceStatusPanel.add(zcLabel, BorderLayout.WEST);
+		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		JLabel logoLabel = new JLabel(new ImageIcon(
+			this.getClass().getClassLoader().getResource("images/zcash-logo-square3.png")));
+		tempPanel.add(logoLabel);
+		tempPanel.add(new JLabel(" "));
+		JLabel zcLabel = new JLabel("Cash Wallet       ");
+		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 37));
+		tempPanel.add(zcLabel);
+		tempPanel.setToolTipText("Powered by Zcash");
+		balanceStatusPanel.add(tempPanel, BorderLayout.WEST);
 				
 		JLabel transactionHeadingLabel = new JLabel("<html><br/>Transactions:</html>");
 		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 20));
@@ -404,8 +413,8 @@ public class DashboardPanel
         JTable table = new JTable(rowData, columnNames);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(160);
-        table.getColumnModel().getColumn(1).setPreferredWidth(120);
-        table.getColumnModel().getColumn(2).setPreferredWidth(180);
+        table.getColumnModel().getColumn(1).setPreferredWidth(140);
+        table.getColumnModel().getColumn(2).setPreferredWidth(200);
         table.getColumnModel().getColumn(3).setPreferredWidth(390);
         table.getColumnModel().getColumn(4).setPreferredWidth(800);
 
@@ -469,6 +478,9 @@ public class DashboardPanel
 			} else if (t[1].equals("send"))
 			{
 				t[1] = "\u21E6 OUT";
+			} else if (t[1].equals("generate"))
+			{
+				t[1] = "\u2692\u2699 MINED";
 			};
 
 			if (!t[3].equals("N/A"))

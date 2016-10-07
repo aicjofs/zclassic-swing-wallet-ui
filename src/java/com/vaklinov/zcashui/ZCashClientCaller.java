@@ -132,7 +132,7 @@ public class ZCashClientCaller
 	    	strTransactions[i][1] = trans.getString("category", "ERROR!");
 	    	strTransactions[i][2] = trans.get("amount").toString();
 	    	strTransactions[i][3] = trans.get("time").toString();
-	    	strTransactions[i][4] = trans.getString("address", "ERROR!");
+	    	strTransactions[i][4] = trans.getString("address", "<NOT LISTED BY WALLET!>");
 	    }
 
 	    return strTransactions;
