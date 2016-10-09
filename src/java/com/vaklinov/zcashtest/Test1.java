@@ -2,6 +2,7 @@ package com.vaklinov.zcashtest;
 
 import java.io.Writer;
 import java.text.DecimalFormat;
+import java.util.Date;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -23,6 +24,11 @@ public class Test1
 		System.out.println(toMany.toString().
 		    replace("\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"", 
                     "\"amount\":" + new DecimalFormat("#########.00######").format(Double.valueOf("1234567890000"))));
+		
+		
+		final Date startDate = new Date("04 Oct 2016 00:00:00 GMT");
+		System.out.println(startDate.toString());
+		
 	}
 
 }

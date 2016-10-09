@@ -334,7 +334,7 @@ public class ZCashClientCaller
 	}
 
 
-	// May only be caled for already failed operatoins
+	// May only be called for already failed operations
 	public String getOperationFinalErrorMessage(String opID)
 	    throws WalletCallException, IOException, InterruptedException
 	{
@@ -434,6 +434,27 @@ public class ZCashClientCaller
     		 throw new WalletCallException("Unexpected response from wallet: " + strResult);
     	 }
     }
+	
+	
+	
+	/*
+	 *  TODO: ENCRYPTION ...
+	 * 
+	 * 
+	 * ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ ./zcashd --daemon
+Zcash server starting
+ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ ./zcash-cli encryptwallet "1234"
+wallet encrypted; Bitcoin server stopping, restart to run with encrypted wallet. The keypool has been flushed, you need to make a new backup.
+ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ ./zcashd --daemon
+Zcash server starting
+ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ ./zcash-cli encryptwallet "1234"
+error: {"code":-15,"message":"Error: running with an encrypted wallet, but encryptwallet was called."}
+ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ 
+
+	 * 
+	 * 
+	 * 
+	 */
 	
 	
 	private JsonObject executeCommandAndGetJsonObject(String command1, String command2)

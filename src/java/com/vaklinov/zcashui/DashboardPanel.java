@@ -324,12 +324,15 @@ public class DashboardPanel
 		}
 		
 		String text =
-			"<html><span style=\"font-weight:bold\">zcashd</span> status: " + 
+			"<html><span style=\"font-weight:bold;color:#303030\">zcashd</span> status: " + 
 		    daemonStatus + ",  " + runtimeInfo + " <br/>" +
-			"Installation directory: " + OSUtil.getProgramDirectory() + " <br/> " +
-	        "Blockchain: " + OSUtil.getBlockchainDirectory() + ", " +
-			"Wallet: " + walletDAT.getCanonicalPath() + walletEncryption + " <br/> " +
-		    "System: " + this.OSInfo + "</html>";
+			"Wallet: <span style=\"font-weight:bold;color:#303030\">" + walletDAT.getCanonicalPath() + "</span>" + 
+			walletEncryption + " <br/> " +
+			"<span style=\"font-size:3px\"><br/></span>" +
+			"<span style=\"font-size:8px\">" +
+			"Installation: " + OSUtil.getProgramDirectory() + ", " +
+	        "Blockchain: " + OSUtil.getBlockchainDirectory() + " <br/> " +
+		    "System: " + this.OSInfo + " </span> </html>";
 		this.daemonStatusLabel.setText(text);
 	}
 
@@ -344,11 +347,38 @@ public class DashboardPanel
 		{
 			return;
 		}
+		
+		// TODO: Get the start date right after ZCash release - from first block!!!
+		final Date startDate = new Date("04 Oct 2016 22:00:00 GMT");
+		final Date nowDate = new Date(System.currentTimeMillis());
+		
+		long fullTime = nowDate.getTime() - startDate.getTime();
+		long remainingTime = nowDate.getTime() - info.lastBlockDate.getTime();
+		
+		String percentage = "100";
+		if (remainingTime > 20 * 60 * 1000) // After 10 min we report 100% anyway
+		{
+			double dPercentage = 100d - (((double)remainingTime / (double) fullTime) * 100d);
+			if (dPercentage < 0)
+			{
+				dPercentage = 0;
+			}
+			DecimalFormat df = new DecimalFormat("##0.##");
+			percentage = df.format(dPercentage);
+		}
+		
+		// Just in case early on the call returns some junk date
+		if (info.lastBlockDate.before(startDate))
+		{
+			// TODO: write log that we fix minimum date!
+			info.lastBlockDate = startDate;
+		}
 				
 		String text =
 			"<html> " +
-		    "Blockchain synchronized until: &#x20;<br/> <span style=\"font-weight:bold\">" + 
-			info.lastBlockDate.toLocaleString() + "  </span> <br/> <br/>" + 
+		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + percentage + "% </span> <br/>" +
+			"Up to: <span style=\"font-size:8px;font-weight:bold\">" + 
+		    info.lastBlockDate.toLocaleString() + "</span>  <br/> <br/>" + 
 			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections </span>";
 		this.networkAndBlockchainLabel.setText(text);
 	}
