@@ -8,8 +8,6 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
-**The project is currently a work in progress and has not yet reached production quality!**
-
 ## Building, installing and running the Wallet GUI
 
 **For security reasons it is recommended to always build the program from GitHub**
@@ -19,11 +17,22 @@ presents the information in a user-friendly manner.
 
 1. Operating system and tools
 
-   As of September 2016 this program is only intended to work on Linux (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK7 or later) and Ant. If using Ubuntu Linux they may be installed via command: 
+   As of October 2016 (ZCash v1.0.0-beta2) this program is only intended to work on Linux 
+   (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run 
+   the Wallet GUI are Git, Java (JDK7 or later) and Ant. If using Ubuntu Linux, they may be 
+   installed via command: 
    ```
    user@ubuntu:~/build-dir$ sudo apt-get install git default-jdk ant
    ``` 
-   If you have another Linux distribution, please check your relevant documentation on installing Git, JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line before proceeding with build.
+   For RedHat/CentOS/Fedora-type Linux systems the command is (like):
+   ```
+   user@centos:~/build-dir$ sudo yum install java-1.8.0-openjdk git ant 
+   ```
+   The name of the JDK package (`java-1.8.0-openjdk`) may very depending on the Linux system, so you need to
+   check it if name `java-1.8.0-openjdk` is not accepted.
+   If you have some other Linux distribution, please check your relevant documentation on installing Git, 
+   JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line 
+   before proceeding with build.
 
 2. Building from source code
 
@@ -39,26 +48,36 @@ presents the information in a user-friendly manner.
    ```
    user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ ant -buildfile ./src/build/build.xml
    ```
-   This takes a few seconds and when it finishes, it builds a JAR file `./build/jars/ZCashSwingWalletUI.jar`. You need to make this file executable:
+   This takes a few seconds and when it finishes, it builds a JAR file `./build/jars/ZCashSwingWalletUI.jar`. 
+   You need to make this file executable:
    ```
    user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ chmod u+x ./build/jars/ZCashSwingWalletUI.jar
    ```
-   At this point the build process is finished the built GUI wallet program is the JAR file `./build/jars/ZCashSwingWalletUI.jar`
+   At this point the build process is finished the built GUI wallet program is the JAR 
+   file `./build/jars/ZCashSwingWalletUI.jar`
 
 3. Installing the built ZCash GUI wallet
 
-   Assuming you have already installed [ZCash](https://z.cash/) in directory `/home/user/zcash/bin` (for example) which contains the command line tools `zcash-cli` and `zcashd` you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it to diretcory `/home/user/zcash/bin` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
+   Assuming you have already installed [ZCash](https://z.cash/) in directory `/home/user/zcash/src` (for 
+   example - this is the typical install dir. for ZCash v1.0.0-beta2) which contains the command line tools `zcash-cli` 
+   and `zcashd` you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it 
+   to diretcory `/home/user/zcash/src` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
    ```
-   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ cp ./build/jars/ZCashSwingWalletUI.jar /home/user/zcash/bin    
+   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ cp ./build/jars/ZCashSwingWalletUI.jar /home/user/zcash/src    
    ```
 
 3. Running the installed ZCash GUI wallet
 
-   Before running the GUI you need to start zcashd (e.g. `zcashd --daemon`). The wallet GUI is a Java program packaged as an executable JAR file. It may be run from command line or started from another GUI tool (e.g. file manager). Assuming you have already installed [ZCash](https://z.cash/) and the GUI Wallet `ZCashSwingWalletUI.jar` in directory `/home/user/zcash/bin` one way to run it from comamnd line is:
+   Before running the GUI you need to start zcashd (e.g. `zcashd --daemon`). The wallet GUI is a Java program packaged 
+   as an executable JAR file. It may be run from command line or started from another GUI tool (e.g. file manager). 
+   Assuming you have already installed [ZCash](https://z.cash/) and the GUI Wallet `ZCashSwingWalletUI.jar` in 
+   directory `/home/user/zcash/src` one way to run it from command line is:
    ```
-   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ java -jar /home/user/zcash/bin/ZCashSwingWalletUI.jar
+   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ java -jar /home/user/zcash/src/ZCashSwingWalletUI.jar
    ```
-   If you are using Ubuntu (or similar ;) Linux you may instead just use the file manager and right-click on the `ZCashSwingWalletUI.jar` file and choose the option "Open with OpenJDK 8 Runtime". This will start the ZCash GUI wallet.
+   If you are using Ubuntu (or similar ;) Linux you may instead just use the file manager and 
+   right-click on the `ZCashSwingWalletUI.jar` file and choose the option "Open with OpenJDK 8 Runtime". 
+   This will start the ZCash GUI wallet.
 
 
 
@@ -90,6 +109,9 @@ If the wallet file (`wallet.dat`) is manually replaced then file `CreatedTranspa
 needs to be manually replaced too (or deleted)! 
 **If this is not done, the wallet may show transparent (T) addresses that do not belong to it!** 
 This limitation will be removed in future versions!
-1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools (`zcash-cli`).
-1. Limitation: The CPU percentage shown to be taken by zcashd is the average for the entire lifetime of the process. This is not very
-useful. This will be improved in future versions.
+1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
+transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools 
+(`zcash-cli`). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
+for the ZCash developers. 
+1. Limitation: The CPU percentage shown to be taken by zcashd is the average for the entire lifetime of the process. 
+This is not very useful. This will be improved in future versions.
