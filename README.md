@@ -28,8 +28,8 @@ presents the information in a user-friendly manner.
    ```
    user@centos:~/build-dir$ sudo yum install java-1.8.0-openjdk git ant 
    ```
-   The name of the JDK package (`java-1.8.0-openjdk`) may very depending on the Linux system, so you need to
-   check it if name `java-1.8.0-openjdk` is not accepted.
+   The name of the JDK package (`java-1.8.0-openjdk`) may vary depending on the Linux system, so you need to
+   check it, if name `java-1.8.0-openjdk` is not accepted.
    If you have some other Linux distribution, please check your relevant documentation on installing Git, 
    JDK and Ant. The commands `git`, `java`, `javac` and `ant` need to be startable from command line 
    before proceeding with build.
