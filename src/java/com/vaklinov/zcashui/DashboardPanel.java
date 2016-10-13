@@ -37,9 +37,11 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -85,6 +87,10 @@ public class DashboardPanel
 	private JScrollPane transactionsTablePane  = null;
 	private String[][] lastTransactionsData = null;
 	private DataGatheringThread<String[][]> transactionGatheringThread = null;
+	
+	// Lists of threads and timers that may be stopped if necessary
+	private List<Timer> timers                   = null;
+	private List<DataGatheringThread<?>> threads = null;	
 
 
 	public DashboardPanel(ZCashInstallationObserver installationObserver,
@@ -95,6 +101,9 @@ public class DashboardPanel
 		this.installationObserver = installationObserver;
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
+		
+		this.timers = new ArrayList<Timer>();
+		this.threads = new ArrayList<DataGatheringThread<?>>();
 
 		// Build content
 		JPanel dashboard = this;
@@ -115,7 +124,7 @@ public class DashboardPanel
 		JLabel zcLabel = new JLabel("Cash Wallet       ");
 		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 37));
 		tempPanel.add(zcLabel);
-		tempPanel.setToolTipText("Powered by Zcash");
+		tempPanel.setToolTipText("Powered by ZCash");
 		balanceStatusPanel.add(tempPanel, BorderLayout.WEST);
 				
 		JLabel transactionHeadingLabel = new JLabel("<html><br/>Transactions:</html>");
@@ -156,6 +165,7 @@ public class DashboardPanel
 				}
 			}, 
 			this.errorReporter, 2000, true);
+		this.threads.add(this.daemonInfoGatheringThread);
 		
 		ActionListener alDeamonStatus = new ActionListener() {
 			@Override
@@ -171,7 +181,9 @@ public class DashboardPanel
 				}
 			}
 		};
-		new Timer(1000, alDeamonStatus).start();
+		Timer t = new Timer(1000, alDeamonStatus);
+		t.start();
+		this.timers.add(t);
 		
 		// Thread and timer to update the wallet balance
 		this.walletBalanceGatheringThread = new DataGatheringThread<WalletBalance>(
@@ -185,6 +197,7 @@ public class DashboardPanel
 					long end = System.currentTimeMillis();
 					
 					// TODO: move this call to a dedicated one-off gathering thread - this is the wrong place
+					// it works but a better design is needed.
 					if (DashboardPanel.this.walletIsEncrypted == null)
 					{
 					    DashboardPanel.this.walletIsEncrypted = DashboardPanel.this.clientCaller.isWalletEncrypted();
@@ -196,6 +209,7 @@ public class DashboardPanel
 				}
 			}, 
 			this.errorReporter, 8000, true);
+		this.threads.add(this.walletBalanceGatheringThread);
 		
 		ActionListener alWalletBalance = new ActionListener() {
 			@Override
@@ -214,6 +228,7 @@ public class DashboardPanel
 		Timer walletBalanceTimer =  new Timer(2000, alWalletBalance);
 		walletBalanceTimer.setInitialDelay(1000);
 		walletBalanceTimer.start();
+		this.timers.add(walletBalanceTimer);
 
 		// Thread and timer to update the transactions table
 		this.transactionGatheringThread = new DataGatheringThread<String[][]>(
@@ -231,6 +246,7 @@ public class DashboardPanel
 				}
 			}, 
 			this.errorReporter, 25000);
+		this.threads.add(this.transactionGatheringThread);
 		
 		ActionListener alTransactions = new ActionListener() {
 			@Override
@@ -246,7 +262,9 @@ public class DashboardPanel
 				}
 			}
 		};
-		new Timer(5000, alTransactions).start();
+		t = new Timer(5000, alTransactions);
+		t.start();
+		this.timers.add(t);
 
 		// Thread and timer to update the network and blockchain details
 		this.netInfoGatheringThread = new DataGatheringThread<NetworkAndBlockchainInfo>(
@@ -264,6 +282,7 @@ public class DashboardPanel
 				}
 			}, 
 			this.errorReporter, 10000, true);
+		this.threads.add(this.netInfoGatheringThread);
 		
 		ActionListener alNetAndBlockchain = new ActionListener() {
 			@Override
@@ -282,8 +301,23 @@ public class DashboardPanel
 		Timer netAndBlockchainTimer = new Timer(5000, alNetAndBlockchain);
 		netAndBlockchainTimer.setInitialDelay(1000);
 		netAndBlockchainTimer.start();
+		this.timers.add(netAndBlockchainTimer);
 	}
 
+	
+	public void stopThreadsAndTimers()
+	{
+		for (Timer t : this.timers)
+		{
+			t.stop();
+		}
+		
+		for (DataGatheringThread<?> t : this.threads)
+		{
+			t.setSuspended(true);
+		}
+	}
+	
 
 	private void updateDaemonStatusLabel()
 		throws IOException, InterruptedException, WalletCallException
@@ -308,7 +342,7 @@ public class DashboardPanel
 					      " MB, CPU: " + daemonInfo.cpuPercentage + "%";
 		}
 
-		// TODO: what if directory is non-default...
+		// TODO: what if ZCash directory is non-default...
 		File walletDAT = new File(OSUtil.getBlockchainDirectory() + "/wallet.dat");
 		
 		if (this.OSInfo == null)
@@ -317,7 +351,7 @@ public class DashboardPanel
 		}
 		
 		String walletEncryption = "";
-		// TODO: Use a one-off data gathering thread
+		// TODO: Use a one-off data gathering thread - better design
 		if (this.walletIsEncrypted != null)
 		{
 			walletEncryption = " (" + (this.walletIsEncrypted ? "" : "not ") + "encrypted)";
@@ -370,7 +404,7 @@ public class DashboardPanel
 		// Just in case early on the call returns some junk date
 		if (info.lastBlockDate.before(startDate))
 		{
-			// TODO: write log that we fix minimum date!
+			// TODO: write log that we fix minimum date! - this condition should not occur
 			info.lastBlockDate = startDate;
 		}
 				
@@ -421,7 +455,12 @@ public class DashboardPanel
 			return;
 		}
 
-		if (lastTransactionsData.length != newTransactionsData.length)
+		// TODO: improve the comparison for when transactions have been updated
+		if ((lastTransactionsData.length != newTransactionsData.length)       ||
+			((newTransactionsData.length > 0) && 
+			 (!lastTransactionsData[0][3].equals(newTransactionsData[0][3]))) ||
+			((newTransactionsData.length > 0) && 
+		     (!lastTransactionsData[0][4].equals(newTransactionsData[0][4]))))
 		{
 			this.remove(transactionsTablePane);
 			this.add(transactionsTablePane = new JScrollPane(
@@ -442,7 +481,7 @@ public class DashboardPanel
 		String columnNames[] = { "Type", "Direction", "Amount", "Date", "Address"};
         JTable table = new JTable(rowData, columnNames);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(160);
+        table.getColumnModel().getColumn(0).setPreferredWidth(170);
         table.getColumnModel().getColumn(1).setPreferredWidth(140);
         table.getColumnModel().getColumn(2).setPreferredWidth(200);
         table.getColumnModel().getColumn(3).setPreferredWidth(390);
@@ -499,9 +538,12 @@ public class DashboardPanel
 			}
 		});
 
-		// Change the direction and date attributes for presentation purposes
+		DecimalFormat df = new DecimalFormat("########0.00######");
+		
+		// Change the direction and date etc. attributes for presentation purposes
 		for (String[] t : allTransactions)
 		{
+			// Direction
 			if (t[1].equals("receive"))
 			{
 				t[1] = "\u21E8 IN";
@@ -513,9 +555,24 @@ public class DashboardPanel
 				t[1] = "\u2692\u2699 MINED";
 			};
 
+			// Date
 			if (!t[3].equals("N/A"))
 			{
 				t[3] = new Date(Long.valueOf(t[3]).longValue() * 1000L).toLocaleString();
+			}
+			
+			// Amount
+			try
+			{
+				double amount = Double.valueOf(t[2]);
+				if (amount < 0d)
+				{
+					amount = -amount;
+				}
+				t[2] = df.format(amount);
+			} catch (NumberFormatException nfe)
+			{
+				// TODO: log this
 			}
 		}
 

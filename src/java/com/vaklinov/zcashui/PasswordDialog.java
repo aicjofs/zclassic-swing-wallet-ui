@@ -48,18 +48,24 @@ import javax.swing.JTextField;
 
 
 /**
- * Dialog to get the user password for encrypted wallts
+ * Dialog to get the user password for encrypted wallets - for unlock.
  *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
 public class PasswordDialog
 	extends JDialog
 {
-	private boolean isOKPressed = false;
-	private String  password    = null;
+	protected boolean isOKPressed = false;
+	protected String  password    = null;
 	
-	private JTextField passwordField = null;
+	protected JLabel     passwordLabel = null;
+	protected JTextField passwordField = null;
 	
+	protected JLabel upperLabel;
+	protected JLabel lowerLabel;
+	
+	protected JPanel freeSlotPanel;
+	protected JPanel freeSlotPanel2;
 	
 	public PasswordDialog(JFrame parent)
 	{
@@ -75,7 +81,7 @@ public class PasswordDialog
 		controlsPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
 		JPanel tempPanel = new JPanel(new BorderLayout(0, 0));
-		tempPanel.add(new JLabel("<html>The wallet is encrypted and protected with a password. " +
+		tempPanel.add(this.upperLabel = new JLabel("<html>The wallet is encrypted and protected with a password. " +
 		                         "Please enter the password to unlock it temporarily during " +
 				                 "the operation</html>"), BorderLayout.CENTER);
 		controlsPanel.add(tempPanel);
@@ -85,16 +91,22 @@ public class PasswordDialog
 		controlsPanel.add(dividerLabel);
 		
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(new JLabel("Password: "));
+		tempPanel.add(passwordLabel = new JLabel("Password: "));
 		tempPanel.add(passwordField = new JPasswordField(30));
 		controlsPanel.add(tempPanel);
 		
 		dividerLabel = new JLabel("   ");
 		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 8));
 		controlsPanel.add(dividerLabel);
+		
+		this.freeSlotPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		controlsPanel.add(this.freeSlotPanel);
+		
+		this.freeSlotPanel2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		controlsPanel.add(this.freeSlotPanel2);
 
 		tempPanel = new JPanel(new BorderLayout(0, 0));
-		tempPanel.add(new JLabel("<html><span style=\"font-weight:bold\">" + 
+		tempPanel.add(this.lowerLabel = new JLabel("<html><span style=\"font-weight:bold\">" + 
 		                         "WARNING: Never enter your password on a public/shared " +
 		                         "computer or one that you suspect has been infected with malware! " +
 				                 "</span></html>"), BorderLayout.CENTER);
@@ -118,22 +130,7 @@ public class PasswordDialog
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				String pass = PasswordDialog.this.passwordField.getText();
-				
-				if ((pass == null) || (pass.trim().length() <= 0))
-				{
-					JOptionPane.showMessageDialog(
-						PasswordDialog.this.getParent(), 
-						"The password is empty. Please enter it into the text field.", "Empty...", 
-						JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				PasswordDialog.this.setVisible(false);
-				PasswordDialog.this.dispose();
-				
-				PasswordDialog.this.isOKPressed = true;
-				PasswordDialog.this.password = pass;
+				PasswordDialog.this.processOK();
 			}
 		});
 		
@@ -153,6 +150,27 @@ public class PasswordDialog
 		this.setSize(450, 190);
 		this.validate();
 		this.repaint();
+	}
+	
+	
+	protected void processOK()
+	{
+		String pass = PasswordDialog.this.passwordField.getText();
+		
+		if ((pass == null) || (pass.trim().length() <= 0))
+		{
+			JOptionPane.showMessageDialog(
+				PasswordDialog.this.getParent(), 
+				"The password is empty. Please enter it into the text field.", "Empty...", 
+				JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		PasswordDialog.this.setVisible(false);
+		PasswordDialog.this.dispose();
+		
+		PasswordDialog.this.isOKPressed = true;
+		PasswordDialog.this.password = pass;
 	}
 	
 	

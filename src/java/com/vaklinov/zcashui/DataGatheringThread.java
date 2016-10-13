@@ -65,6 +65,8 @@ public class DataGatheringThread<T>
 	boolean doAFirstGatehring;
 	// Error reporter
 	private StatusUpdateErrorReporter errorReporter;
+	// Flag allowing the thread to be suspended
+	private boolean suspended;
 
 	/**
 	 * Creates a new thread for data gathering.
@@ -88,6 +90,7 @@ public class DataGatheringThread<T>
 	public DataGatheringThread(DataGatherer<T> gatherer, StatusUpdateErrorReporter errorReporter, 
 			                   int interval, boolean doAFirstGatehring)
 	{
+		this.suspended = false;
 		this.gatherer = gatherer;
 		this.errorReporter = errorReporter;
 		this.interval = interval;
@@ -97,6 +100,17 @@ public class DataGatheringThread<T>
 				
 		// Start the thread to gather
 		this.start();
+	}
+	
+	
+	/**
+	 * Sets the suspension flag.
+	 * 
+	 * @param suspended suspension flag.
+	 */
+	public synchronized void setSuspended(boolean suspended)
+	{
+		this.suspended = suspended;
 	}
 	
 	
@@ -117,7 +131,7 @@ public class DataGatheringThread<T>
 	@Override
 	public void run()
 	{
-		if (this.doAFirstGatehring)
+		if (this.doAFirstGatehring && (!this.suspended))
 		{
 			this.doOneGathering();
 		}
@@ -136,7 +150,10 @@ public class DataGatheringThread<T>
 				}
 			}
 			
-			this.doOneGathering();
+			if (!this.suspended)
+			{
+				this.doOneGathering();
+			}
 		}
 	} // End public void run()
 	

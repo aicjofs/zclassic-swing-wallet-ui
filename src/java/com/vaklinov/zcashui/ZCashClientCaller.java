@@ -128,11 +128,11 @@ public class ZCashClientCaller
 
 	    	// Needs to be the same as in getWalletZReceivedTransactions()
 	    	// TODO: some day refactor to use object containers
-	    	strTransactions[i][0] = "T (Public)";
+	    	strTransactions[i][0] = "\u2606T (Public)";
 	    	strTransactions[i][1] = trans.getString("category", "ERROR!");
 	    	strTransactions[i][2] = trans.get("amount").toString();
 	    	strTransactions[i][3] = trans.get("time").toString();
-	    	strTransactions[i][4] = trans.getString("address", "<NOT LISTED BY WALLET!>");
+	    	strTransactions[i][4] = trans.getString("address", "\u26D4 (Z Address not listed by wallet!)");
 	    }
 
 	    return strTransactions;
@@ -170,7 +170,7 @@ public class ZCashClientCaller
 
 		    	// Needs to be the same as in getWalletPublicTransactions()
 		    	// TODO: some day refactor to use object containers
-		    	currentTransaction[0] = "Z (Private)";
+		    	currentTransaction[0] = "\u2605Z (Private)";
 		    	currentTransaction[1] = "receive";
 		    	currentTransaction[2] = trans.get("amount").toString();
 		    	String txID = trans.getString("txid", "ERROR!");
@@ -254,7 +254,7 @@ public class ZCashClientCaller
 		}
 		
 		// The JSON Builder has a problem with double values that have no fractional part
-		// TODO: find a better way to format the amount
+		// TODO: find a better/cleaner way to format the amount
 		toArgument.set("amount", "\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF");
 		
 		JsonArray toMany = new JsonArray();
@@ -436,25 +436,25 @@ public class ZCashClientCaller
     }
 	
 	
-	
-	/*
-	 *  TODO: ENCRYPTION ...
+	/**
+	 * Encrypts the wallet. Typical success/error use cases are:
 	 * 
+	 * ./zcash-cli encryptwallet "1234"
+	 * wallet encrypted; Bitcoin server stopping, restart to run with encrypted wallet. 
+	 * The keypool has been flushed, you need to make a new backup.
 	 * 
-	 * ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ ./zcashd --daemon
-Zcash server starting
-ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ ./zcash-cli encryptwallet "1234"
-wallet encrypted; Bitcoin server stopping, restart to run with encrypted wallet. The keypool has been flushed, you need to make a new backup.
-ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ ./zcashd --daemon
-Zcash server starting
-ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ ./zcash-cli encryptwallet "1234"
-error: {"code":-15,"message":"Error: running with an encrypted wallet, but encryptwallet was called."}
-ivan@ivan-laptop:~/workspaces/ZCashGit2/zcash/src$ 
-
+	 * ./zcash-cli encryptwallet "1234"
+	 * error: {"code":-15,"message":"Error: running with an encrypted wallet, but encryptwallet was called."}
 	 * 
-	 * 
-	 * 
+	 * @param password
 	 */
+	public void encryptWallet(String password)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String response = this.executeCommandAndGetSingleStringResponse("encryptwallet", password);
+		System.out.println("Result of wallet encryption is: \n" + response);
+		// If no exception - obviously successful
+	}
 	
 	
 	private JsonObject executeCommandAndGetJsonObject(String command1, String command2)

@@ -50,7 +50,8 @@ public class OSUtil
 	public static String getProgramDirectory()
 		throws IOException
 	{
-		// TODO: JAR name dependent - tricky, may not work if repackaged!
+		// TODO: this way of finding the dir is JAR name dependent - tricky, may not work 
+		// if program is repackaged as different JAR!
 		final String JAR_NAME = "ZCashSwingWalletUI.jar";
 		String cp = System.getProperty("java.class.path");
 		if ((cp != null) && (cp.indexOf(File.pathSeparator) == -1) && 

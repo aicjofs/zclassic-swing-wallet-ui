@@ -33,11 +33,13 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -64,8 +66,11 @@ public class ZCashUI
     private ZCashClientCaller clientCaller;
     private StatusUpdateErrorReporter errorReporter;
     
+    private WalletOperations walletOps;
+    
     private JMenuItem menuItemExit;
     private JMenuItem menuItemAbout;
+    private JMenuItem menuItemEncrypt;
 
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
@@ -74,13 +79,16 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.17 (beta)");
+        super("ZCash Swing Wallet UI 0.18 (beta)");
+        this.setIconImage(new ImageIcon(
+        	this.getClass().getClassLoader().getResource("images/Z-yellow.orange-logo.png")).getImage());
+        
         Container contentPane = this.getContentPane();
         
         errorReporter = new StatusUpdateErrorReporter(this);
         installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
         clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
-        
+                
         // Build content
         JTabbedPane tabs = new JTabbedPane();
         tabs.add("Dashboard", dashboard = new DashboardPanel(installationObserver, clientCaller, errorReporter));
@@ -88,15 +96,25 @@ public class ZCashUI
         tabs.add("Send cash", sendPanel = new SendCashPanel(clientCaller, errorReporter));
         contentPane.add(tabs);
         
+        this.walletOps = new WalletOperations(
+            	this, this.dashboard, this.sendPanel, installationObserver, clientCaller, errorReporter);
+        
         this.setSize(new Dimension(870, 400));
         
         // Build menu
         JMenuBar mb = new JMenuBar();
         JMenu file = new JMenu("File");
-        file.add(menuItemAbout = new JMenuItem("About..."));
+        file.setMnemonic(KeyEvent.VK_F);
+        file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_A));
         file.addSeparator();
-        file.add(menuItemExit = new JMenuItem("Exit"));
+        file.add(menuItemExit = new JMenuItem("Exit", KeyEvent.VK_E));
         mb.add(file);
+        
+        JMenu wallet = new JMenu("Wallet");
+        wallet.setMnemonic(KeyEvent.VK_W);
+        wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_A));
+        mb.add(wallet);
+        
         this.setJMenuBar(mb);
         
         // Add listeners etc.
@@ -106,7 +124,7 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e) 
                 {
-                    ZCashUI.this.exit();
+                    ZCashUI.this.exitProgram();
                 }
             }
         );
@@ -123,6 +141,18 @@ public class ZCashUI
             }
         );
         
+        menuItemEncrypt.addActionListener(
+            new ActionListener() 
+            {
+                @Override
+                public void actionPerformed(ActionEvent e) 
+                {
+                    ZCashUI.this.walletOps.encryptWallet();
+                }
+            }
+        );
+
+        
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() 
@@ -130,7 +160,7 @@ public class ZCashUI
             @Override
             public void windowClosing(WindowEvent e) 
             {
-                ZCashUI.this.exit();                
+                ZCashUI.this.exitProgram();                
             }
         });
         
@@ -159,11 +189,9 @@ public class ZCashUI
                 
                 JOptionPane.showMessageDialog(
                     ZCashUI.this.getRootPane().getParent(), 
-                    "The ZCash wallet GUI should be considered experimental at this time " +
-                    "since there has \nnot been much feedback from the community. It is not " +
-                    "advisable to use the GUI wallet \nto send large amounts of cash! Use of " +
-                    "this software is at your own risk! Be sure to\n" +
-                    "read the list of known issues and limitations at this page: \n" +
+                    "The ZCash GUI Wallet is currently considered experimental. Use of this software\n" +
+                    "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
+                    "at this page: \n" +
                     "https://github.com/vaklinov/zcash-swing-wallet-ui#known-issues-and-limitations\n\n" +
                     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
                     "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
@@ -178,11 +206,15 @@ public class ZCashUI
         });
     }
     
-    private void exit()
+    public void exitProgram()
     {
         System.out.println("Exiting ...");
+        
+        this.dashboard.stopThreadsAndTimers();
+        
         ZCashUI.this.setVisible(false);
         ZCashUI.this.dispose();
+        
         System.exit(0);
     }
     
@@ -193,7 +225,7 @@ public class ZCashUI
         {
             System.out.println("Starting ZCash Swing Wallet ...");
             System.out.println("Current directory: " + new File(".").getCanonicalPath());
-            //System.out.println("System properties: " + System.getProperties().toString().replace(",", "\n"));
+            System.out.println("Class path: " + System.getProperty("java.class.path"));
                         
             ////////////////////////////////////////////////////////////
             for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels()) 

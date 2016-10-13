@@ -37,7 +37,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -84,10 +86,18 @@ public class SendCashPanel
 	private Timer        operationStatusTimer        = null;
 	private String       operationStatusID           = null;
 	private int          operationStatusCounter      = 0;
+	
+	// Lists of threads and timers that may be stopped if necessary
+	private List<Timer> timers                   = null;
+	private List<DataGatheringThread<?>> threads = null;	
+
 
 	public SendCashPanel(ZCashClientCaller clientCaller,  StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
+		this.timers = new ArrayList<Timer>();
+		this.threads = new ArrayList<DataGatheringThread<?>>();
+		
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
 
@@ -229,6 +239,7 @@ public class SendCashPanel
 				}
 			}, 
 			this.errorReporter, 25000, true);
+		this.threads.add(addressBalanceGatheringThread);
 		
 		ActionListener alBalancesUpdater = new ActionListener() 
 		{
@@ -249,6 +260,21 @@ public class SendCashPanel
 		Timer timerBalancesUpdater = new Timer(15000, alBalancesUpdater);
 		timerBalancesUpdater.setInitialDelay(3000);
 		timerBalancesUpdater.start();
+		this.timers.add(timerBalancesUpdater);
+	}
+	
+	
+	public void stopThreadsAndTimers()
+	{
+		for (Timer t : this.timers)
+		{
+			t.stop();
+		}
+		
+		for (DataGatheringThread<?> t : this.threads)
+		{
+			t.setSuspended(true);
+		}
 	}
 	
 	
