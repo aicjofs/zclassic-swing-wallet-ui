@@ -114,24 +114,27 @@ public class DashboardPanel
 		JPanel balanceStatusPanel = new JPanel();
 		// Use border layout to have balances to the left
 		balanceStatusPanel.setLayout(new BorderLayout(3, 3)); 
-		balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		//balanceStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
-		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 9));
 		JLabel logoLabel = new JLabel(new ImageIcon(
-			this.getClass().getClassLoader().getResource("images/zcash-logo-square3.png")));
+			this.getClass().getClassLoader().getResource("images/Z-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
-		tempPanel.add(new JLabel(" "));
-		JLabel zcLabel = new JLabel("Cash Wallet       ");
-		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 37));
+		//tempPanel.add(new JLabel(" "));
+		JLabel zcLabel = new JLabel("Cash Wallet        ");
+		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 32));
 		tempPanel.add(zcLabel);
 		tempPanel.setToolTipText("Powered by ZCash");
 		balanceStatusPanel.add(tempPanel, BorderLayout.WEST);
 				
-		JLabel transactionHeadingLabel = new JLabel("<html><br/>Transactions:</html>");
-		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 20));
+		JLabel transactionHeadingLabel = new JLabel(
+			"<html><span style=\"font-size:23px\"><br/></span>Transactions:</html>");
+		transactionHeadingLabel.setFont(new Font("Helvetica", Font.BOLD, 19));
 		balanceStatusPanel.add(transactionHeadingLabel, BorderLayout.CENTER);
 						
-		balanceStatusPanel.add(walletBalanceLabel = new JLabel(), BorderLayout.EAST);
+		PresentationPanel walletBalancePanel = new PresentationPanel();
+		walletBalancePanel.add(walletBalanceLabel = new JLabel());
+		balanceStatusPanel.add(walletBalancePanel, BorderLayout.EAST);
 		
 		dashboard.add(balanceStatusPanel, BorderLayout.NORTH);
 
@@ -144,9 +147,15 @@ public class DashboardPanel
 		// Lower panel with installation status
 		JPanel installationStatusPanel = new JPanel();
 		installationStatusPanel.setLayout(new BorderLayout(3, 3));
-		installationStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		installationStatusPanel.add(daemonStatusLabel = new JLabel(), BorderLayout.WEST);
-		installationStatusPanel.add(networkAndBlockchainLabel = new JLabel(), BorderLayout.EAST);		
+		//installationStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		PresentationPanel daemonStatusPanel = new PresentationPanel();
+		daemonStatusPanel.add(daemonStatusLabel = new JLabel());
+		installationStatusPanel.add(daemonStatusPanel, BorderLayout.WEST);
+		
+		PresentationPanel networkAndBlockchainPanel = new PresentationPanel();
+		networkAndBlockchainPanel.add(networkAndBlockchainLabel = new JLabel());
+		installationStatusPanel.add(networkAndBlockchainPanel, BorderLayout.EAST);		
+		
 		dashboard.add(installationStatusPanel, BorderLayout.SOUTH);
 
 		// Thread and timer to update the daemon status
@@ -572,7 +581,8 @@ public class DashboardPanel
 				t[2] = df.format(amount);
 			} catch (NumberFormatException nfe)
 			{
-				// TODO: log this
+				System.out.println("Error occurred while formatting amount: " + t[2] + 
+						           " - " + nfe.getMessage() + "!");
 			}
 		}
 

@@ -31,6 +31,7 @@ package com.vaklinov.zcashui;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -79,9 +80,10 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.18 (beta)");
-        this.setIconImage(new ImageIcon(
-        	this.getClass().getClassLoader().getResource("images/Z-yellow.orange-logo.png")).getImage());
+        super("ZCash Swing Wallet UI 0.19 (beta)");
+        ClassLoader cl = this.getClass().getClassLoader();
+        
+        this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
         
         Container contentPane = this.getContentPane();
         
@@ -91,9 +93,18 @@ public class ZCashUI
                 
         // Build content
         JTabbedPane tabs = new JTabbedPane();
-        tabs.add("Dashboard", dashboard = new DashboardPanel(installationObserver, clientCaller, errorReporter));
-        tabs.add("Own addresses", addresses = new AddressesPanel(clientCaller, errorReporter));
-        tabs.add("Send cash", sendPanel = new SendCashPanel(clientCaller, errorReporter));
+        Font oldTabFont = tabs.getFont();
+        Font newTabFont  = new Font(oldTabFont.getName(), Font.BOLD | Font.ITALIC, oldTabFont.getSize() * 57 / 50);
+        tabs.setFont(newTabFont);
+        tabs.addTab("Overview ",
+        		    new ImageIcon(cl.getResource("images/overview.png")),
+        		    dashboard = new DashboardPanel(installationObserver, clientCaller, errorReporter));
+        tabs.addTab("Own addresses ", 
+        		    new ImageIcon(cl.getResource("images/address-book.png")),
+        		    addresses = new AddressesPanel(clientCaller, errorReporter));
+        tabs.addTab("Send cash ", 
+        		    new ImageIcon(cl.getResource("images/send.png")),
+        		    sendPanel = new SendCashPanel(clientCaller, errorReporter));
         contentPane.add(tabs);
         
         this.walletOps = new WalletOperations(
