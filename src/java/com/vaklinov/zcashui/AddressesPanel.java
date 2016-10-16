@@ -212,7 +212,7 @@ public class AddressesPanel
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String columnNames[] = { "Balance", "Address" };
-        JTable table = new JTable(rowData, columnNames);
+        JTable table = new DataTable(rowData, columnNames);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(160);
         table.getColumnModel().getColumn(1).setPreferredWidth(1000);

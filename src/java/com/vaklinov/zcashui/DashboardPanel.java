@@ -488,7 +488,7 @@ public class DashboardPanel
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String columnNames[] = { "Type", "Direction", "Amount", "Date", "Address"};
-        JTable table = new JTable(rowData, columnNames);
+        JTable table = new DataTable(rowData, columnNames);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(170);
         table.getColumnModel().getColumn(1).setPreferredWidth(140);
