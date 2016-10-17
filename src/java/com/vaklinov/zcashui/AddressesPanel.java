@@ -104,6 +104,20 @@ public class AddressesPanel
 				               addressBalanceTable = this.createAddressBalanceTable(lastAddressBalanceData)),
 				           BorderLayout.CENTER);
 		
+		
+		JPanel warningPanel = new JPanel();
+		warningPanel.setLayout(new BorderLayout(3, 3));
+		warningPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		JLabel warningL = new JLabel(
+				"<html><span style=\"font-size:8px;\">" +
+				" * Only confirmed address balances are shown in the table. If you have sent cash from an address " +
+				"in the past few minutes, its balance may appear to be reduced or zero until confirmed! " +
+				"The average confirmation time is 2.5 min." +
+			    "</span>");
+		warningPanel.add(warningL, BorderLayout.NORTH);
+		addressesPanel.add(warningPanel, BorderLayout.NORTH);
+		
+		
 		// Button actions
 		refreshButton.addActionListener(new ActionListener() 
 		{	

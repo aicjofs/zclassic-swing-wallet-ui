@@ -50,7 +50,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.Timer;
-import javax.swing.border.EtchedBorder;
 
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletBalance;
@@ -444,12 +443,36 @@ public class DashboardPanel
 		String transparentBalance = df.format(balance.transparentBalance);
 		String privateBalance = df.format(balance.privateBalance);
 		String totalBalance = df.format(balance.totalBalance);
+		
+		String transparentUCBalance = df.format(balance.transparentUnconfirmedBalance);
+		String privateUCBalance = df.format(balance.privateUnconfirmedBalance);
+		String totalUCBalance = df.format(balance.totalUnconfirmedBalance);
 
+		String color1 = transparentBalance.equals(transparentUCBalance) ? "" : "color:#cc3300;";
+		String color2 = privateBalance.equals(privateUCBalance)         ? "" : "color:#cc3300;";
+		String color3 = totalBalance.equals(totalUCBalance)             ? "" : "color:#cc3300;";
+		
 		String text =
-			"<html><span style=\"\">Transparent balance: " + transparentBalance + " ZEC </span><br/> " +
-			"Private ( Z ) balance: <span style=\"font-weight:bold\">" + privateBalance + " ZEC </span><br/> " +
-			"Total ( Z+T ) balance: <span style=\"font-weight:bold\">" + totalBalance + " ZEC </span> <br/>  </html>";
+			"<html>" + 
+		    "<span style=\"" + color1 + "\">Transparent balance: " + transparentUCBalance + 
+		    	" ZEC </span><br/> " +
+			"<span style=\"" + color2 + "\">Private ( Z ) balance: <span style=\"font-weight:bold\">" + 
+		    	privateUCBalance + " ZEC </span></span><br/> " +
+			"<span style=\"" + color3 + "\">Total ( Z+T ) balance: <span style=\"font-weight:bold\">" + 
+		    	totalUCBalance + " ZEC </span></span>" +
+			"<br/>  </html>";
+		
 		this.walletBalanceLabel.setText(text);
+		
+		String toolTip = null;
+		if ((!transparentBalance.equals(transparentUCBalance)) ||
+		    (!privateBalance.equals(privateUCBalance))         ||
+		    (!totalBalance.equals(totalUCBalance)))
+		{
+			toolTip = "Immature balance is being shown due to an ongoing transaction!";
+		}
+		
+		this.walletBalanceLabel.setToolTipText(toolTip);
 	}
 
 

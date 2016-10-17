@@ -57,6 +57,10 @@ public class ZCashClientCaller
 		public double transparentBalance;
 		public double privateBalance;
 		public double totalBalance;
+		
+		public double transparentUnconfirmedBalance;
+		public double privateUnconfirmedBalance;
+		public double totalUnconfirmedBalance;
 	}
 	
 	
@@ -106,11 +110,18 @@ public class ZCashClientCaller
 		throws WalletCallException, IOException, InterruptedException
 	{
 		WalletBalance balance = new WalletBalance();
+		
 		JsonObject objResponse = this.executeCommandAndGetJsonObject("z_gettotalbalance", null);
 		
     	balance.transparentBalance = Double.valueOf(objResponse.getString("transparent", "-1"));
     	balance.privateBalance     = Double.valueOf(objResponse.getString("private", "-1"));
     	balance.totalBalance       = Double.valueOf(objResponse.getString("total", "-1"));
+    	
+        objResponse = this.executeCommandAndGetJsonObject("z_gettotalbalance", "0");
+		
+    	balance.transparentUnconfirmedBalance = Double.valueOf(objResponse.getString("transparent", "-1"));
+    	balance.privateUnconfirmedBalance     = Double.valueOf(objResponse.getString("private", "-1"));
+    	balance.totalUnconfirmedBalance       = Double.valueOf(objResponse.getString("total", "-1"));
 
 		return balance;
 	}

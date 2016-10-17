@@ -80,7 +80,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.20 (beta)");
+        super("ZCash Swing Wallet UI 0.21 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
         
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -110,7 +110,7 @@ public class ZCashUI
         this.walletOps = new WalletOperations(
             	this, this.dashboard, this.sendPanel, installationObserver, clientCaller, errorReporter);
         
-        this.setSize(new Dimension(870, 400));
+        this.setSize(new Dimension(870, 427));
         
         // Build menu
         JMenuBar mb = new JMenuBar();

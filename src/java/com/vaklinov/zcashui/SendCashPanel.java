@@ -110,7 +110,11 @@ public class SendCashPanel
 		sendCashPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(new JLabel("Send cash from:"));
+		tempPanel.add(new JLabel("Send cash from:     "));
+		tempPanel.add(new JLabel(
+			"<html><span style=\"font-size:8px;\">" +
+			"* Only addresses with a confirmed balance are shown as sources for sending!" +
+		    "</span>  "));
 		sendCashPanel.add(tempPanel);
 
 		balanceAddressCombo = new JComboBox<>(new String[] { "" });
@@ -165,15 +169,29 @@ public class SendCashPanel
 		sendCashPanel.add(tempPanel);
 
 		dividerLabel = new JLabel("   ");
-		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 28));
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 5));
+		sendCashPanel.add(dividerLabel);
+		
+		JPanel warningPanel = new JPanel();
+		warningPanel.setLayout(new BorderLayout(7, 3));
+		JLabel warningL = new JLabel(
+				"<html><span style=\"font-size:8px;\">" +
+				" * When you send cash from a transparent (T) address, the remining unspent balance is sent to another " +
+				"auto-generated T address. When you send from a Z address, the remining unspent balance remains with " +
+				"the Z address. In both cases the original sending address cannot be used for sending again until the " +
+				"transaction is confirmed. The address is temporarily removed from the list!" +
+			    "</span>");
+		warningPanel.add(warningL, BorderLayout.NORTH);
+		sendCashPanel.add(warningPanel);
+		
+		dividerLabel = new JLabel("   ");
+		dividerLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		sendCashPanel.add(dividerLabel);
 		
 		// Build the operation status panel
 		operationStatusPanel = new JPanel();
-		//this.add(operationStatusPanel, BorderLayout.SOUTH);
 		sendCashPanel.add(operationStatusPanel);
 		operationStatusPanel.setLayout(new BoxLayout(operationStatusPanel, BoxLayout.Y_AXIS));
-		//operationStatusPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		tempPanel.add(new JLabel("Last operation status: "));
@@ -238,7 +256,7 @@ public class SendCashPanel
 					return data;
 				}
 			}, 
-			this.errorReporter, 25000, true);
+			this.errorReporter, 10000, true);
 		this.threads.add(addressBalanceGatheringThread);
 		
 		ActionListener alBalancesUpdater = new ActionListener() 
@@ -301,10 +319,10 @@ public class SendCashPanel
 			return;
 		}
 		
-		String sourceAddress = this.lastAddressBalanceData[this.balanceAddressCombo.getSelectedIndex()][1];
-		String destinationAddress = this.destinationAddressField.getText();
-		String memo = this.destinationMemoField.getText();
-		String amount = this.destinationAmountField.getText();
+		final String sourceAddress = this.lastAddressBalanceData[this.balanceAddressCombo.getSelectedIndex()][1];
+		final String destinationAddress = this.destinationAddressField.getText();
+		final String memo = this.destinationMemoField.getText();
+		final String amount = this.destinationAmountField.getText();
 
 		// Verify general correctness.
 		String errorMessage = null;
@@ -391,11 +409,25 @@ public class SendCashPanel
 						{
 							operationStatusLabel.setText(
 								"<html><span style=\"color:green;font-weight:bold\">SUCCESSFUL</span></html>");
+							JOptionPane.showMessageDialog(
+									SendCashPanel.this.getRootPane().getParent(), 
+									"Succesfully sent " + amount + " ZEC from address: \n" +
+									sourceAddress + "\n" +
+									"to address: \n" +
+									destinationAddress + "\n", 
+									"Cash sent successfully", JOptionPane.INFORMATION_MESSAGE);
 						} else
 						{
 							String errorMessage = clientCaller.getOperationFinalErrorMessage(operationStatusID); 
 							operationStatusLabel.setText(
 								"<html><span style=\"color:red;font-weight:bold\">ERROR: " + errorMessage + "</span></html>");
+
+							JOptionPane.showMessageDialog(
+									SendCashPanel.this.getRootPane().getParent(), 
+									"An error occurred when sending cash. Error message is:\n" +
+									errorMessage + "\n\n" +
+									"Please ensure that sending parameters are correct. You may try again later...\n", 
+									"Error in sending cash", JOptionPane.ERROR_MESSAGE);
 
 						}
 						
