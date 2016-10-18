@@ -110,7 +110,7 @@ public class SendCashPanel
 		sendCashPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		
 		JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(new JLabel("Send cash from:     "));
+		tempPanel.add(new JLabel("Send cash from:       "));
 		tempPanel.add(new JLabel(
 			"<html><span style=\"font-size:8px;\">" +
 			"* Only addresses with a confirmed balance are shown as sources for sending!" +
@@ -140,7 +140,11 @@ public class SendCashPanel
 		sendCashPanel.add(dividerLabel);
 
 		tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		tempPanel.add(new JLabel("Memo (optional):"));
+		tempPanel.add(new JLabel("Memo (optional):     "));
+		tempPanel.add(new JLabel(
+				"<html><span style=\"font-size:8px;\">" +
+				"* Memo may be specified only if the destination is a Z (Private) address!" +
+			    "</span>  "));
 		sendCashPanel.add(tempPanel);
 		
 		destinationMemoField = new JTextField(73);
@@ -176,10 +180,11 @@ public class SendCashPanel
 		warningPanel.setLayout(new BorderLayout(7, 3));
 		JLabel warningL = new JLabel(
 				"<html><span style=\"font-size:8px;\">" +
-				" * When you send cash from a transparent (T) address, the remining unspent balance is sent to another " +
-				"auto-generated T address. When you send from a Z address, the remining unspent balance remains with " +
+				" * When sending cash from a T (Transparent) address, the remining unspent balance is sent to another " +
+				"auto-generated T address. When sending from a Z (Private) address, the remining unspent balance remains with " +
 				"the Z address. In both cases the original sending address cannot be used for sending again until the " +
-				"transaction is confirmed. The address is temporarily removed from the list!" +
+				"transaction is confirmed. The address is temporarily removed from the list! Freshly mined coins may only "+
+				"be sent to a Z (Private) address." +
 			    "</span>");
 		warningPanel.add(warningL, BorderLayout.NORTH);
 		sendCashPanel.add(warningPanel);
@@ -525,9 +530,8 @@ public class SendCashPanel
 		// Z Addresses - they are OK
 		String[] zAddresses = clientCaller.getWalletZAddresses();
 		
-		// T Addresses created by GUI only
-		// TODO: What if wallet is changed - stored addresses are invalid?!!
-		String[] tAddresses = AddressesPanel.getCreatedAndStoredTAddresses();
+		// T Addresses created inside wallet that may be empty
+		String[] tAddresses = this.clientCaller.getWalletAllPublicAddresses();
 		Set<String> tStoredAddressSet = new HashSet<>();
 		for (String address : tAddresses)
 		{

@@ -173,7 +173,7 @@ public class ZCashClientCaller
 
 		for (String zAddress : zAddresses)
 		{
-		    JsonArray jsonTransactions = executeCommandAndGetJsonArray("z_listreceivedbyaddress", zAddress);
+		    JsonArray jsonTransactions = executeCommandAndGetJsonArray("z_listreceivedbyaddress", zAddress, "0");
 		    for (int i = 0; i < jsonTransactions.size(); i++)
 		    {
 		    	String[] currentTransaction = new String[5];
@@ -212,6 +212,22 @@ public class ZCashClientCaller
 	    return addresses.toArray(new String[0]);
      }
 
+	
+	// ./zcash-cli listreceivedbyaddress 0 true 
+	public synchronized String[] getWalletAllPublicAddresses()
+		throws WalletCallException, IOException, InterruptedException
+	{
+		JsonArray jsonReceivedOutputs = executeCommandAndGetJsonArray("listreceivedbyaddress", "0", "true");
+
+		Set<String> addresses = new HashSet<>();
+		for (int i = 0; i < jsonReceivedOutputs.size(); i++)
+		{
+		   	JsonObject outp = jsonReceivedOutputs.get(i).asObject();
+		   	addresses.add(outp.getString("address", "ERROR!"));
+		}
+
+		return addresses.toArray(new String[0]);
+    }
 	
 	
 	// return UNIX time as tring
@@ -265,6 +281,7 @@ public class ZCashClientCaller
 		}
 		
 		// The JSON Builder has a problem with double values that have no fractional part
+		// it serializes them as integers that ZCash does not accept. So we do a replacement
 		// TODO: find a better/cleaner way to format the amount
 		toArgument.set("amount", "\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF");
 		
@@ -274,7 +291,7 @@ public class ZCashClientCaller
 		String[] sendCashParameters = new String[]
 	    {
 		    this.zcashcli.getCanonicalPath(), "z_sendmany", from,
-		    // This replacement is a hack to make the JSON object have real format 0.00 etc.
+		    // This replacement is a hack to make the JSON object amount has double format 0.00 etc.
 		    // TODO: find a better way to format the amount
 		    toMany.toString().replace("\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"", 
 		    		                  "\"amount\":" + new DecimalFormat("########0.00######").format(Double.valueOf(amount)))
@@ -482,12 +499,19 @@ public class ZCashClientCaller
 		}
 
 	}
-	
+
 	
 	private JsonArray executeCommandAndGetJsonArray(String command1, String command2)
 		throws WalletCallException, IOException, InterruptedException	
 	{
-		JsonValue response = this.executeCommandAndGetJsonValue(command1, command2);
+		return this.executeCommandAndGetJsonArray(command1, command2, null);
+	}
+		
+	
+	private JsonArray executeCommandAndGetJsonArray(String command1, String command2, String command3)
+		throws WalletCallException, IOException, InterruptedException	
+	{
+		JsonValue response = this.executeCommandAndGetJsonValue(command1, command2, command3);
 		
 		if (response.isArray())
 		{
@@ -500,9 +524,16 @@ public class ZCashClientCaller
 
 	
 	private JsonValue executeCommandAndGetJsonValue(String command1, String command2)
+			throws WalletCallException, IOException, InterruptedException
+	{
+		return this.executeCommandAndGetJsonValue(command1, command2, null);
+	}
+	
+	
+	private JsonValue executeCommandAndGetJsonValue(String command1, String command2, String command3)
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String strResponse = this.executeCommandAndGetSingleStringResponse(command1, command2);
+		String strResponse = this.executeCommandAndGetSingleStringResponse(command1, command2, command3);
 		
 		JsonValue response = null;
 		try

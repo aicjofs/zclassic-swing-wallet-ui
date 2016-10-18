@@ -181,12 +181,7 @@ public class AddressesPanel
 			{
 				this.clientCaller.lockWallet();
 			}
-			
-			if (!isZAddress)
-			{
-				this.addCreatedTAddress(address);
-			}
-			
+						
 			JOptionPane.showMessageDialog(
 				this.getRootPane().getParent(), 
 				"A new " + (isZAddress ? "Z (Private)" : "T (Transparent)") 
@@ -241,16 +236,15 @@ public class AddressesPanel
 		// Z Addresses - they are OK
 		String[] zAddresses = clientCaller.getWalletZAddresses();
 		
-		// T Addresses created by GUI only
-		// TODO: What if wallet.dat is changed -stored addresses are invalid?!!
-		String[] tAddresses = this.getCreatedAndStoredTAddresses();
+		// T Addresses listed with the list received by addr comamnd
+		String[] tAddresses = this.clientCaller.getWalletAllPublicAddresses();
 		Set<String> tStoredAddressSet = new HashSet<>();
 		for (String address : tAddresses)
 		{
 			tStoredAddressSet.add(address);
 		}
 		
-		// T addresses with unspent outputs (even if not GUI created)...
+		// T addresses with unspent outputs - just in case they are different
 		String[] tAddressesWithUnspentOuts = this.clientCaller.getWalletPublicAddressesWithUnspentOutputs();
 		Set<String> tAddressSetWithUnspentOuts = new HashSet<>();
 		for (String address : tAddressesWithUnspentOuts)
@@ -287,47 +281,6 @@ public class AddressesPanel
 		}
 
 		return addressBalances;
-	}
-	
-	
-	// TODO: move to a utility class - it is reused
-	public static String[] getCreatedAndStoredTAddresses()
-		throws IOException
-	{
-		File tAddressesFile = new File(OSUtil.getSettingsDirectory() + "/" + T_ADDRESSES_FILE);
-		
-		if (!tAddressesFile.exists())
-		{
-			return new String[0];
-		}
-		
-		LineNumberReader lnr = new LineNumberReader(new FileReader(tAddressesFile));
-		Set<String> addressSet = new HashSet<String>();
-		
-		String line;
-		while ((line = lnr.readLine()) != null)
-		{
-			addressSet.add(line.trim());
-		}
-		
-		return addressSet.toArray(new String[0]);
-	}
-	
+	}	
 
-	// TODO: move to a utility class - it is reused
-	public static void addCreatedTAddress(String address)
-		throws IOException
-	{
-		File tAddressesFile = new File(OSUtil.getSettingsDirectory() + "/" + T_ADDRESSES_FILE);
-		if (!tAddressesFile.exists())
-		{
-			tAddressesFile.createNewFile();
-		}
-		
-		 long rafLength = tAddressesFile.length();
-		 RandomAccessFile raf = new RandomAccessFile(tAddressesFile, "rw");
-		 raf.seek(rafLength);
-		 raf.write((address + "\n").getBytes());
-		 raf.close();
-	}
 }

@@ -85,7 +85,7 @@ presents the information in a user-friendly manner.
 This program is distributed under an [MIT License](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/LICENSE).
 
 ### Disclaimer
-This program is not officially endorsed by or associated with the ZCash project and the ZCash parent company.
+This program is not officially endorsed by or associated with the ZCash project and the ZCash company.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
