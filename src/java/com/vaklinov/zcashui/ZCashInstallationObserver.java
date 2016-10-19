@@ -1,11 +1,11 @@
 /************************************************************************************************
- *  _________          _     ____          _           __        __    _ _      _   _   _ ___ 
+ *  _________          _     ____          _           __        __    _ _      _   _   _ ___
  * |__  / ___|__ _ ___| |__ / ___|_      _(_)_ __   __ \ \      / /_ _| | | ___| |_| | | |_ _|
- *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || | 
- *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || | 
+ *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || |
+ *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || |
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
- *                                                 |___/                                      
- *                                       
+ *                                                 |___/
+ *
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -14,10 +14,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,34 +38,34 @@ import java.util.StringTokenizer;
 
 /**
  * Observes the daemon - running etc.
- * 
+ *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
-public class ZCashInstallationObserver 
-{	
+public class ZCashInstallationObserver
+{
 	public static class DaemonInfo
 	{
 		public DAEMON_STATUS status;
 		public double residentSizeMB;
 		public double virtualSizeMB;
-		public double cpuPercentage;		
+		public double cpuPercentage;
 	}
-	
+
 	public static enum DAEMON_STATUS
 	{
 		RUNNING,
 		NOT_RUNNING,
 		UNABLE_TO_ASCERTAIN;
 	}
-	
+
 	private String args[];
-	
+
 	public ZCashInstallationObserver(String installDir)
 		throws IOException
 	{
 		// Detect daemon and client tools installation
 		File dir = new File(installDir);
-		
+
 		if (!dir.exists() || dir.isFile())
 		{
 			throw new InstallationDetectionException(
@@ -76,26 +76,37 @@ public class ZCashInstallationObserver
 		// TODO: names will change on Windows
 		File zcashd = new File(dir, "zcashd");
 		File zcashcli = new File(dir, "zcash-cli");
-		
+
 		if ((!zcashd.exists()) || (!zcashcli.exists()))
 		{
-			throw new InstallationDetectionException(
-				"The ZCash installation directory " + installDir + " needs \nto contain " +
-				"the command line utilities zcashd and zcash-cli. At least one of them is missing!");
+			zcashd = OSUtil.findZCashCommand("zcashd");
+			zcashcli = OSUtil.findZCashCommand("zcash-cli");
 		}
-	}		
-	
-	
+
+		System.out.println("Using ZCash utilities: " +
+		                   "zcashd: "    + ((zcashd != null) ? zcashd.getCanonicalPath() : "<MISSING>") + ", " +
+		                   "zcash-cli: " + ((zcashcli != null) ? zcashcli.getCanonicalPath() : "<MISSING>"));
+
+		if ((zcashd == null) || (zcashcli == null) || (!zcashd.exists()) || (!zcashcli.exists()))
+		{
+			throw new InstallationDetectionException(
+				"The ZCash GUI Wallet installation directory " + installDir + " needs\nto contain " +
+				"the command line utilities zcashd and zcash-cli. At least one of them is missing! \n" +
+				"Please place files ZCashSwingWalletUI.jar, zcash-cli, zcashd in the same directory.");
+		}
+	}
+
+
 	public synchronized DaemonInfo getDaemonInfo()
 		throws IOException, InterruptedException
 	{
 		// TODO: OS Specific
 		DaemonInfo info = new DaemonInfo();
 		info.status = DAEMON_STATUS.UNABLE_TO_ASCERTAIN;
-		
+
 		CommandExecutor exec = new CommandExecutor(new String[] { "ps", "auxwww"});
 		LineNumberReader lnr = new LineNumberReader(new StringReader(exec.execute()));
-		
+
 		String line;
 		while ((line = lnr.readLine()) != null)
 		{
@@ -111,7 +122,7 @@ public class ZCashInstallationObserver
 				{
 					break;
 				}
-				
+
 				if (i == 2)
 				{
 					try
@@ -138,26 +149,26 @@ public class ZCashInstallationObserver
 						foundZCash = true;
 						break;
 					}
-				} 
+				}
 			}
-			
+
 			if (foundZCash)
 			{
 				break;
 			}
 		}
-		
+
 		if (info.status != DAEMON_STATUS.RUNNING)
 		{
 			info.cpuPercentage  = 0;
 			info.residentSizeMB = 0;
 			info.virtualSizeMB  = 0;
 		}
-		
+
 		return info;
 	}
-	
-	
+
+
 	public static class InstallationDetectionException
 		extends IOException
 	{

@@ -1,11 +1,11 @@
 /************************************************************************************************
- *  _________          _     ____          _           __        __    _ _      _   _   _ ___ 
+ *  _________          _     ____          _           __        __    _ _      _   _   _ ___
  * |__  / ___|__ _ ___| |__ / ___|_      _(_)_ __   __ \ \      / /_ _| | | ___| |_| | | |_ _|
- *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || | 
- *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || | 
+ *   / / |   / _` / __| '_ \\___ \ \ /\ / / | '_ \ / _` \ \ /\ / / _` | | |/ _ \ __| | | || |
+ *  / /| |__| (_| \__ \ | | |___) \ V  V /| | | | | (_| |\ V  V / (_| | | |  __/ |_| |_| || |
  * /____\____\__,_|___/_| |_|____/ \_/\_/ |_|_| |_|\__, | \_/\_/ \__,_|_|_|\___|\__|\___/|___|
- *                                                 |___/                                      
- *                                       
+ *                                                 |___/
+ *
  * Copyright (c) 2016 Ivan Vaklinov <ivan@vaklinov.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -14,10 +14,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -57,18 +57,18 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionExcep
 
 /**
  * Main ZCash Window.
- * 
+ *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
-public class ZCashUI 
+public class ZCashUI
     extends JFrame
 {
     private ZCashInstallationObserver installationObserver;
     private ZCashClientCaller clientCaller;
     private StatusUpdateErrorReporter errorReporter;
-    
+
     private WalletOperations walletOps;
-    
+
     private JMenuItem menuItemExit;
     private JMenuItem menuItemAbout;
     private JMenuItem menuItemEncrypt;
@@ -76,21 +76,21 @@ public class ZCashUI
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
     private SendCashPanel  sendPanel;
-    
+
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.23 (beta)");
+        super("ZCash Swing Wallet UI 0.24 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
-        
+
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
-        
+
         Container contentPane = this.getContentPane();
-        
+
         errorReporter = new StatusUpdateErrorReporter(this);
         installationObserver = new ZCashInstallationObserver(OSUtil.getProgramDirectory());
         clientCaller = new ZCashClientCaller(OSUtil.getProgramDirectory());
-                
+
         // Build content
         JTabbedPane tabs = new JTabbedPane();
         Font oldTabFont = tabs.getFont();
@@ -99,19 +99,19 @@ public class ZCashUI
         tabs.addTab("Overview ",
         		    new ImageIcon(cl.getResource("images/overview.png")),
         		    dashboard = new DashboardPanel(installationObserver, clientCaller, errorReporter));
-        tabs.addTab("Own addresses ", 
+        tabs.addTab("Own addresses ",
         		    new ImageIcon(cl.getResource("images/address-book.png")),
         		    addresses = new AddressesPanel(clientCaller, errorReporter));
-        tabs.addTab("Send cash ", 
+        tabs.addTab("Send cash ",
         		    new ImageIcon(cl.getResource("images/send.png")),
         		    sendPanel = new SendCashPanel(clientCaller, errorReporter));
         contentPane.add(tabs);
-        
+
         this.walletOps = new WalletOperations(
             	this, this.dashboard, this.sendPanel, installationObserver, clientCaller, errorReporter);
-        
+
         this.setSize(new Dimension(870, 427));
-        
+
         // Build menu
         JMenuBar mb = new JMenuBar();
         JMenu file = new JMenu("File");
@@ -120,65 +120,65 @@ public class ZCashUI
         file.addSeparator();
         file.add(menuItemExit = new JMenuItem("Exit", KeyEvent.VK_E));
         mb.add(file);
-        
+
         JMenu wallet = new JMenu("Wallet");
         wallet.setMnemonic(KeyEvent.VK_W);
         wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_A));
         mb.add(wallet);
-        
+
         this.setJMenuBar(mb);
-        
+
         // Add listeners etc.
         menuItemExit.addActionListener(
-            new ActionListener() 
+            new ActionListener()
             {
                 @Override
-                public void actionPerformed(ActionEvent e) 
+                public void actionPerformed(ActionEvent e)
                 {
                     ZCashUI.this.exitProgram();
                 }
             }
         );
-        
+
         menuItemAbout.addActionListener(
-            new ActionListener() 
+            new ActionListener()
             {
                 @Override
-                public void actionPerformed(ActionEvent e) 
+                public void actionPerformed(ActionEvent e)
                 {
                     AboutDialog ad = new AboutDialog(ZCashUI.this);
                     ad.setVisible(true);
                 }
             }
         );
-        
+
         menuItemEncrypt.addActionListener(
-            new ActionListener() 
+            new ActionListener()
             {
                 @Override
-                public void actionPerformed(ActionEvent e) 
+                public void actionPerformed(ActionEvent e)
                 {
                     ZCashUI.this.walletOps.encryptWallet();
                 }
             }
         );
 
-        
+
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new WindowAdapter() 
-        {    
+        this.addWindowListener(new WindowAdapter()
+        {
             @Override
-            public void windowClosing(WindowEvent e) 
+            public void windowClosing(WindowEvent e)
             {
-                ZCashUI.this.exitProgram();                
+                ZCashUI.this.exitProgram();
             }
         });
-        
+
         // Show initial message
-        SwingUtilities.invokeLater(new Runnable() 
-        {    
-            public void run() 
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
             {
                 try
                 {
@@ -191,15 +191,15 @@ public class ZCashUI
                     {
                         warningFlagFile.createNewFile();
                     }
-                    
+
                 } catch (IOException ioe)
                 {
                     /* TODO: report exceptions to the user */
                     ioe.printStackTrace();
                 }
-                
+
                 JOptionPane.showMessageDialog(
-                    ZCashUI.this.getRootPane().getParent(), 
+                    ZCashUI.this.getRootPane().getParent(),
                     "The ZCash GUI Wallet is currently considered experimental. Use of this software\n" +
                     "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
                     "at this page: \n" +
@@ -211,49 +211,49 @@ public class ZCashUI
                     "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
                     "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n" +
                     "THE SOFTWARE.\n\n" +
-                    "(This message will be shown only once)", 
+                    "(This message will be shown only once)",
                     "Disclaimer", JOptionPane.INFORMATION_MESSAGE);
             }
         });
     }
-    
+
     public void exitProgram()
     {
         System.out.println("Exiting ...");
-        
+
         this.dashboard.stopThreadsAndTimers();
-        
+
         ZCashUI.this.setVisible(false);
         ZCashUI.this.dispose();
-        
+
         System.exit(0);
     }
-    
+
     public static void main(String argv[])
         throws IOException
-    {        
-        try 
+    {
+        try
         {
             System.out.println("Starting ZCash Swing Wallet ...");
             System.out.println("Current directory: " + new File(".").getCanonicalPath());
             System.out.println("Class path: " + System.getProperty("java.class.path"));
-                        
+
             ////////////////////////////////////////////////////////////
-            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels()) 
+            for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
             {
                 System.out.println("Available look and feel: " + ui.getName() + " " + ui.getClassName());
-                if (ui.getName().equals("Nimbus")) 
+                if (ui.getName().equals("Nimbus"))
                 {
                     UIManager.setLookAndFeel(ui.getClassName());
                     break;
                 }
             }
-            
+
             /////////////////////////////////////////////////////
             ZCashUI ui = new ZCashUI();
             ui.setVisible(true);
 
-        } catch (InstallationDetectionException ide) 
+        } catch (InstallationDetectionException ide)
         {
             ide.printStackTrace();
             JOptionPane.showMessageDialog(
@@ -264,10 +264,10 @@ public class ZCashUI
                 "Installation error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(1);
-        } catch (WalletCallException wce) 
+        } catch (WalletCallException wce)
         {
             wce.printStackTrace();
-            
+
             if ((wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks")      != -1)  ||
             	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Rescanning")            != -1)  ||
             	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Loading wallet")        != -1)  ||
@@ -279,21 +279,21 @@ public class ZCashUI
                         "connections. It is still loading the wallet and blockchain. Please try to \n" +
                         "start the GUI wallet later...",
                         "Wallet communication error",
-                        JOptionPane.ERROR_MESSAGE);                
+                        JOptionPane.ERROR_MESSAGE);
             } else
             {
                 JOptionPane.showMessageDialog(
                     null,
                     "There was a problem communicating with the ZCash daemon/wallet. \n" +
-                    "Please ensure that zcashd is started. Error message is: \n" +        
+                    "Please ensure that zcashd is started. Error message is: \n" +
                      wce.getMessage() +
                     "See the console output for more detailed error information!",
                     "Wallet communication error",
                     JOptionPane.ERROR_MESSAGE);
             }
-            
+
             System.exit(2);
-        } catch (Exception e) 
+        } catch (Exception e)
         {
             e.printStackTrace();
             JOptionPane.showMessageDialog(
@@ -303,6 +303,6 @@ public class ZCashUI
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(3);
-        }     
+        }
     }
 }
