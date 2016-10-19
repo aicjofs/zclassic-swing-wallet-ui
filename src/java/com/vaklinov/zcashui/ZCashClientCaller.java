@@ -200,7 +200,7 @@ public class ZCashClientCaller
 	public synchronized String[] getWalletPublicAddressesWithUnspentOutputs()
 		throws WalletCallException, IOException, InterruptedException
 	{
-		JsonArray jsonUnspentOutputs = executeCommandAndGetJsonArray("listunspent", null);
+		JsonArray jsonUnspentOutputs = executeCommandAndGetJsonArray("listunspent", "0");
 
 		Set<String> addresses = new HashSet<>();
 	    for (int i = 0; i < jsonUnspentOutputs.size(); i++)
@@ -240,10 +240,20 @@ public class ZCashClientCaller
 	}
 	
 	
+	// Returns confirmed balance only!
 	public synchronized String getBalanceForAddress(String address)
 		throws WalletCallException, IOException, InterruptedException
 	{
 	    JsonValue response = this.executeCommandAndGetJsonValue("z_getbalance", address);
+	    
+		return String.valueOf(response.toString());
+	}
+	
+	
+	public synchronized String getUnconfirmedBalanceForAddress(String address)
+		throws WalletCallException, IOException, InterruptedException
+	{
+	    JsonValue response = this.executeCommandAndGetJsonValue("z_getbalance", address, "0");
 	    
 		return String.valueOf(response.toString());
 	}

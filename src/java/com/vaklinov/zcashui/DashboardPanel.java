@@ -510,7 +510,7 @@ public class DashboardPanel
 	private JTable createTransactionsTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String columnNames[] = { "Type", "Direction", "Amount", "Date", "Address"};
+		String columnNames[] = { "Type", "Direction", "Amount", "Date", "Destination Address"};
         JTable table = new DataTable(rowData, columnNames);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(170);
@@ -585,6 +585,9 @@ public class DashboardPanel
 			} else if (t[1].equals("generate"))
 			{
 				t[1] = "\u2692\u2699 MINED";
+			} else if (t[1].equals("immature"))
+			{
+				t[1] = "\u2696 Immature";
 			};
 
 			// Date

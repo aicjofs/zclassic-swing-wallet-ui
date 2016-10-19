@@ -110,8 +110,9 @@ public class AddressesPanel
 		warningPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		JLabel warningL = new JLabel(
 				"<html><span style=\"font-size:8px;\">" +
-				" * Only confirmed address balances are shown in the table. If you have sent cash from an address " +
-				"in the past few minutes, its balance may appear to be reduced or zero until confirmed! " +
+				"* If the balance of an address is flagged as not confirmed, the address is currently taking " +
+				"part in a transaction. The shown balance then is the expected value it will have when " +
+				"the transaction is confirmed. " +
 				"The average confirmation time is 2.5 min." +
 			    "</span>");
 		warningPanel.add(warningL, BorderLayout.NORTH);
@@ -220,11 +221,12 @@ public class AddressesPanel
 	private JTable createAddressBalanceTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String columnNames[] = { "Balance", "Address" };
+		String columnNames[] = { "Balance", "Confirmed?", "Address" };
         JTable table = new DataTable(rowData, columnNames);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(160);
-        table.getColumnModel().getColumn(1).setPreferredWidth(1000);
+        table.getColumnModel().getColumn(1).setPreferredWidth(140);
+        table.getColumnModel().getColumn(2).setPreferredWidth(1000);
 
         return table;
 	}
@@ -263,9 +265,16 @@ public class AddressesPanel
 
 		for (String address : tAddressesCombined)
 		{
+			String confirmedBalance = this.clientCaller.getBalanceForAddress(address);
+			String unconfirmedBalance = this.clientCaller.getUnconfirmedBalanceForAddress(address);
+			boolean isConfirmed =  (confirmedBalance.equals(unconfirmedBalance));
+			
+			// TODO: format balance
+			
 			addressBalances[i++] = new String[] 
 			{  
-				this.clientCaller.getBalanceForAddress(address),
+				isConfirmed ? confirmedBalance : unconfirmedBalance,
+				isConfirmed ? "Yes \u2690" : "No  \u2691",
 				address
 			};
 		}
@@ -273,9 +282,16 @@ public class AddressesPanel
 		for (String address : zAddresses)
 		{
 			// TODO: check for wrong/negative balance, - maybe address does not exist
+			String confirmedBalance = this.clientCaller.getBalanceForAddress(address);
+			String unconfirmedBalance = this.clientCaller.getUnconfirmedBalanceForAddress(address);
+			boolean isConfirmed =  (confirmedBalance.equals(unconfirmedBalance));
+			
+			// TODO: format balance
+			
 			addressBalances[i++] = new String[] 
 			{  
-				this.clientCaller.getBalanceForAddress(address),
+				isConfirmed ? confirmedBalance : unconfirmedBalance,
+				isConfirmed ? "Yes \u2690" : "No  \u2691",
 				address
 			};
 		}

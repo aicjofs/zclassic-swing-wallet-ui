@@ -104,13 +104,6 @@ The latter needs to be disabled.
 1. Issue: When sending cash from an address without spending its entire available balance, the remaining balance remains 
 in the wallet. However the wallet total balance does not immediately reflect this and it **appears for a few minutes**
 **that the entire address balance has been sent/spent!** This behavior comes from the underlying ZCash implementation.
-1. Limitation: Transparent (T) addresses not created via the GUI are not shown in the list of "Own addresses"
-1. Limitation: The wallet GUI keeps track of transparent (T) addresses created via the GUI in file
-`/home/user/.ZCashSwingWalletUI/CreatedTransparentAddresses.txt` 
-If the wallet file (`wallet.dat`) is manually replaced then file `CreatedTransparentAddresses.txt`
-needs to be manually replaced too (or deleted)! 
-**If this is not done, the wallet may show transparent (T) addresses that do not belong to it!** 
-This limitation will be removed in future versions!
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
 transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools 
 (`zcash-cli`). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
