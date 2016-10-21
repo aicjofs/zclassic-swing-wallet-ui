@@ -59,7 +59,7 @@ presents the information in a user-friendly manner.
 
 3. Installing the built ZCash GUI wallet
 
-3.1. If you have built ZCash from source code:
+  3.1. If you have built ZCash from source code:
 
    Assuming you have already built from source code [ZCash](https://z.cash/) in directory `/home/user/zcash/src` (for 
    example - this is the typical build dir. for ZCash v1.0.0-rc1) which contains the command line tools `zcash-cli` 
@@ -68,7 +68,8 @@ presents the information in a user-friendly manner.
    ```
    user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ cp ./build/jars/ZCashSwingWalletUI.jar /home/user/zcash/src    
    ```
-3.2. If you have installed the ZCash [binary packages](https://github.com/zcash/zcash/wiki/Debian-binary-packages)
+   
+  3.2. If you have installed the ZCash [binary packages](https://github.com/zcash/zcash/wiki/Debian-binary-packages)
 
    The the command line tools `zcash-cli` and `zcashd` are placed by the package installer in:
    ```
