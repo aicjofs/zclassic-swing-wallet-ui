@@ -13,12 +13,13 @@ presents the information in a user-friendly manner.
 **For security reasons it is recommended to always build the program from GitHub**
 **[source](https://github.com/vaklinov/zcash-swing-wallet-ui/archive/master.zip).**
 **The details of how to build it are described below (easy to follow).**
-**There is no plan as of now to distribute binary versions due to the risk of hacking attacks!**
+**Binary versions will be distributed in the future but they carry the risk of hacking attacks!**
 
 1. Operating system and tools
 
-   As of October 2016 (ZCash v1.0.0-beta2) this program is only intended to work on Linux 
-   (same limitation as [ZCash](https://z.cash/)). The Linux tools you need to build and run 
+   As of October 2016 (ZCash v1.0.0-rc1) this program is only intended to work on Linux 
+   (same limitation as [ZCash](https://z.cash/)). Future versions will work on MAC/Windows.  
+   The Linux tools you need to build and run 
    the Wallet GUI are Git, Java (JDK7 or later) and Ant. If using Ubuntu Linux, they may be 
    installed via command: 
    ```
@@ -58,15 +59,26 @@ presents the information in a user-friendly manner.
 
 3. Installing the built ZCash GUI wallet
 
-   Assuming you have already installed [ZCash](https://z.cash/) in directory `/home/user/zcash/src` (for 
-   example - this is the typical install dir. for ZCash v1.0.0-beta2) which contains the command line tools `zcash-cli` 
+3.1. If you have built ZCash from source code:
+
+   Assuming you have already built from source code [ZCash](https://z.cash/) in directory `/home/user/zcash/src` (for 
+   example - this is the typical build dir. for ZCash v1.0.0-rc1) which contains the command line tools `zcash-cli` 
    and `zcashd` you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it 
    to diretcory `/home/user/zcash/src` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
    ```
    user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ cp ./build/jars/ZCashSwingWalletUI.jar /home/user/zcash/src    
    ```
+3.2. If you have installed the ZCash [binary packages](https://github.com/zcash/zcash/wiki/Debian-binary-packages)
 
-3. Running the installed ZCash GUI wallet
+   The the command line tools `zcash-cli` and `zcashd` are placed by the package installer in:
+   ```
+   /usr/bin/zcash-cli
+   /usr/bin/zcashd
+   ```
+   The ZCash GUI wallet knows how to find them there. You may place the file  `./build/jars/ZCashSwingWalletUI.jar`
+   anywhere in your `/home` directory that you find convenient and start it from there.
+
+4. Running the installed ZCash GUI wallet
 
    Before running the GUI you need to start zcashd (e.g. `zcashd --daemon`). The wallet GUI is a Java program packaged 
    as an executable JAR file. It may be run from command line or started from another GUI tool (e.g. file manager). 
@@ -101,9 +113,6 @@ SOFTWARE.
 `zcashd -datadir=/home/data/whatever` This will be fixed in later versions.
 1. Issue: GUI data tables (transactions/addresses etc.) allow copying of data via double click but also allow editing. 
 The latter needs to be disabled. 
-1. Issue: When sending cash from an address without spending its entire available balance, the remaining balance remains 
-in the wallet. However the wallet total balance does not immediately reflect this and it **appears for a few minutes**
-**that the entire address balance has been sent/spent!** This behavior comes from the underlying ZCash implementation.
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
 transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools 
 (`zcash-cli`). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
