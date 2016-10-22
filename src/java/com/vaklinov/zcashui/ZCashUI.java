@@ -72,6 +72,7 @@ public class ZCashUI
     private JMenuItem menuItemExit;
     private JMenuItem menuItemAbout;
     private JMenuItem menuItemEncrypt;
+    private JMenuItem menuItemBackup;
 
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
@@ -80,7 +81,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.24 (beta)");
+        super("ZCash Swing Wallet UI 0.25 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -123,6 +124,7 @@ public class ZCashUI
 
         JMenu wallet = new JMenu("Wallet");
         wallet.setMnemonic(KeyEvent.VK_W);
+        wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
         wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_A));
         mb.add(wallet);
 
@@ -152,6 +154,17 @@ public class ZCashUI
             }
         );
 
+        menuItemBackup.addActionListener(   
+        	new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    ZCashUI.this.walletOps.backupWallet();
+                }
+            }
+        );
+        
         menuItemEncrypt.addActionListener(
             new ActionListener()
             {

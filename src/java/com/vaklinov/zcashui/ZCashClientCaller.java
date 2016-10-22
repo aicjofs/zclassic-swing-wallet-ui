@@ -498,6 +498,15 @@ public class ZCashClientCaller
 		System.out.println("Result of wallet encryption is: \n" + response);
 		// If no exception - obviously successful
 	}
+	
+	
+	public void backupWallet(String fileName)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		System.out.println("Backup up wallet to location: " + fileName);
+		String response = this.executeCommandAndGetSingleStringResponse("backupwallet", fileName);
+		// If no exception - obviously successful		
+	}
 
 
 	private JsonObject executeCommandAndGetJsonObject(String command1, String command2)

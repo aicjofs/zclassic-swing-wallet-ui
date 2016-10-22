@@ -454,11 +454,11 @@ public class DashboardPanel
 		
 		String text =
 			"<html>" + 
-		    "<span style=\"" + color1 + "\">Transparent balance: " + transparentUCBalance + 
-		    	" ZEC </span><br/> " +
-			"<span style=\"" + color2 + "\">Private ( Z ) balance: <span style=\"font-weight:bold\">" + 
+		    "<span style=\"font-family:monospace;font-size:9px;" + color1 + "\">Transparent balance: " + 
+				transparentUCBalance + " ZEC </span><br/> " +
+			"<span style=\"font-family:monospace;font-size:9px;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold\">" + 
 		    	privateUCBalance + " ZEC </span></span><br/> " +
-			"<span style=\"" + color3 + "\">Total ( Z+T ) balance: <span style=\"font-weight:bold\">" + 
+			"<span style=\"font-family:monospace;font-size:9px;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:11.5px;\">" + 
 		    	totalUCBalance + " ZEC </span></span>" +
 			"<br/>  </html>";
 		
@@ -469,7 +469,14 @@ public class DashboardPanel
 		    (!privateBalance.equals(privateUCBalance))         ||
 		    (!totalBalance.equals(totalUCBalance)))
 		{
-			toolTip = "Immature balance is being shown due to an ongoing transaction!";
+			toolTip = "<html>" +
+					  "Unconfirmed (unspendable) balance is being shown due to an<br/>" + 
+		              "ongoing transaction! Actual confirmed (spendable) balance is:<br/>" +
+		              "<span style=\"font-size:5px\"><br/></span>" +
+					  "Transparent: " + transparentBalance + " ZEC<br/>" +
+		              "Private ( Z ): <span style=\"font-weight:bold\">" + privateBalance + " ZEC</span><br/>" +
+					  "Total ( Z+T ): <span style=\"font-weight:bold\">" + totalBalance + " ZEC</span>" +
+					  "</html>";
 		}
 		
 		this.walletBalanceLabel.setToolTipText(toolTip);

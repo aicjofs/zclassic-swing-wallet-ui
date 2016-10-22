@@ -29,8 +29,12 @@
 package com.vaklinov.zcashui;
 
 import java.awt.Cursor;
+import java.io.File;
 import java.io.IOException;
+
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 
@@ -143,6 +147,57 @@ public class WalletOperations
 				"Wallet is now encrypted...", JOptionPane.INFORMATION_MESSAGE);
 			
 			this.parent.exitProgram();
+			
+		} catch (Exception e)
+		{
+			this.errorReporter.reportError(e, false);
+		}
+	}
+	
+	
+	public void backupWallet()
+	{
+		try
+		{
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("Backup wallet to file...");
+			fileChooser.setFileFilter(new FileNameExtensionFilter("wallets (*.dat)", "dat"));
+			 
+			int result = fileChooser.showSaveDialog(this.parent);
+			 
+			if (result != JFileChooser.APPROVE_OPTION) 
+			{
+			    return;
+			}
+			
+			File f = fileChooser.getSelectedFile();
+			
+			Cursor oldCursor = this.parent.getCursor();
+			try
+			{
+				this.parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+							
+				this.clientCaller.backupWallet(f.getCanonicalPath());
+				
+				this.parent.setCursor(oldCursor);
+			} catch (WalletCallException wce)
+			{
+				this.parent.setCursor(oldCursor);
+				wce.printStackTrace();
+				
+				JOptionPane.showMessageDialog(
+					this.parent, 
+					"An unexpected error occurred while backing up the wallet!" +
+					"\n" + wce.getMessage().replace(",", ",\n"),
+					"Error in backing up wallet...", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			JOptionPane.showMessageDialog(
+				this.parent, 
+				"The wallet has been backed up successfully to location:\n" +
+				f.getCanonicalPath(),
+				"Wallet is backed up...", JOptionPane.INFORMATION_MESSAGE);
 			
 		} catch (Exception e)
 		{

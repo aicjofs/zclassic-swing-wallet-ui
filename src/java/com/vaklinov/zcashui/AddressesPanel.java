@@ -30,6 +30,7 @@ package com.vaklinov.zcashui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +39,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.RandomAccessFile;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -124,12 +126,23 @@ public class AddressesPanel
 		{	
 			public void actionPerformed(ActionEvent e) 
 			{
+				Cursor oldCursor = null;
 				try
 				{
-					// TODO: Hourglass cursor + dummy progress bar ...
+					// TODO: dummy progress bar ...
+					oldCursor = AddressesPanel.this.getCursor();
+					AddressesPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					
 					AddressesPanel.this.updateWalletAddressBalanceTable();
+					
+					AddressesPanel.this.setCursor(oldCursor);
 				} catch (Exception ex)
 				{
+					if (oldCursor != null)
+					{
+						AddressesPanel.this.setCursor(oldCursor);
+					}
+					
 					ex.printStackTrace();
 					AddressesPanel.this.errorReporter.reportError(ex, false);
 				}
@@ -152,7 +165,6 @@ public class AddressesPanel
 			}
 		});
 		
-		// TODO: validate stored t addresses on startup
 	}
 
 	
@@ -261,19 +273,22 @@ public class AddressesPanel
 		
 		String[][] addressBalances = new String[zAddresses.length + tAddressesCombined.size()][];
 		
+		// Format double numbers - else sometimes we get exponential notation 1E-4 ZEC
+		DecimalFormat df = new DecimalFormat("########0.00######");
+		
 		int i = 0;
 
 		for (String address : tAddressesCombined)
 		{
 			String confirmedBalance = this.clientCaller.getBalanceForAddress(address);
 			String unconfirmedBalance = this.clientCaller.getUnconfirmedBalanceForAddress(address);
-			boolean isConfirmed =  (confirmedBalance.equals(unconfirmedBalance));
-			
-			// TODO: format balance
+			boolean isConfirmed =  (confirmedBalance.equals(unconfirmedBalance));			
+			String balanceToShow = df.format(Double.valueOf(
+				isConfirmed ? confirmedBalance : unconfirmedBalance));
 			
 			addressBalances[i++] = new String[] 
 			{  
-				isConfirmed ? confirmedBalance : unconfirmedBalance,
+				balanceToShow,
 				isConfirmed ? "Yes \u2690" : "No  \u2691",
 				address
 			};
@@ -281,16 +296,15 @@ public class AddressesPanel
 		
 		for (String address : zAddresses)
 		{
-			// TODO: check for wrong/negative balance, - maybe address does not exist
 			String confirmedBalance = this.clientCaller.getBalanceForAddress(address);
 			String unconfirmedBalance = this.clientCaller.getUnconfirmedBalanceForAddress(address);
 			boolean isConfirmed =  (confirmedBalance.equals(unconfirmedBalance));
-			
-			// TODO: format balance
+			String balanceToShow = df.format(Double.valueOf(
+				isConfirmed ? confirmedBalance : unconfirmedBalance));
 			
 			addressBalances[i++] = new String[] 
 			{  
-				isConfirmed ? confirmedBalance : unconfirmedBalance,
+				balanceToShow,
 				isConfirmed ? "Yes \u2690" : "No  \u2691",
 				address
 			};
