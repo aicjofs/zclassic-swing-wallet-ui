@@ -1,4 +1,4 @@
-# [ZCash](https://z.cash/) Desktop GUI Wallet - v0.25-beta
+# [ZCash](https://z.cash/) Desktop GUI Wallet - binary release v0.25-beta
 
 This document describes how to install binary release v0.25-beta of the [ZCash](https://z.cash/) 
 Desktop GUI Wallet. This release of the ZCash Desktop GUI Wallet is tested with ZCash version 
@@ -20,10 +20,10 @@ It is intended to be used in the ZCash test network only - not in production!
    need to compute its SHA256 checksum, like this:
    ```
    user@ubuntu:~/Downloads$ sha256sum ZCashSwingWalletUI.jar 
-   **5042002b1ac2ceabdce04fc2a2a2534315c4ad59f85e7efa7349ad20ec3519ad**  ZCashSwingWalletUI.jar
+   5042002b1ac2ceabdce04fc2a2a2534315c4ad59f85e7efa7349ad20ec3519ad  ZCashSwingWalletUI.jar
    ```
-   If the resulting checksum is not `5042002b1ac2ceabdce04fc2a2a2534315c4ad59f85e7efa7349ad20ec3519ad` then
-   something is wrong and you should discard the downloaded wallet!
+   **If the resulting checksum is not `5042002b1ac2ceabdce04fc2a2a2534315c4ad59f85e7efa7349ad20ec3519ad` then**
+   **something is wrong and you should discard the downloaded wallet!**
 
 3. Installing the downloaded ZCash GUI wallet
 
