@@ -13,10 +13,12 @@ presents the information in a user-friendly manner.
 **For security reasons it is recommended to always build the program from GitHub**
 **[source](https://github.com/vaklinov/zcash-swing-wallet-ui/archive/master.zip).**
 The details of how to build it are described below (easy to follow).
-**Binary versions will be distributed in the future but they carry the risk of hacking attacks!**
 Users who are less experienced with working on a command line, may instead use this 
 quite-user-friendly [installation guide](https://www.cryptocompare.com/wallets/guides/how-to-install-the-zcash-gui-wallet) 
 and [usage guide](https://www.cryptocompare.com/wallets/guides/how-to-use-the-zcash-gui-wallet).
+
+Users who insist on downloading a binary release may instead use 
+[ZCash Desktop GUI Wallet - binary release v0.25-beta](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.25-beta.md)
 
 1. Operating system and tools
 
