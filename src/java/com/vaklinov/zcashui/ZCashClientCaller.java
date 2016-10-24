@@ -139,7 +139,7 @@ public class ZCashClientCaller
 	    String strTransactions[][] = new String[jsonTransactions.size()][];
 	    for (int i = 0; i < jsonTransactions.size(); i++)
 	    {
-	    	strTransactions[i] = new String[5];
+	    	strTransactions[i] = new String[6];
 	    	JsonObject trans = jsonTransactions.get(i).asObject();
 
 	    	// Needs to be the same as in getWalletZReceivedTransactions()
@@ -149,6 +149,8 @@ public class ZCashClientCaller
 	    	strTransactions[i][2] = trans.get("amount").toString();
 	    	strTransactions[i][3] = trans.get("time").toString();
 	    	strTransactions[i][4] = trans.getString("address", "\u26D4 (Z Address not listed by wallet!)");
+	    	strTransactions[i][5] = trans.get("txid").toString();
+
 	    }
 
 	    return strTransactions;
@@ -181,7 +183,7 @@ public class ZCashClientCaller
 		    JsonArray jsonTransactions = executeCommandAndGetJsonArray("z_listreceivedbyaddress", zAddress, "0");
 		    for (int i = 0; i < jsonTransactions.size(); i++)
 		    {
-		    	String[] currentTransaction = new String[5];
+		    	String[] currentTransaction = new String[6];
 		    	JsonObject trans = jsonTransactions.get(i).asObject();
 
 		    	// Needs to be the same as in getWalletPublicTransactions()
@@ -192,6 +194,7 @@ public class ZCashClientCaller
 		    	String txID = trans.getString("txid", "ERROR!");
 		    	currentTransaction[3] = this.getWalletTransactionTime(txID);
 		    	currentTransaction[4] = zAddress;
+		    	currentTransaction[5] = trans.get("txid").toString();
 
 		    	zReceivedTransactions.add(currentTransaction);
 		    }
@@ -306,7 +309,7 @@ public class ZCashClientCaller
 		String[] sendCashParameters = new String[]
 	    {
 		    this.zcashcli.getCanonicalPath(), "z_sendmany", from,
-		    // This replacement is a hack to make the JSON object amount has double format 0.00 etc.
+		    // This replacement is a hack to make sure the JSON object amount has double format 0.00 etc.
 		    // TODO: find a better way to format the amount
 		    toMany.toString().replace("\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"",
 		    		                  "\"amount\":" + new DecimalFormat("########0.00######").format(Double.valueOf(amount)))

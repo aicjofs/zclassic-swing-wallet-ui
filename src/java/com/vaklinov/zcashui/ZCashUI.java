@@ -50,6 +50,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 import com.vaklinov.zcashui.ZCashInstallationObserver.InstallationDetectionException;
@@ -81,7 +83,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.25 (beta)");
+        super("ZCash Swing Wallet UI 0.26 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -115,19 +117,69 @@ public class ZCashUI
 
         // Build menu
         JMenuBar mb = new JMenuBar();
-        JMenu file = new JMenu("File");
-        file.setMnemonic(KeyEvent.VK_F);
+        JMenu file = new JMenu("Main");
+        file.setMnemonic(KeyEvent.VK_M);
         file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_A));
         file.addSeparator();
-        file.add(menuItemExit = new JMenuItem("Exit", KeyEvent.VK_E));
+        file.add(menuItemExit = new JMenuItem("Quit", KeyEvent.VK_Q));
         mb.add(file);
 
         JMenu wallet = new JMenu("Wallet");
         wallet.setMnemonic(KeyEvent.VK_W);
         wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
-        wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_A));
+        wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_E));
         mb.add(wallet);
 
+        // TODO: Temporarily disable encryption until further notice - Oct 24 2016
+        menuItemEncrypt.setEnabled(false);
+        
+        // TODO: Temporary warning regarding spending mined coins
+        // https://github.com/zcash/zcash/issues/1616
+        tabs.addChangeListener(
+        	new ChangeListener() 
+        	{	
+				@Override
+				public void stateChanged(ChangeEvent e) 
+				{
+					JTabbedPane tabs = (JTabbedPane)e.getSource();
+					if (tabs.getSelectedIndex() == 2)
+					{
+		                try
+		                {
+		                    String userDir = OSUtil.getSettingsDirectory();
+		                    File warningFlagFile = new File(userDir + "/warningOnIssue1616Shown.flag");
+		                    if (warningFlagFile.exists())
+		                    {
+		                        return;
+		                    } else
+		                    {
+		                        warningFlagFile.createNewFile();
+		                    }
+
+		                } catch (IOException ioe)
+		                {
+		                    /* TODO: report exceptions to the user */
+		                    ioe.printStackTrace();
+		                }
+		                
+		                JOptionPane.showMessageDialog(
+		                    ZCashUI.this.getRootPane().getParent(),
+		                    "The ZCash 1.0 release has a known issue when spending freshly mined cash. \n" + 
+		                    "When you spend freshly mined cash from a T address to a Z address, you must \n" +
+		                    "spend the entire available mined T address balance. If you attempt to spend\n" +
+		                    "only a part of it, the entire balance will be spent and sent to the specified\n" +
+		                    "destination address anyway! \n\n" +
+		                    "For full details see issue: https://github.com/zcash/zcash/issues/1616\n" +
+		                    "\n" +
+		                    "(This message will be shown only once)",
+		                    "Warning on spending newly mined cash...", JOptionPane.WARNING_MESSAGE);
+
+					}
+				}
+			}
+        );
+        // END  warning regarding spending mined coins
+        
         this.setJMenuBar(mb);
 
         // Add listeners etc.
@@ -250,6 +302,7 @@ public class ZCashUI
             System.out.println("Starting ZCash Swing Wallet ...");
             System.out.println("Current directory: " + new File(".").getCanonicalPath());
             System.out.println("Class path: " + System.getProperty("java.class.path"));
+            System.out.println("Environment PATH: " + System.getenv("PATH"));
 
             ////////////////////////////////////////////////////////////
             for (LookAndFeelInfo ui : UIManager.getInstalledLookAndFeels())
@@ -298,7 +351,8 @@ public class ZCashUI
                 JOptionPane.showMessageDialog(
                     null,
                     "There was a problem communicating with the ZCash daemon/wallet. \n" +
-                    "Please ensure that zcashd is started. Error message is: \n" +
+                    "Please ensure that the ZCash server zcashd is started (e.g. via \n" + 
+                    "command  \"zcashd --daemon\"). Error message is: \n" +
                      wce.getMessage() +
                     "See the console output for more detailed error information!",
                     "Wallet communication error",

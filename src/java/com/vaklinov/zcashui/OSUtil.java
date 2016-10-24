@@ -114,6 +114,7 @@ public class OSUtil
 	// Can be used to find zcashd/zcash-cli
 	// Null if not found
 	public static File findZCashCommand(String command)
+		throws IOException
 	{
 		final String dirs[] = new String[]
 		{
@@ -135,8 +136,16 @@ public class OSUtil
 				return f;
 			}
 		}
+		
+		// Try in the current directory
+		File f = new File("." + File.separator + command);
+		if (f.exists() && f.isFile())
+		{
+			return f.getCanonicalFile();
+		}
 
-		// TODO: Try to find it with which
+		// TODO: Try to find it with which/PATH
+		
 		return null;
 	}
 }

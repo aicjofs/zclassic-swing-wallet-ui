@@ -115,6 +115,13 @@ SOFTWARE.
 
 ### Known issues and limitations
 
+1. Wallet encryption has been temporarily disabled in ZCash due to stability problems. A corresponding issue 
+[#1552](https://github.com/zcash/zcash/issues/1552) has been opened by the ZCash developers. Correspondingly
+wallet encryption has been temporarily disabled in the ZCash Desktop GUI Wallet.
+1. **The ZCash 1.0 release has a known issue when spending freshly mined cash. When you spend freshly mined** 
+**cash from a T address to a Z address, you must spend the entire available mined T address balance. If you** 
+**attempt to spend only a part of it, the entire balance will be spent and sent to the specified destination** 
+**address anyway! For full details see issue: [#1616](https://github.com/zcash/zcash/issues/1616)**
 1. Issue: the GUI wallet does not work correctly if zcashd is started with a custom data directory, like:
 `zcashd -datadir=/home/data/whatever` This will be fixed in later versions.
 1. Issue: GUI data tables (transactions/addresses etc.) allow copying of data via double click but also allow editing. 

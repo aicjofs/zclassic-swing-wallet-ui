@@ -77,20 +77,7 @@ public class WalletOperations
 	public void encryptWallet()
 	{
 		try
-		{
-		    int option = JOptionPane.showConfirmDialog(  
-		          this.parent,
-		          "ZCash wallet encryption is not yet considered a stable feature.\n" +
-		          "For more information see issue: \n" +
-		          "https://github.com/zcash/zcash/issues/1552\n\n" +
-		          "Are you sure you wish to encrypt the wallet?",
-		          "Wallet encryption notice...",
-		          JOptionPane.YES_NO_OPTION);
-		    if (option == JOptionPane.NO_OPTION)
-		    {
-		    	return;
-		    }
-			
+		{			
 			if (this.clientCaller.isWalletEncrypted())
 			{
 		        JOptionPane.showMessageDialog(

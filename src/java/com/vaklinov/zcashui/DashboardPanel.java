@@ -391,14 +391,14 @@ public class DashboardPanel
 		}
 		
 		// TODO: Get the start date right after ZCash release - from first block!!!
-		final Date startDate = new Date("04 Oct 2016 22:00:00 GMT");
+		final Date startDate = new Date("21 Oct 2016 22:00:00 GMT");
 		final Date nowDate = new Date(System.currentTimeMillis());
 		
 		long fullTime = nowDate.getTime() - startDate.getTime();
 		long remainingTime = nowDate.getTime() - info.lastBlockDate.getTime();
 		
 		String percentage = "100";
-		if (remainingTime > 20 * 60 * 1000) // After 10 min we report 100% anyway
+		if (remainingTime > 20 * 60 * 1000) // After 20 min we report 100% anyway
 		{
 			double dPercentage = 100d - (((double)remainingTime / (double) fullTime) * 100d);
 			if (dPercentage < 0)
@@ -415,13 +415,38 @@ public class DashboardPanel
 			// TODO: write log that we fix minimum date! - this condition should not occur
 			info.lastBlockDate = startDate;
 		}
+		
+		String tick = "";
+		if (percentage.equals("100"))
+		{
+			tick = "<span style=\"font-weight:bold;font-size:12px;color:green\"> \u2705</span>";
+		}
+		
+		String netColor = "red";
+		if (info.numConnections > 0)
+		{
+			netColor = "#cc3300";
+		}
+		
+		if (info.numConnections > 2)
+		{
+			netColor = "black";
+		}	
+		
+		if (info.numConnections > 6)
+		{
+			netColor = "green";
+		}		
 				
 		String text =
 			"<html> " +
-		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + percentage + "% </span> <br/>" +
+		    "Blockchain synchronized: <span style=\"font-weight:bold\">" + 
+			percentage + "% </span> " + tick + " <br/>" +
 			"Up to: <span style=\"font-size:8px;font-weight:bold\">" + 
-		    info.lastBlockDate.toLocaleString() + "</span>  <br/> <br/>" + 
-			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections </span>";
+		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
+			"<span style=\"font-size:1px\"><br/></span>" + 
+			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections</span>" +
+			"<span style=\"font-size:16px;color:" + netColor + "\"> \u26D7</span>";
 		this.networkAndBlockchainLabel.setText(text);
 	}
 	
@@ -499,7 +524,9 @@ public class DashboardPanel
 			((newTransactionsData.length > 0) && 
 			 (!lastTransactionsData[0][3].equals(newTransactionsData[0][3]))) ||
 			((newTransactionsData.length > 0) && 
-		     (!lastTransactionsData[0][4].equals(newTransactionsData[0][4]))))
+		     (!lastTransactionsData[0][4].equals(newTransactionsData[0][4]))) ||
+			((newTransactionsData.length > 0) && 
+		     (!lastTransactionsData[0][1].equals(newTransactionsData[0][1]))))
 		{
 			this.remove(transactionsTablePane);
 			this.add(transactionsTablePane = new JScrollPane(
