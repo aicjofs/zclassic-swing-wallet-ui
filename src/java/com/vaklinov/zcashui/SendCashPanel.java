@@ -33,8 +33,14 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -48,9 +54,12 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
@@ -284,6 +293,54 @@ public class SendCashPanel
 		timerBalancesUpdater.setInitialDelay(3000);
 		timerBalancesUpdater.start();
 		this.timers.add(timerBalancesUpdater);
+		
+		// Add a popup menu to the destination address field - for convenience
+		JMenuItem paste = new JMenuItem("Paste address");
+		final JPopupMenu popupMenu = new JPopupMenu();
+        popupMenu.add(paste);
+        paste.addActionListener(new ActionListener() 
+        {	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				try
+				{
+					String address = (String)Toolkit.getDefaultToolkit().getSystemClipboard().
+							         getData(DataFlavor.stringFlavor);
+					if ((address != null) && (address.trim().length() > 0))
+					{
+						SendCashPanel.this.destinationAddressField.setText(address);
+					}
+				} catch (Exception ex)
+				{
+					ex.printStackTrace();
+					// TODO: clipboard exception handling - do it better
+					// java.awt.datatransfer.UnsupportedFlavorException: Unicode String
+					//SendCashPanel.this.errorReporter.reportError(ex);
+				}
+			}
+		});
+        
+        this.destinationAddressField.addMouseListener(new MouseAdapter()
+        {
+        	public void mousePressed(MouseEvent e)
+        	{
+                if ((!e.isConsumed()) && e.isPopupTrigger())
+                {
+                    popupMenu.show(e.getComponent(), e.getPoint().x, e.getPoint().y);
+                    e.consume();
+                };
+        	}
+        	
+            public void mouseReleased(MouseEvent e)
+            {
+            	if ((!e.isConsumed()) && e.isPopupTrigger())
+            	{
+            		mousePressed(e);
+            	}
+            }
+        });
+		
 	}
 	
 	

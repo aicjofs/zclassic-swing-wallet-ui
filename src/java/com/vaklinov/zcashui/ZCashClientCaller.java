@@ -305,14 +305,25 @@ public class ZCashClientCaller
 
 		JsonArray toMany = new JsonArray();
 		toMany.add(toArgument);
+		
+		String amountPattern = "\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"";
+		// Make sure our replacement hack never leads to a mess up
+		String toManyBeforeReplace = toMany.toString();
+		int firstIndex = toManyBeforeReplace.indexOf(amountPattern);
+		int lastIndex = toManyBeforeReplace.lastIndexOf(amountPattern);
+		if ((firstIndex == -1) || (firstIndex != lastIndex))
+		{
+			throw new WalletCallException("Error in forming z_sendmany command: " + toManyBeforeReplace);
+		}
 
 		String[] sendCashParameters = new String[]
 	    {
 		    this.zcashcli.getCanonicalPath(), "z_sendmany", from,
 		    // This replacement is a hack to make sure the JSON object amount has double format 0.00 etc.
 		    // TODO: find a better way to format the amount
-		    toMany.toString().replace("\"amount\":\"\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\"",
-		    		                  "\"amount\":" + new DecimalFormat("########0.00######").format(Double.valueOf(amount)))
+		    toMany.toString().replace(
+		    	amountPattern,
+		    	"\"amount\":" + new DecimalFormat("########0.00######").format(Double.valueOf(amount)))
 		};
 
 	    CommandExecutor caller = new CommandExecutor(sendCashParameters);

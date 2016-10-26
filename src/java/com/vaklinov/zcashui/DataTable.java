@@ -50,15 +50,17 @@ import javax.swing.JTable;
 public class DataTable 
 	extends JTable 
 {
-	int lastRow = -1;
-	int lastColumn = -1;
+	protected int lastRow = -1;
+	protected int lastColumn = -1;
+	
+	protected JPopupMenu popupMenu;
 	
 	public DataTable(final Object[][] rowData, final Object[] columnNames)
 	{
 		super(rowData, columnNames);
 		
 		JMenuItem copy = new JMenuItem("Copy value");
-		final JPopupMenu popupMenu = new JPopupMenu();
+		popupMenu = new JPopupMenu();
         popupMenu.add(copy);
         
         copy.addActionListener(new ActionListener() 

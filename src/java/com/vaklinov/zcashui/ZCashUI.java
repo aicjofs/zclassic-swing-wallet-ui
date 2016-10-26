@@ -83,7 +83,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.26 (beta)");
+        super("ZCash Swing Wallet UI 0.27 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -132,54 +132,7 @@ public class ZCashUI
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
         menuItemEncrypt.setEnabled(false);
-        
-        // TODO: Temporary warning regarding spending mined coins
-        // https://github.com/zcash/zcash/issues/1616
-        tabs.addChangeListener(
-        	new ChangeListener() 
-        	{	
-				@Override
-				public void stateChanged(ChangeEvent e) 
-				{
-					JTabbedPane tabs = (JTabbedPane)e.getSource();
-					if (tabs.getSelectedIndex() == 2)
-					{
-		                try
-		                {
-		                    String userDir = OSUtil.getSettingsDirectory();
-		                    File warningFlagFile = new File(userDir + "/warningOnIssue1616Shown.flag");
-		                    if (warningFlagFile.exists())
-		                    {
-		                        return;
-		                    } else
-		                    {
-		                        warningFlagFile.createNewFile();
-		                    }
-
-		                } catch (IOException ioe)
-		                {
-		                    /* TODO: report exceptions to the user */
-		                    ioe.printStackTrace();
-		                }
-		                
-		                JOptionPane.showMessageDialog(
-		                    ZCashUI.this.getRootPane().getParent(),
-		                    "The ZCash 1.0 release has a known issue when spending freshly mined cash. \n" + 
-		                    "When you spend freshly mined cash from a T address to a Z address, you must \n" +
-		                    "spend the entire available mined T address balance. If you attempt to spend\n" +
-		                    "only a part of it, the entire balance will be spent and sent to the specified\n" +
-		                    "destination address anyway! \n\n" +
-		                    "For full details see issue: https://github.com/zcash/zcash/issues/1616\n" +
-		                    "\n" +
-		                    "(This message will be shown only once)",
-		                    "Warning on spending newly mined cash...", JOptionPane.WARNING_MESSAGE);
-
-					}
-				}
-			}
-        );
-        // END  warning regarding spending mined coins
-        
+                
         this.setJMenuBar(mb);
 
         // Add listeners etc.

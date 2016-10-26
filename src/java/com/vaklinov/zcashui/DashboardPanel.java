@@ -479,11 +479,11 @@ public class DashboardPanel
 		
 		String text =
 			"<html>" + 
-		    "<span style=\"font-family:monospace;font-size:9px;" + color1 + "\">Transparent balance: " + 
-				transparentUCBalance + " ZEC </span><br/> " +
-			"<span style=\"font-family:monospace;font-size:9px;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold\">" + 
+		    "<span style=\"font-family:monospace;font-size:8.9px;" + color1 + "\">Transparent balance: <span style=\"font-size:9px\">" + 
+				transparentUCBalance + " ZEC </span></span><br/> " +
+			"<span style=\"font-family:monospace;font-size:8.9px;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:9px\">" + 
 		    	privateUCBalance + " ZEC </span></span><br/> " +
-			"<span style=\"font-family:monospace;font-size:9px;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:11.5px;\">" + 
+			"<span style=\"font-family:monospace;font-size:8.9px;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:11.5px;\">" + 
 		    	totalUCBalance + " ZEC </span></span>" +
 			"<br/>  </html>";
 		
