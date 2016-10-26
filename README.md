@@ -8,6 +8,12 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
+### Announcement about ZCash release 1.0
+ZCash is about to be released within hours. It is expected that the GUI wallet will work with the ZCash 1.0
+release but fixes may be necessary. There is more work planned for the time after release like the fix for
+showing outgoing Z transactions and various new features. So stay tuned and check for new versions in the days 
+after ZCash release. The fun does not end on Oct. 28th - it begins!
+
 ## Building, installing and running the Wallet GUI
 
 **For security reasons it is recommended to always build the program from GitHub**
@@ -16,9 +22,12 @@ The details of how to build it are described below (easy to follow).
 Users who are less experienced with working on a command line, may instead use this 
 quite-user-friendly [installation guide](https://www.cryptocompare.com/wallets/guides/how-to-install-the-zcash-gui-wallet) 
 and [usage guide](https://www.cryptocompare.com/wallets/guides/how-to-use-the-zcash-gui-wallet).
+The following videos also explain how to [set up ZCash](https://www.youtube.com/watch?v=9-P7IHC7d-o) and 
+how to [set up the GUI wallet](https://www.youtube.com/watch?v=IDifG4h1bgE).
 
 Users who insist on downloading a binary release may instead use 
-[ZCash Desktop GUI Wallet - binary release v0.25-beta](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.25-beta.md)
+[ZCash Desktop GUI Wallet - binary release v0.25-beta - 22 Oct 2016](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.25-beta.md)
+
 
 1. Operating system and tools
 
@@ -118,17 +127,12 @@ SOFTWARE.
 1. Limitation: Wallet encryption has been temporarily disabled in ZCash due to stability problems. A corresponding issue 
 [#1552](https://github.com/zcash/zcash/issues/1552) has been opened by the ZCash developers. Correspondingly
 wallet encryption has been temporarily disabled in the ZCash Desktop GUI Wallet.
-1. **Issue: The ZCash 1.0 release has a known issue when spending freshly mined cash. When you spend freshly mined** 
-**cash from a T address to a Z address, you must spend the entire available mined T address balance. If you** 
-**attempt to spend only a part of it, the entire balance will be spent and sent to the specified destination** 
-**address anyway! For full details see issue: [#1616](https://github.com/zcash/zcash/issues/1616)**
 1. Issue: the GUI wallet does not work correctly if zcashd is started with a custom data directory, like:
 `zcashd -datadir=/home/data/whatever` This will be fixed in later versions.
 1. Issue: GUI data tables (transactions/addresses etc.) allow copying of data via double click but also allow editing. 
 The latter needs to be disabled. 
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
-transactions). This will be addressed when it becomes possible to do so via the ZCash command line tools 
-(`zcash-cli`). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
-for the ZCash developers. 
+transactions). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
+for the ZCash developers - now fixed. A fix for the GUI wallet may be expected around 29-30th Oct 2016. 
 1. Limitation: The CPU percentage shown to be taken by zcashd is the average for the entire lifetime of the process. 
 This is not very useful. This will be improved in future versions.
