@@ -286,7 +286,7 @@ public class ZCashClientCaller
 			String hexChar = Integer.toHexString((int)c);
 			if (hexChar.length() < 2)
 			{
-				hexChar = "0" + hashCode();
+				hexChar = "0" + hexChar;
 			}
 			hexMemo.append(hexChar);
 		}

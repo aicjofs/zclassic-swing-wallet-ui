@@ -39,6 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -83,7 +84,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.27 (beta)");
+        super("ZCash Swing Wallet UI 0.28 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -153,8 +154,15 @@ public class ZCashUI
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    AboutDialog ad = new AboutDialog(ZCashUI.this);
-                    ad.setVisible(true);
+                	try
+                	{
+                		AboutDialog ad = new AboutDialog(ZCashUI.this);
+                		ad.setVisible(true);
+                	} catch (UnsupportedEncodingException uee)
+                	{
+                		uee.printStackTrace();
+                		ZCashUI.this.errorReporter.reportError(uee);
+                	}
                 }
             }
         );

@@ -391,7 +391,7 @@ public class DashboardPanel
 		}
 		
 		// TODO: Get the start date right after ZCash release - from first block!!!
-		final Date startDate = new Date("21 Oct 2016 22:00:00 GMT");
+		final Date startDate = new Date("26 Oct 2016 22:00:00 GMT");
 		final Date nowDate = new Date(System.currentTimeMillis());
 		
 		long fullTime = nowDate.getTime() - startDate.getTime();
@@ -404,7 +404,11 @@ public class DashboardPanel
 			if (dPercentage < 0)
 			{
 				dPercentage = 0;
+			} else if (dPercentage > 100d)
+			{
+				dPercentage = 100d;
 			}
+			
 			DecimalFormat df = new DecimalFormat("##0.##");
 			percentage = df.format(dPercentage);
 		}
