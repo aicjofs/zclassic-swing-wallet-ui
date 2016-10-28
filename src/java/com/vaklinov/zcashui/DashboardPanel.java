@@ -391,7 +391,7 @@ public class DashboardPanel
 		}
 		
 		// TODO: Get the start date right after ZCash release - from first block!!!
-		final Date startDate = new Date("26 Oct 2016 22:00:00 GMT");
+		final Date startDate = new Date("28 Oct 2016 02:00:00 GMT");
 		final Date nowDate = new Date(System.currentTimeMillis());
 		
 		long fullTime = nowDate.getTime() - startDate.getTime();

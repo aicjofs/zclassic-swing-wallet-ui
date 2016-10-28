@@ -133,6 +133,6 @@ wallet encryption has been temporarily disabled in the ZCash Desktop GUI Wallet.
 The latter needs to be disabled. 
 1. Limitation: The list of transactions does not show all outgoing ones (specifically outgoing Z address 
 transactions). A corresponding issue [#1438](https://github.com/zcash/zcash/issues/1438) has been opened 
-for the ZCash developers - now fixed. A fix for the GUI wallet may be expected around 29-30th Oct 2016. 
+for the ZCash developers - soon to be fixed. A fix for the GUI wallet may be expected within 1-2 weeks. 
 1. Limitation: The CPU percentage shown to be taken by zcashd is the average for the entire lifetime of the process. 
 This is not very useful. This will be improved in future versions.
