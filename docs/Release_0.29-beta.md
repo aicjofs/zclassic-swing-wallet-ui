@@ -29,16 +29,16 @@ the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
    **If the resulting checksum is not `410ef840e5838e41250706d870135b4d00a3a1c940583392f8c8ff8cb96ba9cb` then**
    **something is wrong and you should discard the downloaded wallet!**
 
-3. Installing the built ZCash GUI wallet
+3. Installing the downloaded ZCash GUI wallet
 
   3.1. If you have built ZCash from source code:
 
    Assuming you have already built from source code [ZCash](https://z.cash/) in directory `/home/user/zcash/src` (for 
-   example - this is the typical build dir. for ZCash v1.0.0-rc1) which contains the command line tools `zcash-cli` 
-   and `zcashd` you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it 
+   example - this is the typical build dir. for ZCash v1.0.0) which contains the command line tools `zcash-cli` 
+   and `zcashd` you need to take the file `ZCashSwingWalletUI.jar` and copy it 
    to diretcory `/home/user/zcash/src` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
    ```
-   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ cp ./build/jars/ZCashSwingWalletUI.jar /home/user/zcash/src    
+   user@ubuntu:~/Downloads$ cp ./ZCashSwingWalletUI.jar /home/user/zcash/src    
    ```
    
   3.2. If you have installed the ZCash [binary packages](https://github.com/zcash/zcash/wiki/Debian-binary-packages)
@@ -48,7 +48,7 @@ the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
    /usr/bin/zcash-cli
    /usr/bin/zcashd
    ```
-   The ZCash GUI wallet knows how to find them there. You may place the file  `./build/jars/ZCashSwingWalletUI.jar`
+   The ZCash GUI wallet knows how to find them there. You may place the file  `ZCashSwingWalletUI.jar`
    anywhere in your `/home` directory that you find convenient and start it from there.
 
 4. Running the installed ZCash GUI wallet
@@ -58,7 +58,7 @@ the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
    Assuming you have already installed [ZCash](https://z.cash/) and the GUI Wallet `ZCashSwingWalletUI.jar` in 
    directory `/home/user/zcash/src` one way to run it from command line is:
    ```
-   user@ubuntu:~/build-dir/zcash-swing-wallet-ui$ java -jar /home/user/zcash/src/ZCashSwingWalletUI.jar
+   user@ubuntu:~$ java -jar /home/user/zcash/src/ZCashSwingWalletUI.jar
    ```
    If you are using Ubuntu (or similar ;) Linux you may instead just use the file manager and 
    right-click on the `ZCashSwingWalletUI.jar` file and choose the option "Open with OpenJDK 8 Runtime". 
