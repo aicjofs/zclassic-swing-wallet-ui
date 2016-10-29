@@ -12,7 +12,7 @@ the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
 
 1. Downloading the wallet
  
-   Download file [ZCashSwingWalletUI.jar](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/download/v0.29-beta/ZCashSwingWalletUI.jar)
+   Download file [ZCashSwingWalletUI.jar](https://github.com/vaklinov/zcash-swing-wallet-ui/releases/download/0.29-beta/ZCashSwingWalletUI.jar)
    and place it in a folder like `~/Downloads`. Then please make the JAR executable with a command like:
    ```
    user@ubuntu:~/Downloads$ chmod u+x ./ZCashSwingWalletUI.jar
