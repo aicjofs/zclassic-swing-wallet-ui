@@ -84,7 +84,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.29 (beta)");
+        super("ZCash Swing Wallet UI 0.30 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -102,7 +102,7 @@ public class ZCashUI
         tabs.setFont(newTabFont);
         tabs.addTab("Overview ",
         		    new ImageIcon(cl.getResource("images/overview.png")),
-        		    dashboard = new DashboardPanel(installationObserver, clientCaller, errorReporter));
+        		    dashboard = new DashboardPanel(this, installationObserver, clientCaller, errorReporter));
         tabs.addTab("Own addresses ",
         		    new ImageIcon(cl.getResource("images/address-book.png")),
         		    addresses = new AddressesPanel(clientCaller, errorReporter));

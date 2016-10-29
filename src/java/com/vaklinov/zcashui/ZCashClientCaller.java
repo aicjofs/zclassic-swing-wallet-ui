@@ -32,10 +32,12 @@ package com.vaklinov.zcashui;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.eclipsesource.json.Json;
@@ -43,6 +45,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.eclipsesource.json.ParseException;
+import com.eclipsesource.json.WriterConfig;
 
 
 /**
@@ -236,6 +239,31 @@ public class ZCashClientCaller
 
 		return addresses.toArray(new String[0]);
     }
+
+	
+	public synchronized Map<String, String> getRawTransactionDetails(String txID)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject("gettransaction", txID);
+
+		Map<String, String> map = new HashMap<String, String>();
+
+		for (String name : jsonTransaction.names())
+		{
+			this.decomposeJSONValue(name, jsonTransaction.get(name), map);
+		}
+				
+		return map;
+	}
+	
+	
+	public synchronized String getRawTransaction(String txID)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject("gettransaction", txID);
+
+		return jsonTransaction.toString(WriterConfig.PRETTY_PRINT);
+	}
 
 
 	// return UNIX time as tring
@@ -624,6 +652,29 @@ public class ZCashClientCaller
 		}
 
 		return strResponse;
+	}
+	
+	
+	private void decomposeJSONValue(String name, JsonValue val, Map<String, String> map)
+	{
+		if (val.isObject())
+		{
+			JsonObject obj = val.asObject();
+			for (String memberName : obj.names())
+			{
+				this.decomposeJSONValue(name + "." + memberName, obj.get(memberName), map);
+			}
+		} else if (val.isArray())
+		{
+			JsonArray arr = val.asArray();
+			for (int i = 0; i < arr.size(); i++)
+			{
+				this.decomposeJSONValue(name + "[" + i + "]", arr.get(i), map);
+			}
+		} else
+		{
+			map.put(name, val.toString());
+		}
 	}
 
 }

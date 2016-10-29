@@ -45,6 +45,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -66,6 +67,7 @@ import com.vaklinov.zcashui.ZCashInstallationObserver.DaemonInfo;
 public class DashboardPanel
 	extends JPanel
 {
+	private JFrame parentFrame;
 	private ZCashInstallationObserver installationObserver;
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
@@ -92,11 +94,13 @@ public class DashboardPanel
 	private List<DataGatheringThread<?>> threads = null;	
 
 
-	public DashboardPanel(ZCashInstallationObserver installationObserver,
+	public DashboardPanel(JFrame parentFrame,
+			              ZCashInstallationObserver installationObserver,
 			              ZCashClientCaller clientCaller,
 			              StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
+		this.parentFrame = parentFrame;
 		this.installationObserver = installationObserver;
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
@@ -549,7 +553,8 @@ public class DashboardPanel
 		throws WalletCallException, IOException, InterruptedException
 	{
 		String columnNames[] = { "Type", "Direction", "Amount", "Date", "Destination Address"};
-        JTable table = new DataTable(rowData, columnNames);
+        JTable table = new TransactionTable(
+        	rowData, columnNames, this.parentFrame, this.clientCaller); // TODO: null parent
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.getColumnModel().getColumn(0).setPreferredWidth(170);
         table.getColumnModel().getColumn(1).setPreferredWidth(140);
