@@ -9,10 +9,12 @@ presents the information in a user-friendly manner.
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
 ### Announcement about ZCash release 1.0
-ZCash is about to be released within hours. It is expected that the GUI wallet will work with the ZCash 1.0
-release but fixes may be necessary. There is more work planned for the time after release like the fix for
-showing outgoing Z transactions and various new features. So stay tuned and check for new versions in the days 
-after ZCash release. The fun does not end on Oct. 28th - it begins!
+ZCash has been released. The latest version of the ZCash Desktop GUI wallet has undergone basic tests with it
+and it works. Users who encounter issues not listed in the list of known issues and limitations, are welcome to
+report them in the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues). 
+There is more work planned for the upcoming weeks like the fix for showing outgoing Z transactions and 
+various new features (like information of network/mining etc). So stay tuned and check for new versions 
+in the coming days... The fun has begun!
 
 ## Building, installing and running the Wallet GUI
 
@@ -26,7 +28,7 @@ The following videos also explain how to [set up ZCash](https://www.youtube.com/
 how to [set up the GUI wallet](https://www.youtube.com/watch?v=IDifG4h1bgE).
 
 Users who insist on downloading a binary release may instead use 
-[ZCash Desktop GUI Wallet - binary release v0.25-beta - 22 Oct 2016](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.25-beta.md)
+[ZCash Desktop GUI Wallet - binary release v0.29-beta](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.29-beta.md)
 
 
 1. Operating system and tools
@@ -106,7 +108,13 @@ Users who insist on downloading a binary release may instead use
    right-click on the `ZCashSwingWalletUI.jar` file and choose the option "Open with OpenJDK 8 Runtime". 
    This will start the ZCash GUI wallet.
 
-
+### Donations accepted
+At the present time this project is non-commercial in nature and developed by volunteers. If you find the GUI
+Wallet useful, please consider making a donation for its further development. Your contribution matters! Donations 
+are accepted at Z address:
+```
+zcSqmKSDoSNLZ6azqiHtX1h7CuwwcDxK3rXGRwshGVq3zd91MQRqjgePhqiqWRXq3tHTmSAuh99D8drUemu7CfncBqXUjnN
+```
 
 ### License
 This program is distributed under an [MIT License](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/LICENSE).
