@@ -8,11 +8,13 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
-### Announcement about ZCash release 1.0
+### Announcement regarding [ZCash release 1.0](https://github.com/zcash/zcash/releases/tag/v1.0.0)
 ZCash has been released. The latest version of the ZCash Desktop GUI wallet has undergone basic tests with it
 and it works. Users who encounter issues not listed in the list of known issues and limitations, are welcome to
-report them in the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues). 
-There is more work planned for the upcoming weeks like the fix for showing outgoing Z transactions and 
+report them in the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
+**One known issue in the ZCash release 1.0 that affects all wallets is that transactions involving Z addresses**
+**may stay unconfirmed for long periods of time [ZCash issue #1705](https://github.com/zcash/zcash/issues/1705)**
+There is more work planned for the upcoming weeks like the fix for showing/listing outgoing Z transactions and 
 various new features (like information of network/mining etc). So stay tuned and check for new versions 
 in the coming days... The fun has begun!
 
