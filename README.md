@@ -113,9 +113,9 @@ Users who insist on downloading a binary release may instead use
 ### Donations accepted
 At the present time this project is non-commercial in nature and developed by volunteers. If you find the GUI
 Wallet useful, please consider making a donation for its further development. Your contribution matters! Donations 
-are accepted at Z address:
+are accepted at ZCash T address:
 ```
-zcSqmKSDoSNLZ6azqiHtX1h7CuwwcDxK3rXGRwshGVq3zd91MQRqjgePhqiqWRXq3tHTmSAuh99D8drUemu7CfncBqXUjnN
+t1VAggo7RusLVBzHSeYbGkxDQQhLZyigxty
 ```
 
 ### License
