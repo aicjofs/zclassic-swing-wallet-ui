@@ -350,8 +350,9 @@ public class DashboardPanel
 		String runtimeInfo = "";
 		if (daemonInfo.status == DAEMON_STATUS.RUNNING)
 		{
-			runtimeInfo = "Resident: " + daemonInfo.residentSizeMB + " MB, Virtual: " + daemonInfo.virtualSizeMB +
-					      " MB, CPU: " + daemonInfo.cpuPercentage + "%";
+			runtimeInfo = "<span style=\"font-size:8px\">" +
+					      "Resident: " + daemonInfo.residentSizeMB + " MB, Virtual: " + daemonInfo.virtualSizeMB +
+					      " MB, CPU: " + daemonInfo.cpuPercentage + "%" + "</span>";
 		}
 
 		// TODO: what if ZCash directory is non-default...
@@ -366,7 +367,10 @@ public class DashboardPanel
 		// TODO: Use a one-off data gathering thread - better design
 		if (this.walletIsEncrypted != null)
 		{
-			walletEncryption = " (" + (this.walletIsEncrypted ? "" : "not ") + "encrypted)";
+			walletEncryption = 
+					"<span style=\"font-size:8px\">" + 
+			        " (" + (this.walletIsEncrypted ? "" : "not ") + "encrypted)" +
+			        "</span>";
 		}
 		
 		String text =

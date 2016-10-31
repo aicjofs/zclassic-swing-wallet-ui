@@ -191,4 +191,60 @@ public class WalletOperations
 			this.errorReporter.reportError(e, false);
 		}
 	}
+	
+	
+	public void exportWalletPrivateKeys()
+	{
+		// TODO: Will need corrections once encryption is reenabled!!!
+		
+		try
+		{
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("Export wallet private keys to file...");
+			fileChooser.setFileFilter(new FileNameExtensionFilter("Text files (*.txt)", "txt"));
+			 
+			int result = fileChooser.showSaveDialog(this.parent);
+			 
+			if (result != JFileChooser.APPROVE_OPTION) 
+			{
+			    return;
+			}
+			
+			File f = fileChooser.getSelectedFile();
+			
+			Cursor oldCursor = this.parent.getCursor();
+			try
+			{
+				this.parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+							
+				this.clientCaller.exportWallet(f.getCanonicalPath());
+				
+				this.parent.setCursor(oldCursor);
+			} catch (WalletCallException wce)
+			{
+				this.parent.setCursor(oldCursor);
+				wce.printStackTrace();
+				
+				JOptionPane.showMessageDialog(
+					this.parent, 
+					"An unexpected error occurred while exporting wallet private keys!" +
+					"\n" + wce.getMessage().replace(",", ",\n"),
+					"Error in exporting wallet private keys...", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			JOptionPane.showMessageDialog(
+				this.parent, 
+				"The wallet private keys have been exported successfully to location:\n" +
+				f.getCanonicalPath() + "\n\n" +
+				"You need to protect this file from unauthorized access. Anyone who\n" +
+				"has access to the private keys can spend the ZCash balance!",
+				"Wallet private key export...", JOptionPane.INFORMATION_MESSAGE);
+			
+		} catch (Exception e)
+		{
+			this.errorReporter.reportError(e, false);
+		}
+	}
+
 }
