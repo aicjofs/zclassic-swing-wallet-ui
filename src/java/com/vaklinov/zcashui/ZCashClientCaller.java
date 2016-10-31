@@ -34,9 +34,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -344,6 +346,7 @@ public class ZCashClientCaller
 			throw new WalletCallException("Error in forming z_sendmany command: " + toManyBeforeReplace);
 		}
 
+		DecimalFormatSymbols decSymbols = new DecimalFormatSymbols(Locale.ROOT);
 		String[] sendCashParameters = new String[]
 	    {
 		    this.zcashcli.getCanonicalPath(), "z_sendmany", from,
@@ -351,7 +354,7 @@ public class ZCashClientCaller
 		    // TODO: find a better way to format the amount
 		    toMany.toString().replace(
 		    	amountPattern,
-		    	"\"amount\":" + new DecimalFormat("########0.00######").format(Double.valueOf(amount)))
+		    	"\"amount\":" + new DecimalFormat("########0.00######", decSymbols).format(Double.valueOf(amount)))
 		};
 
 	    CommandExecutor caller = new CommandExecutor(sendCashParameters);
