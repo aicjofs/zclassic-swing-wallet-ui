@@ -77,7 +77,7 @@ public class TransactionTable
 				{
 					try
 					{
-						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 5).toString();
+						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
 						
 						System.out.println("Transaction ID for detail dialog is: " + txID);
@@ -111,7 +111,7 @@ public class TransactionTable
 				{
 					try
 					{
-						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 5).toString();
+						String txID = TransactionTable.this.getModel().getValueAt(lastRow, 6).toString();
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
 						
 						System.out.println("Transaction ID for block explorer is: " + txID);

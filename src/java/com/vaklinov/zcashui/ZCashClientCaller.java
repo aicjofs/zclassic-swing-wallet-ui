@@ -144,17 +144,18 @@ public class ZCashClientCaller
 	    String strTransactions[][] = new String[jsonTransactions.size()][];
 	    for (int i = 0; i < jsonTransactions.size(); i++)
 	    {
-	    	strTransactions[i] = new String[6];
+	    	strTransactions[i] = new String[7];
 	    	JsonObject trans = jsonTransactions.get(i).asObject();
 
 	    	// Needs to be the same as in getWalletZReceivedTransactions()
 	    	// TODO: some day refactor to use object containers
 	    	strTransactions[i][0] = "\u2606T (Public)";
 	    	strTransactions[i][1] = trans.getString("category", "ERROR!");
-	    	strTransactions[i][2] = trans.get("amount").toString();
-	    	strTransactions[i][3] = trans.get("time").toString();
-	    	strTransactions[i][4] = trans.getString("address", "\u26D4 (Z Address not listed by wallet!)");
-	    	strTransactions[i][5] = trans.get("txid").toString();
+	    	strTransactions[i][2] = trans.get("confirmations").toString();
+	    	strTransactions[i][3] = trans.get("amount").toString();
+	    	strTransactions[i][4] = trans.get("time").toString();
+	    	strTransactions[i][5] = trans.getString("address", "\u26D4 (Z Address not listed by wallet!)");
+	    	strTransactions[i][6] = trans.get("txid").toString();
 
 	    }
 
@@ -188,18 +189,19 @@ public class ZCashClientCaller
 		    JsonArray jsonTransactions = executeCommandAndGetJsonArray("z_listreceivedbyaddress", zAddress, "0");
 		    for (int i = 0; i < jsonTransactions.size(); i++)
 		    {
-		    	String[] currentTransaction = new String[6];
+		    	String[] currentTransaction = new String[7];
 		    	JsonObject trans = jsonTransactions.get(i).asObject();
 
+		    	String txID = trans.getString("txid", "ERROR!");
 		    	// Needs to be the same as in getWalletPublicTransactions()
 		    	// TODO: some day refactor to use object containers
 		    	currentTransaction[0] = "\u2605Z (Private)";
 		    	currentTransaction[1] = "receive";
-		    	currentTransaction[2] = trans.get("amount").toString();
-		    	String txID = trans.getString("txid", "ERROR!");
-		    	currentTransaction[3] = this.getWalletTransactionTime(txID);
-		    	currentTransaction[4] = zAddress;
-		    	currentTransaction[5] = trans.get("txid").toString();
+		    	currentTransaction[2] = this.getWalletTransactionConfirmations(txID);
+		    	currentTransaction[3] = trans.get("amount").toString();
+		    	currentTransaction[4] = this.getWalletTransactionTime(txID); // TODO: minimize sub-calls
+		    	currentTransaction[5] = zAddress;
+		    	currentTransaction[6] = trans.get("txid").toString();
 
 		    	zReceivedTransactions.add(currentTransaction);
 		    }
@@ -276,7 +278,16 @@ public class ZCashClientCaller
 
 		return String.valueOf(jsonTransaction.getLong("time", -1));
 	}
+	
+	
+	public synchronized String getWalletTransactionConfirmations(String txID)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		JsonObject jsonTransaction = this.executeCommandAndGetJsonObject("gettransaction", txID);
 
+		return jsonTransaction.get("confirmations").toString();
+	}
+	
 
 	// Returns confirmed balance only!
 	public synchronized String getBalanceForAddress(String address)

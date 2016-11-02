@@ -538,7 +538,9 @@ public class DashboardPanel
 			((newTransactionsData.length > 0) && 
 		     (!lastTransactionsData[0][4].equals(newTransactionsData[0][4]))) ||
 			((newTransactionsData.length > 0) && 
-		     (!lastTransactionsData[0][1].equals(newTransactionsData[0][1]))))
+		     (!lastTransactionsData[0][1].equals(newTransactionsData[0][1]))) ||
+			((newTransactionsData.length > 0) && 
+		     (!lastTransactionsData[0][2].equals(newTransactionsData[0][2]))))
 		{
 			this.remove(transactionsTablePane);
 			this.add(transactionsTablePane = new JScrollPane(
@@ -556,15 +558,16 @@ public class DashboardPanel
 	private JTable createTransactionsTable(String rowData[][])
 		throws WalletCallException, IOException, InterruptedException
 	{
-		String columnNames[] = { "Type", "Direction", "Amount", "Date", "Destination Address"};
+		String columnNames[] = { "Type", "Direction", "Confirmed?", "Amount", "Date", "Destination Address"};
         JTable table = new TransactionTable(
-        	rowData, columnNames, this.parentFrame, this.clientCaller); // TODO: null parent
+        	rowData, columnNames, this.parentFrame, this.clientCaller); 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setPreferredWidth(170);
-        table.getColumnModel().getColumn(1).setPreferredWidth(140);
-        table.getColumnModel().getColumn(2).setPreferredWidth(200);
-        table.getColumnModel().getColumn(3).setPreferredWidth(390);
-        table.getColumnModel().getColumn(4).setPreferredWidth(800);
+        table.getColumnModel().getColumn(0).setPreferredWidth(190);
+        table.getColumnModel().getColumn(1).setPreferredWidth(145);
+        table.getColumnModel().getColumn(2).setPreferredWidth(170);
+        table.getColumnModel().getColumn(3).setPreferredWidth(210);
+        table.getColumnModel().getColumn(4).setPreferredWidth(405);
+        table.getColumnModel().getColumn(5).setPreferredWidth(800);
 
         return table;
 	}
@@ -596,15 +599,15 @@ public class DashboardPanel
 			public int compare(String[] o1, String[] o2)
 			{
 				Date d1 = new Date(0);
-				if (!o1[3].equals("N/A"))
+				if (!o1[4].equals("N/A"))
 				{
-					d1 = new Date(Long.valueOf(o1[3]).longValue() * 1000L);
+					d1 = new Date(Long.valueOf(o1[4]).longValue() * 1000L);
 				}
 
 				Date d2 = new Date(0);
-				if (!o2[3].equals("N/A"))
+				if (!o2[4].equals("N/A"))
 				{
-					d2 = new Date(Long.valueOf(o2[3]).longValue() * 1000L);
+					d2 = new Date(Long.valueOf(o2[4]).longValue() * 1000L);
 				}
 
 				if (d1.equals(d2))
@@ -620,41 +623,53 @@ public class DashboardPanel
 		DecimalFormat df = new DecimalFormat("########0.00######");
 		
 		// Change the direction and date etc. attributes for presentation purposes
-		for (String[] t : allTransactions)
+		for (String[] trans : allTransactions)
 		{
 			// Direction
-			if (t[1].equals("receive"))
+			if (trans[1].equals("receive"))
 			{
-				t[1] = "\u21E8 IN";
-			} else if (t[1].equals("send"))
+				trans[1] = "\u21E8 IN";
+			} else if (trans[1].equals("send"))
 			{
-				t[1] = "\u21E6 OUT";
-			} else if (t[1].equals("generate"))
+				trans[1] = "\u21E6 OUT";
+			} else if (trans[1].equals("generate"))
 			{
-				t[1] = "\u2692\u2699 MINED";
-			} else if (t[1].equals("immature"))
+				trans[1] = "\u2692\u2699 MINED";
+			} else if (trans[1].equals("immature"))
 			{
-				t[1] = "\u2696 Immature";
+				trans[1] = "\u2696 Immature";
 			};
 
 			// Date
-			if (!t[3].equals("N/A"))
+			if (!trans[4].equals("N/A"))
 			{
-				t[3] = new Date(Long.valueOf(t[3]).longValue() * 1000L).toLocaleString();
+				trans[4] = new Date(Long.valueOf(trans[4]).longValue() * 1000L).toLocaleString();
 			}
 			
 			// Amount
 			try
 			{
-				double amount = Double.valueOf(t[2]);
+				double amount = Double.valueOf(trans[3]);
 				if (amount < 0d)
 				{
 					amount = -amount;
 				}
-				t[2] = df.format(amount);
+				trans[3] = df.format(amount);
 			} catch (NumberFormatException nfe)
 			{
-				System.out.println("Error occurred while formatting amount: " + t[2] + 
+				System.out.println("Error occurred while formatting amount: " + trans[3] + 
+						           " - " + nfe.getMessage() + "!");
+			}
+			
+			// Confirmed?
+			try
+			{
+				boolean isConfirmed = !trans[2].trim().equals("0"); 
+				
+				trans[2] = isConfirmed ? "Yes \u2690" : "No  \u2691";
+			} catch (NumberFormatException nfe)
+			{
+				System.out.println("Error occurred while formatting confirmations: " + trans[2] + 
 						           " - " + nfe.getMessage() + "!");
 			}
 		}
@@ -662,4 +677,5 @@ public class DashboardPanel
 
 		return allTransactions;
 	}
-}
+	
+} // End class
