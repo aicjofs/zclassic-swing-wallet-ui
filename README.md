@@ -8,6 +8,11 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
+### Status update (01 Nov 2016)
+Multiple users with East-European system locales have been affected
+by [Issue #4 - incorrect JSON on sending ZCash](https://github.com/vaklinov/zcash-swing-wallet-ui/issues/4). Affected
+users need to use the latest version **0.33 beta** (build it from source) where it is fixed.
+
 ### Announcement regarding [ZCash release 1.0](https://github.com/zcash/zcash/releases/tag/v1.0.0)
 ZCash has been released. The latest version of the ZCash Desktop GUI wallet has undergone basic tests with it
 and it works. Users who encounter issues not listed in the list of known issues and limitations, are welcome to
