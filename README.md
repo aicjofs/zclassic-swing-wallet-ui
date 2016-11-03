@@ -2,8 +2,7 @@
 
 ## Graphical user interface wrapper for the [ZCash](https://z.cash/) command line tools
 
-This program is intended to make it easy to work with the ZCash client tools
-by providing a Graphical User Interface (GUI) that acts as a wrapper and 
+This program provides a Graphical User Interface (GUI) for the ZCash client tools that acts as a wrapper and 
 presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
@@ -11,40 +10,31 @@ presents the information in a user-friendly manner.
 ### Status update (01 Nov 2016)
 Multiple users with East-European system locales have been affected
 by [Issue #4 - incorrect JSON on sending ZCash](https://github.com/vaklinov/zcash-swing-wallet-ui/issues/4). Affected
-users need to use the latest version **0.33 beta** (build it from source) where it is fixed.
-
-### Announcement regarding [ZCash release 1.0](https://github.com/zcash/zcash/releases/tag/v1.0.0)
-ZCash has been released. The latest version of the ZCash Desktop GUI wallet has undergone basic tests with it
-and it works. Users who encounter issues not listed in the list of known issues and limitations, are welcome to
-report them in the [issues section](https://github.com/vaklinov/zcash-swing-wallet-ui/issues).
-**One known issue in the ZCash release 1.0 that affects all wallets is that transactions involving Z addresses**
-**may stay unconfirmed for long periods of time [ZCash issue #1705](https://github.com/zcash/zcash/issues/1705)**
-There is more work planned for the upcoming weeks like the fix for showing/listing outgoing Z transactions and 
-various new features (like information of network/mining etc). So stay tuned and check for new versions 
-in the coming days... The fun has begun!
+users need to use the latest version **0.34 beta** (build it from source) where it is fixed.
 
 ## Building, installing and running the Wallet GUI
 
-**For security reasons it is recommended to always build the program from GitHub**
+Before installing the Desktop GUI Wallet you need to have ZCash up and running. The following [guide](https://github.com/zcash/zcash/wiki/1.0-User-Guide) 
+explains how to set up [ZCash](https://z.cash/). There is also a user-friendly [instructional video](https://www.youtube.com/watch?v=ZoRFLkZG0zg&feature=youtu.be)
+on the same topic.
+
+**For security reasons it is recommended to always build the GUI wallet program from GitHub**
 **[source](https://github.com/vaklinov/zcash-swing-wallet-ui/archive/master.zip).**
 The details of how to build it are described below (easy to follow).
 Users who are less experienced with working on a command line, may instead use this 
 quite-user-friendly [installation guide](https://www.cryptocompare.com/wallets/guides/how-to-install-the-zcash-gui-wallet) 
 and [usage guide](https://www.cryptocompare.com/wallets/guides/how-to-use-the-zcash-gui-wallet).
-The following videos also explain how to [set up ZCash](https://www.youtube.com/watch?v=9-P7IHC7d-o) and 
-how to [set up the GUI wallet](https://www.youtube.com/watch?v=IDifG4h1bgE).
-
-Users who insist on downloading a binary release may instead use 
-[ZCash Desktop GUI Wallet - binary release v0.29-beta](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.29-beta.md)
+The following video also explains how to [set up the GUI wallet](https://www.youtube.com/watch?v=IDifG4h1bgE). 
+Users who insist on downloading a binary release may instead 
+use [ZCash Desktop GUI Wallet - binary release v0.29-beta](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.29-beta.md)
 
 
 1. Operating system and tools
 
-   As of October 2016 (ZCash v1.0.0) this program is only intended to work on Linux 
+   As of November 2016 (ZCash v1.0.0) this program is only intended to work on Linux 
    (same limitation as [ZCash](https://z.cash/)). Future versions will work on MAC/Windows.  
-   The Linux tools you need to build and run 
-   the Wallet GUI are Git, Java (JDK7 or later) and Ant. If using Ubuntu Linux, they may be 
-   installed via command: 
+   The Linux tools you need to build and run the Wallet GUI are Git, Java (JDK7 or later) and 
+   Ant. If using Ubuntu Linux, they may be installed via command: 
    ```
    user@ubuntu:~/build-dir$ sudo apt-get install git default-jdk ant
    ``` 
