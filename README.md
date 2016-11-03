@@ -7,11 +7,6 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
-### Status update (01 Nov 2016)
-Multiple users with East-European system locales have been affected
-by [Issue #4 - incorrect JSON on sending ZCash](https://github.com/vaklinov/zcash-swing-wallet-ui/issues/4). Affected
-users need to use the latest version **0.34 beta** (build it from source) where it is fixed.
-
 ## Building, installing and running the Wallet GUI
 
 Before installing the Desktop GUI Wallet you need to have ZCash up and running. The following [guide](https://github.com/zcash/zcash/wiki/1.0-User-Guide) 
@@ -26,7 +21,7 @@ quite-user-friendly [installation guide](https://www.cryptocompare.com/wallets/g
 and [usage guide](https://www.cryptocompare.com/wallets/guides/how-to-use-the-zcash-gui-wallet).
 The following video also explains how to [set up the GUI wallet](https://www.youtube.com/watch?v=IDifG4h1bgE). 
 Users who insist on downloading a binary release may instead 
-use [ZCash Desktop GUI Wallet - binary release v0.29-beta](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.29-beta.md)
+use [ZCash Desktop GUI Wallet - binary release v0.35-beta](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Release_0.35-beta.md)
 
 
 1. Operating system and tools
