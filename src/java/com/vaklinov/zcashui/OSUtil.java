@@ -31,6 +31,7 @@ package com.vaklinov.zcashui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 
 /**
@@ -41,10 +42,61 @@ import java.io.IOException;
 public class OSUtil
 {
 
-//	public static enum OS_TYPE
-//	{
-//		LINUX, WINDOWS, MAC_OS, FREE_BSD, OTHER_BSD, SOLARIS, AIX, OTHER_OS
-//	};
+	public static enum OS_TYPE
+	{
+		LINUX, WINDOWS, MAC_OS, FREE_BSD, OTHER_BSD, SOLARIS, AIX, OTHER_UNIX, OTHER_OS
+	};
+	
+	
+	public boolean isUnixLike(OS_TYPE os)
+	{
+		return os == OS_TYPE.LINUX || os == OS_TYPE.MAC_OS || os == OS_TYPE.FREE_BSD || 
+			   os == OS_TYPE.OTHER_BSD || os == OS_TYPE.SOLARIS || os == OS_TYPE.AIX || 
+			   os == OS_TYPE.OTHER_UNIX;
+	}
+	
+	
+	public boolean isHardUnix(OS_TYPE os)
+	{
+		return os == OS_TYPE.FREE_BSD || 
+			   os == OS_TYPE.OTHER_BSD || os == OS_TYPE.SOLARIS || 
+			   os == OS_TYPE.AIX || os == OS_TYPE.OTHER_UNIX;
+	}
+	
+	
+	public static OS_TYPE getOSType()
+	{
+		String name = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+		
+		if (name.contains("linux"))
+		{
+			return OS_TYPE.LINUX;
+		} else if (name.contains("windows"))
+		{
+			return OS_TYPE.WINDOWS;
+		} else if (name.contains("sunos") || name.contains("solaris"))
+		{
+			return OS_TYPE.SOLARIS;
+		} else if (name.contains("darwin") || name.contains("mac os") || name.contains("macos"))
+		{
+			return OS_TYPE.MAC_OS;
+		} else if (name.contains("free") && name.contains("bsd"))
+		{
+			return OS_TYPE.FREE_BSD;
+		} else if ((name.contains("open") || name.contains("net")) && name.contains("bsd"))
+		{
+			return OS_TYPE.OTHER_BSD;
+		} else if (name.contains("aix"))
+		{
+			return OS_TYPE.AIX;
+		} else if (name.contains("unix"))
+		{
+			return OS_TYPE.OTHER_UNIX;
+		} else
+		{
+			return OS_TYPE.OTHER_OS;
+		}
+	}
 
 
 	public static String getProgramDirectory()
@@ -85,7 +137,15 @@ public class OSUtil
 	public static String getBlockchainDirectory()
 		throws IOException
 	{
-		return new File(System.getProperty("user.home") + "/.zcash").getCanonicalPath();
+		OS_TYPE os = getOSType();
+		
+		if (os == OS_TYPE.MAC_OS)
+		{
+			return new File("~/Library/Application Support/Zcash").getCanonicalPath();
+		} else
+		{
+			return new File(System.getProperty("user.home") + "/.zcash").getCanonicalPath();
+		}
 	}
 
 
@@ -106,8 +166,18 @@ public class OSUtil
 	public static String getSystemInfo()
 		throws IOException, InterruptedException
 	{
-		CommandExecutor uname = new CommandExecutor(new String[] { "uname", "-srv" });
-		return uname.execute();
+		OS_TYPE os = getOSType();
+		
+		if (os == OS_TYPE.MAC_OS)
+		{
+			CommandExecutor uname = new CommandExecutor(new String[] { "uname", "-sr" });
+		    return uname.execute() + "; " + 
+		           System.getProperty("os.name") + " " + System.getProperty("os.version");
+		} else
+		{
+			CommandExecutor uname = new CommandExecutor(new String[] { "uname", "-srv" });
+		    return uname.execute();
+		}
 	}
 
 

@@ -85,7 +85,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.35 (beta)");
+        super("ZCash Swing Wallet UI 0.36 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -274,6 +274,7 @@ public class ZCashUI
         try
         {
             System.out.println("Starting ZCash Swing Wallet ...");
+            System.out.println("OS: " + System.getProperty("os.name") + " = " + OSUtil.getOSType());
             System.out.println("Current directory: " + new File(".").getCanonicalPath());
             System.out.println("Class path: " + System.getProperty("java.class.path"));
             System.out.println("Environment PATH: " + System.getenv("PATH"));
