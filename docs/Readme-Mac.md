@@ -1,11 +1,11 @@
-# [ZCash](https://z.cash/) Desktop GUI Wallet - for Mac OS (UNFINISHED!)
+# [ZCash](https://z.cash/) Desktop GUI Wallet - for Mac OS X
 
 ZCash for Mac OS is not yet officially supported. Thanks to [@radix42](https://github.com/radix42) an experimental build has been provided.
 Before installing the GUI wallet on Mac OS you need to [install ZCash on Mac OS](https://github.com/radix42/zcash/blob/v1.0.1-gcc-mac/README-mac.md).
 Please follow the link for this. In case of any problems you may contact the developer for help ;-)
 For the rest of this document we assume that you have a ZCash node (zcashd) running on Mac OS...
 
-![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "ZCash on Mac")
+![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWalletMac.png "ZCash on Mac")
 
 1. Build tools
 
