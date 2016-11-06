@@ -1,6 +1,6 @@
 # [ZCash](https://z.cash/) Desktop GUI Wallet - for Mac OS (UNFINISHED!)
 
-ZCash for Mac OS is not yet officially supported. Thanks to @radix42 an experimental build has been provided.
+ZCash for Mac OS is not yet officially supported. Thanks to [@radix42](https://github.com/radix42) an experimental build has been provided.
 Before installing the GUI wallet on Mac OS you need to [install ZCash on Mac OS](https://github.com/radix42/zcash/blob/v1.0.1-gcc-mac/README-mac.md).
 Please follow the link for this. In case of any problems you may contact the developer for help ;-)
 For the rest of this document we assume that you have a ZCash node (zcashd) running on Mac OS...
@@ -8,15 +8,23 @@ For the rest of this document we assume that you have a ZCash node (zcashd) runn
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "ZCash on Mac")
 
 1. Build tools
-   You need to install git, JDK 8 and Ant for Mac OS to build the GUI wallet. The procedure could be:
+
+   You need to install git, JDK 8 and Ant for Mac OS to build the GUI wallet. The commands 
+   `git`, `java`, `javac` and `ant` need to be startable from command line before proceeding with 
+   build. The procedure could be:
+
    1.1. [Install homebrew](http://brew.sh/)
+
    1.2. Install git: `brew install git`
+
    1.3. [Install JDK 8](https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html)
+
    1.4. [Install Ant](http://www.admfactory.com/how-to-install-apache-ant-on-mac-os-x/)
 
 2. Building the ZCash GUI wallet
 
-   The procedure is the same as on Linux. Summary of commands:
+   Version 0.37 (beta) or later needs to be built from source. The build procedure is the same as on Linux. 
+   Summary of commands:
    ```
    git clone https://github.com/vaklinov/zcash-swing-wallet-ui.git
    cd zcash-swing-wallet-ui/
@@ -30,7 +38,7 @@ For the rest of this document we assume that you have a ZCash node (zcashd) runn
 
    Assuming you have already built from source code [ZCash](https://z.cash/) in directory `/Users/joe/zcash/src` (for 
    example) you need to take the created file `./build/jars/ZCashSwingWalletUI.jar` and copy it 
-   to diretcory `/Users/joe/zcash/src` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
+   to directory `/Users/joe/zcash/src` (the same dir. that contains `zcash-cli` and `zcashd`). Example copy command:
    ```
    cp ./build/jars/ZCashSwingWalletUI.jar /Users/joe/zcash/src    
    ```

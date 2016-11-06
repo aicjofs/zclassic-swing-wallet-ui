@@ -7,6 +7,8 @@ presents the information in a user-friendly manner.
 
 ![Screenshot](https://github.com/vaklinov/zcash-swing-wallet-ui/raw/master/docs/ZCashWallet.png "Main Window")
 
+#### New/Experimental: [ZCash Desktop GUI Wallet for MAC OS X](https://github.com/vaklinov/zcash-swing-wallet-ui/blob/master/docs/Readme-Mac.md) is now available
+
 ## Building, installing and running the Wallet GUI
 
 Before installing the Desktop GUI Wallet you need to have ZCash up and running. The following [guide](https://github.com/zcash/zcash/wiki/1.0-User-Guide) 
