@@ -52,6 +52,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.Timer;
 
+import com.vaklinov.zcashui.OSUtil.OS_TYPE;
 import com.vaklinov.zcashui.ZCashClientCaller.NetworkAndBlockchainInfo;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletBalance;
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
@@ -428,10 +429,20 @@ public class DashboardPanel
 			info.lastBlockDate = startDate;
 		}
 		
+		String connections = " \u26D7";
+		String tickSymbol = " \u2705";
+		OS_TYPE os = OSUtil.getOSType();
+		// Handling special symbols on Mac OS
+		if (os == OS_TYPE.MAC_OS)
+		{
+			connections = " \u21D4";
+			tickSymbol = " \u2606";
+		}
+		
 		String tick = "";
 		if (percentage.equals("100"))
 		{
-			tick = "<span style=\"font-weight:bold;font-size:12px;color:green\"> \u2705</span>";
+			tick = "<span style=\"font-weight:bold;font-size:12px;color:green\">" + tickSymbol + "</span>";
 		}
 		
 		String netColor = "red";
@@ -458,7 +469,7 @@ public class DashboardPanel
 		    info.lastBlockDate.toLocaleString() + "</span>  <br/> " + 
 			"<span style=\"font-size:1px\"><br/></span>" + 
 			"Network: <span style=\"font-weight:bold\">" + info.numConnections + " connections</span>" +
-			"<span style=\"font-size:16px;color:" + netColor + "\"> \u26D7</span>";
+			"<span style=\"font-size:16px;color:" + netColor + "\">" + connections + "</span>";
 		this.networkAndBlockchainLabel.setText(text);
 	}
 	
