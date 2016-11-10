@@ -572,6 +572,15 @@ public class ZCashClientCaller
 		String response = this.executeCommandAndGetSingleStringResponse("z_exportwallet", fileName);
 		// If no exception - obviously successful		
 	}
+	
+	
+	public void importWallet(String fileName)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		System.out.println("Import wallet keys from location: " + fileName);
+		String response = this.executeCommandAndGetSingleStringResponse("z_importwallet", fileName);
+		// If no exception - obviously successful		
+	}
 
 
 	private JsonObject executeCommandAndGetJsonObject(String command1, String command2)

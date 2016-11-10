@@ -77,6 +77,7 @@ public class ZCashUI
     private JMenuItem menuItemEncrypt;
     private JMenuItem menuItemBackup;
     private JMenuItem menuItemExportKeys;
+    private JMenuItem menuItemImportKeys;
 
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
@@ -85,7 +86,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.38 (beta)");
+        super("ZCash Swing Wallet UI 0.39 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -131,6 +132,7 @@ public class ZCashUI
         wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
         wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_E));
         wallet.add(menuItemExportKeys = new JMenuItem("Export private keys...", KeyEvent.VK_K));
+        wallet.add(menuItemImportKeys = new JMenuItem("Import private keys...", KeyEvent.VK_I));
         mb.add(wallet);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
@@ -201,7 +203,17 @@ public class ZCashUI
                 }
             }
        );
-
+        
+       menuItemImportKeys.addActionListener(   
+            new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    ZCashUI.this.walletOps.importWalletPrivateKeys();
+                }
+            }
+       );
 
         // Close operation
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

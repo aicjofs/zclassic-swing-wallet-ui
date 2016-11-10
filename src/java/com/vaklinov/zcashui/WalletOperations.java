@@ -247,4 +247,70 @@ public class WalletOperations
 		}
 	}
 
+	
+	public void importWalletPrivateKeys()
+	{
+		// TODO: Will need corrections once encryption is re-enabled!!!
+		
+	    int option = JOptionPane.showConfirmDialog(  
+		    this.parent,
+		    "Private key import is a potentially slow operation. It may take\n" +
+		    "several minutes during which the GUI will be non-responsive.\n" +
+		    "The data to import must be in the format used by the option:\n" +
+		    "\"Export private keys...\"\n\n" +
+		    "Are you sure you wish to import private keys?",
+		    "Private key import notice...",
+		    JOptionPane.YES_NO_OPTION);
+		if (option == JOptionPane.NO_OPTION)
+		{
+		  	return;
+		}
+		
+		try
+		{
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("Import wallet private keys from file...");
+			fileChooser.setFileFilter(new FileNameExtensionFilter("Text files (*.txt)", "txt"));
+			 
+			int result = fileChooser.showOpenDialog(this.parent);
+			 
+			if (result != JFileChooser.APPROVE_OPTION) 
+			{
+			    return;
+			}
+			
+			File f = fileChooser.getSelectedFile();
+			
+			Cursor oldCursor = this.parent.getCursor();
+			try
+			{
+				this.parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+							
+				this.clientCaller.importWallet(f.getCanonicalPath());
+				
+				this.parent.setCursor(oldCursor);
+			} catch (WalletCallException wce)
+			{
+				this.parent.setCursor(oldCursor);
+				wce.printStackTrace();
+				
+				JOptionPane.showMessageDialog(
+					this.parent, 
+					"An unexpected error occurred while importing wallet private keys!" +
+					"\n" + wce.getMessage().replace(",", ",\n"),
+					"Error in importing wallet private keys...", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			JOptionPane.showMessageDialog(
+				this.parent, 
+				"Wallet private keys have been imported successfully from location:\n" +
+				f.getCanonicalPath() + "\n\n",
+				"Wallet private key import...", JOptionPane.INFORMATION_MESSAGE);
+			
+		} catch (Exception e)
+		{
+			this.errorReporter.reportError(e, false);
+		}
+	}
 }
