@@ -33,12 +33,23 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Map;
 
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 
@@ -59,10 +70,12 @@ public class DataTable
 	{
 		super(rowData, columnNames);
 		
-		JMenuItem copy = new JMenuItem("Copy value");
 		popupMenu = new JPopupMenu();
+		int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
+		
+		JMenuItem copy = new JMenuItem("Copy value");
         popupMenu.add(copy);
-        
+        copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, accelaratorKeyMask));
         copy.addActionListener(new ActionListener() 
         {	
 			@Override
@@ -80,6 +93,33 @@ public class DataTable
 				}
 			}
 		});
+        
+        
+		JMenuItem exportToCSV = new JMenuItem("Export data to CSV...");
+        popupMenu.add(exportToCSV);
+        exportToCSV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, accelaratorKeyMask));
+        exportToCSV.addActionListener(new ActionListener() 
+        {	
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				try
+				{
+					DataTable.this.exportToCSV();						
+				} catch (Exception ex)
+				{
+					ex.printStackTrace();
+					// TODO: better error handling
+					JOptionPane.showMessageDialog(
+							DataTable.this.getRootPane().getParent(), 
+							"An unexpected error occurred when exporting data to CSV file.\n" +
+							"\n" +
+							ex.getMessage(),
+							"Error in CSV export", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+        
         
         this.addMouseListener(new MouseAdapter()
         {
@@ -113,6 +153,82 @@ public class DataTable
             	}
             }
         });
+        
+//        this.addKeyListener(new KeyAdapter() 
+//		{			
+//			@Override
+//			public void keyTyped(KeyEvent e) 
+//			{
+//				if (e.getKeyCode() == KeyEvent.VK_CONTEXT_MENU)
+//				{
+//					System.out.println("Context menu invoked...");;
+//					popupMenu.show(e.getComponent(), e.getComponent().getX(), e.getComponent().getY());
+//				}
+//			}
+//		});
 	}
 
+	
+	// Exports the table data to a CSV file
+	private void exportToCSV()
+		throws IOException
+	{
+        final String ENCODING = "UTF-8";
+		
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Export data to CSV file...");
+		fileChooser.setFileFilter(new FileNameExtensionFilter("CSV Files (*.csv)", "csv"));
+		 
+		int result = fileChooser.showSaveDialog(this.getRootPane().getParent());
+		 
+		if (result != JFileChooser.APPROVE_OPTION) 
+		{
+		    return;
+		}
+		
+		File f = fileChooser.getSelectedFile();
+		
+		FileOutputStream fos = new FileOutputStream(f);
+		fos.write(new byte[] { (byte)0xEF, (byte)0xBB, (byte)0xBF } );
+		
+		// Write header
+		StringBuilder header = new StringBuilder();
+		for (int i = 0; i < this.getColumnCount(); i++)
+		{
+			String columnName = this.getColumnName(i);
+			header.append(columnName);
+			
+			if (i < (this.getColumnCount() - 1))
+			{
+				header.append(",");
+			}
+		}
+		header.append("\n");
+		fos.write(header.toString().getBytes(ENCODING));
+		
+		// Write rows
+		for (int row = 0; row < this.getRowCount(); row++)
+		{
+			StringBuilder rowBuf = new StringBuilder();
+			for (int col = 0; col < this.getColumnCount(); col++)
+			{
+				rowBuf.append(this.getValueAt(row, col).toString());
+				
+				if (col < (this.getColumnCount() - 1))
+				{
+					rowBuf.append(",");
+				}
+			}
+			rowBuf.append("\n");
+			fos.write(rowBuf.toString().getBytes(ENCODING));
+		}
+		
+		fos.close();
+		
+		JOptionPane.showMessageDialog(
+			this.getRootPane().getParent(), 
+			"The data has been exported successfully as CSV to location:\n" +
+			f.getCanonicalPath(),
+			"Export successful...", JOptionPane.INFORMATION_MESSAGE);
+	}
 }

@@ -32,6 +32,7 @@ package com.vaklinov.zcashui;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -48,6 +49,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -86,7 +88,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.39 (beta)");
+        super("ZCash Swing Wallet UI 0.40 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -122,17 +124,24 @@ public class ZCashUI
         JMenuBar mb = new JMenuBar();
         JMenu file = new JMenu("Main");
         file.setMnemonic(KeyEvent.VK_M);
+        int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
         file.add(menuItemAbout = new JMenuItem("About...", KeyEvent.VK_A));
+        menuItemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, accelaratorKeyMask));
         file.addSeparator();
         file.add(menuItemExit = new JMenuItem("Quit", KeyEvent.VK_Q));
+        menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelaratorKeyMask));
         mb.add(file);
 
         JMenu wallet = new JMenu("Wallet");
         wallet.setMnemonic(KeyEvent.VK_W);
         wallet.add(menuItemBackup = new JMenuItem("Backup...", KeyEvent.VK_B));
+        menuItemBackup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, accelaratorKeyMask));
         wallet.add(menuItemEncrypt = new JMenuItem("Encrypt...", KeyEvent.VK_E));
+        menuItemEncrypt.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, accelaratorKeyMask));
         wallet.add(menuItemExportKeys = new JMenuItem("Export private keys...", KeyEvent.VK_K));
+        menuItemExportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, accelaratorKeyMask));
         wallet.add(menuItemImportKeys = new JMenuItem("Import private keys...", KeyEvent.VK_I));
+        menuItemImportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, accelaratorKeyMask));
         mb.add(wallet);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
