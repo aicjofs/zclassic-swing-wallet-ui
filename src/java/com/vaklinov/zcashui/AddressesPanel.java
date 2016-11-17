@@ -34,11 +34,7 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.RandomAccessFile;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,21 +47,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
 import com.vaklinov.zcashui.ZCashClientCaller.WalletCallException;
 
 
 /**
- * Addresses...
+ * Addresses panel - shows T/Z addresses and their balnces.
  *
  * @author Ivan Vaklinov <ivan@vaklinov.com>
  */
 public class AddressesPanel
 	extends JPanel
 {
-	private static final String T_ADDRESSES_FILE = "CreatedTransparentAddresses.txt";
-	
 	private ZCashClientCaller clientCaller;
 	private StatusUpdateErrorReporter errorReporter;
 
@@ -73,12 +68,19 @@ public class AddressesPanel
 	private JScrollPane addressBalanceTablePane  = null;
 	
 	String[][] lastAddressBalanceData = null;
+	
+	private DataGatheringThread<String[][]> balanceGatheringThread = null;
+	
+	private long lastInteractiveRefresh;
+	
 
 	public AddressesPanel(ZCashClientCaller clientCaller, StatusUpdateErrorReporter errorReporter)
 		throws IOException, InterruptedException, WalletCallException
 	{
 		this.clientCaller = clientCaller;
 		this.errorReporter = errorReporter;
+		
+		this.lastInteractiveRefresh = System.currentTimeMillis();
 
 		// Build content
 		JPanel addressesPanel = this;
@@ -120,6 +122,40 @@ public class AddressesPanel
 		warningPanel.add(warningL, BorderLayout.NORTH);
 		addressesPanel.add(warningPanel, BorderLayout.NORTH);
 		
+		// Thread and timer to update the address/balance table
+		this.balanceGatheringThread = new DataGatheringThread<String[][]>(
+			new DataGatheringThread.DataGatherer<String[][]>() 
+			{
+				public String[][] gatherData()
+					throws Exception
+				{
+					long start = System.currentTimeMillis();
+					String[][] data = AddressesPanel.this.getAddressBalanceDataFromWallet();
+					long end = System.currentTimeMillis();
+					System.out.println("Gathering of address/balance table data done in " + (end - start) + "ms." );
+					
+				    return data;
+				}
+			}, 
+			this.errorReporter, 25000);
+		
+		ActionListener alBalances = new ActionListener() 
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{					
+					AddressesPanel.this.updateWalletAddressBalanceTableAutomated();
+				} catch (Exception ex)
+				{
+					ex.printStackTrace();
+					AddressesPanel.this.errorReporter.reportError(ex);
+				}
+			}
+		};
+		Timer t = new Timer(5000, alBalances);
+		t.start();
 		
 		// Button actions
 		refreshButton.addActionListener(new ActionListener() 
@@ -129,11 +165,11 @@ public class AddressesPanel
 				Cursor oldCursor = null;
 				try
 				{
-					// TODO: dummy progress bar ...
+					// TODO: dummy progress bar ... maybe
 					oldCursor = AddressesPanel.this.getCursor();
 					AddressesPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					
-					AddressesPanel.this.updateWalletAddressBalanceTable();
+					AddressesPanel.this.updateWalletAddressBalanceTableInteractive();
 					
 					AddressesPanel.this.setCursor(oldCursor);
 				} catch (Exception ex)
@@ -201,7 +237,7 @@ public class AddressesPanel
 				+ " address has been created cuccessfully:\n" + address, 
 				"Address created", JOptionPane.INFORMATION_MESSAGE);
 			
-			this.updateWalletAddressBalanceTable();
+			this.updateWalletAddressBalanceTableInteractive();
 		} catch (Exception e)
 		{
 			e.printStackTrace();			
@@ -209,24 +245,53 @@ public class AddressesPanel
 		}
 	}
 	
-
-	private void updateWalletAddressBalanceTable()
+	// Interactive and non-interactive are mutually exclusive
+	private synchronized void updateWalletAddressBalanceTableInteractive()
 		throws WalletCallException, IOException, InterruptedException
 	{
+		this.lastInteractiveRefresh = System.currentTimeMillis();
+		
 		String[][] newAddressBalanceData = this.getAddressBalanceDataFromWallet();
 
-		//if (lastAddressBalanceData.length != newAddressBalanceData.length) -always refreshed
+		if (Util.arraysAreDifferent(lastAddressBalanceData, newAddressBalanceData))
 		{
+			System.out.println("Updating table of addresses/balances I...");
 			this.remove(addressBalanceTablePane);
 			this.add(addressBalanceTablePane = new JScrollPane(
 			             addressBalanceTable = this.createAddressBalanceTable(newAddressBalanceData)),
 			         BorderLayout.CENTER);
+			lastAddressBalanceData = newAddressBalanceData;
+
+			this.validate();
+			this.repaint();
 		}
-
-		lastAddressBalanceData = newAddressBalanceData;
-
-		this.validate();
-		this.repaint();
+	}
+	
+	
+	// Interactive and non-interactive are mutually exclusive
+	private synchronized void updateWalletAddressBalanceTableAutomated()
+		throws WalletCallException, IOException, InterruptedException
+	{
+		// Make sure it is > 1 min since the last interactive refresh
+		if ((System.currentTimeMillis() - lastInteractiveRefresh) < (60 * 1000))
+		{
+			return;
+		}
+		
+		String[][] newAddressBalanceData = this.balanceGatheringThread.getLastData();
+		
+		if ((newAddressBalanceData != null) && 
+			Util.arraysAreDifferent(lastAddressBalanceData, newAddressBalanceData))
+		{
+			System.out.println("Updating table of addresses/balances A...");
+			this.remove(addressBalanceTablePane);
+			this.add(addressBalanceTablePane = new JScrollPane(
+			             addressBalanceTable = this.createAddressBalanceTable(newAddressBalanceData)),
+		         BorderLayout.CENTER);
+			lastAddressBalanceData = newAddressBalanceData;
+			this.validate();
+			this.repaint();
+		}
 	}
 
 

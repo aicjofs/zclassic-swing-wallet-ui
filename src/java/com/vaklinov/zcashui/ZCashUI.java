@@ -88,7 +88,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.40 (beta)");
+        super("ZCash Swing Wallet UI 0.41 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -333,7 +333,8 @@ public class ZCashUI
             if ((wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Verifying blocks")      != -1)  ||
             	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Rescanning")            != -1)  ||
             	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Loading wallet")        != -1)  ||
-            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Activating best chain") != -1))
+            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Activating best chain") != -1)  ||
+            	(wce.getMessage().indexOf("{\"code\":-28,\"message\":\"Loading addresses")     != -1))
             {
                 JOptionPane.showMessageDialog(
                         null,

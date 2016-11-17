@@ -541,18 +541,10 @@ public class DashboardPanel
 		{
 			return;
 		}
-
-		// TODO: improve the comparison for when transactions have been updated
-		if ((lastTransactionsData.length != newTransactionsData.length)       ||
-			((newTransactionsData.length > 0) && 
-			 (!lastTransactionsData[0][3].equals(newTransactionsData[0][3]))) ||
-			((newTransactionsData.length > 0) && 
-		     (!lastTransactionsData[0][4].equals(newTransactionsData[0][4]))) ||
-			((newTransactionsData.length > 0) && 
-		     (!lastTransactionsData[0][1].equals(newTransactionsData[0][1]))) ||
-			((newTransactionsData.length > 0) && 
-		     (!lastTransactionsData[0][2].equals(newTransactionsData[0][2]))))
+			
+		if (Util.arraysAreDifferent(lastTransactionsData, newTransactionsData))
 		{
+			System.out.println("Updating table of transactions...");
 			this.remove(transactionsTablePane);
 			this.add(transactionsTablePane = new JScrollPane(
 			             transactionsTable = this.createTransactionsTable(newTransactionsData)),
