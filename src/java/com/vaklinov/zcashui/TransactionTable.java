@@ -67,7 +67,7 @@ public class TransactionTable
 			                final JFrame parent, final ZCashClientCaller caller)
 	{
 		super(rowData, columnNames);
-		int accelaratorKeyMask = Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask();
+		int accelaratorKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		
 		JMenuItem showDetails = new JMenuItem("Show details...");
 		showDetails.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, accelaratorKeyMask));

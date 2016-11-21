@@ -581,7 +581,25 @@ public class ZCashClientCaller
 		String response = this.executeCommandAndGetSingleStringResponse("z_importwallet", fileName);
 		// If no exception - obviously successful		
 	}
-
+	
+	
+	public String getTPrivateKey(String address)
+		throws WalletCallException, IOException, InterruptedException
+	{
+		String response = this.executeCommandAndGetSingleStringResponse("dumpprivkey", address);
+		
+		return response.trim();
+	}
+	
+	
+	public String getZPrivateKey(String address)
+	    throws WalletCallException, IOException, InterruptedException
+	{
+		String response = this.executeCommandAndGetSingleStringResponse("z_exportkey", address);
+		
+		return response.trim();
+	}
+	
 
 	private JsonObject executeCommandAndGetJsonObject(String command1, String command2)
 		throws WalletCallException, IOException, InterruptedException
