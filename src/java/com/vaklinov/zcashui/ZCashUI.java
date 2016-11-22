@@ -88,7 +88,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZCash Swing Wallet UI 0.42 (beta)");
+        super("ZClassic Swing Wallet UI 0.42 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -260,7 +260,7 @@ public class ZCashUI
 
                 JOptionPane.showMessageDialog(
                     ZCashUI.this.getRootPane().getParent(),
-                    "The ZCash GUI Wallet is currently considered experimental. Use of this software\n" +
+                    "The ZClassic GUI Wallet is currently considered experimental. Use of this software\n" +
                     "comes at your own risk! Be sure to read the list of known issues and limitations\n" +
                     "at this page: \n" +
                     "https://github.com/vaklinov/zcash-swing-wallet-ui#known-issues-and-limitations\n\n" +
@@ -294,7 +294,7 @@ public class ZCashUI
     {
         try
         {
-            System.out.println("Starting ZCash Swing Wallet ...");
+            System.out.println("Starting ZClassic Swing Wallet ...");
             System.out.println("OS: " + System.getProperty("os.name") + " = " + OSUtil.getOSType());
             System.out.println("Current directory: " + new File(".").getCanonicalPath());
             System.out.println("Class path: " + System.getProperty("java.class.path"));
@@ -347,8 +347,8 @@ public class ZCashUI
             {
                 JOptionPane.showMessageDialog(
                     null,
-                    "There was a problem communicating with the ZCash daemon/wallet. \n" +
-                    "Please ensure that the ZCash server zcashd is started (e.g. via \n" + 
+                    "There was a problem communicating with the ZClassic daemon/wallet. \n" +
+                    "Please ensure that the ZClassic server zcashd is started (e.g. via \n" + 
                     "command  \"zcashd --daemon\"). Error message is: \n" +
                      wce.getMessage() +
                     "See the console output for more detailed error information!",

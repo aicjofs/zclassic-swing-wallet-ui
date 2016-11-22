@@ -104,7 +104,7 @@ public class OSUtil
 	{
 		// TODO: this way of finding the dir is JAR name dependent - tricky, may not work
 		// if program is repackaged as different JAR!
-		final String JAR_NAME = "ZCashSwingWalletUI.jar";
+		final String JAR_NAME = "ZClassicSwingWalletUI.jar";
 		String cp = System.getProperty("java.class.path");
 		if ((cp != null) && (cp.indexOf(File.pathSeparator) == -1) &&
 			(cp.endsWith(JAR_NAME)))

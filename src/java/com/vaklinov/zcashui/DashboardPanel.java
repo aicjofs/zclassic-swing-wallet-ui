@@ -125,10 +125,10 @@ public class DashboardPanel
 			this.getClass().getClassLoader().getResource("images/Z-yellow.orange-logo-small.png")));
 		tempPanel.add(logoLabel);
 		//tempPanel.add(new JLabel(" "));
-		JLabel zcLabel = new JLabel("Cash Wallet        ");
-		zcLabel.setFont(new Font("Helvetica", Font.BOLD | Font.ITALIC, 32));
+		JLabel zcLabel = new JLabel("ZClassic Wallet        ");
+		zcLabel.setFont(new Font("Helvetica", Font.BOLD, 32));
 		tempPanel.add(zcLabel);
-		tempPanel.setToolTipText("Powered by ZCash");
+		tempPanel.setToolTipText("Powered by ZClassic");
 		balanceStatusPanel.add(tempPanel, BorderLayout.WEST);
 				
 		JLabel transactionHeadingLabel = new JLabel(
@@ -485,7 +485,7 @@ public class DashboardPanel
 			return;
 		}
 		
-		// Format double numbers - else sometimes we get exponential notation 1E-4 ZEC
+		// Format double numbers - else sometimes we get exponential notation 1E-4 ZCL
 		DecimalFormat df = new DecimalFormat("########0.00######");
 		
 		String transparentBalance = df.format(balance.transparentBalance);
@@ -503,11 +503,11 @@ public class DashboardPanel
 		String text =
 			"<html>" + 
 		    "<span style=\"font-family:monospace;font-size:8.9px;" + color1 + "\">Transparent balance: <span style=\"font-size:9px\">" + 
-				transparentUCBalance + " ZEC </span></span><br/> " +
+				transparentUCBalance + " ZCL </span></span><br/> " +
 			"<span style=\"font-family:monospace;font-size:8.9px;" + color2 + "\">Private (Z) balance: <span style=\"font-weight:bold;font-size:9px\">" + 
-		    	privateUCBalance + " ZEC </span></span><br/> " +
+		    	privateUCBalance + " ZCL </span></span><br/> " +
 			"<span style=\"font-family:monospace;font-size:8.9px;" + color3 + "\">Total (Z+T) balance: <span style=\"font-weight:bold;font-size:11.5px;\">" + 
-		    	totalUCBalance + " ZEC </span></span>" +
+		    	totalUCBalance + " ZCL </span></span>" +
 			"<br/>  </html>";
 		
 		this.walletBalanceLabel.setText(text);
@@ -521,9 +521,9 @@ public class DashboardPanel
 					  "Unconfirmed (unspendable) balance is being shown due to an<br/>" + 
 		              "ongoing transaction! Actual confirmed (spendable) balance is:<br/>" +
 		              "<span style=\"font-size:5px\"><br/></span>" +
-					  "Transparent: " + transparentBalance + " ZEC<br/>" +
-		              "Private ( Z ): <span style=\"font-weight:bold\">" + privateBalance + " ZEC</span><br/>" +
-					  "Total ( Z+T ): <span style=\"font-weight:bold\">" + totalBalance + " ZEC</span>" +
+					  "Transparent: " + transparentBalance + " ZCL<br/>" +
+		              "Private ( Z ): <span style=\"font-weight:bold\">" + privateBalance + " ZCL</span><br/>" +
+					  "Total ( Z+T ): <span style=\"font-weight:bold\">" + totalBalance + " ZCL</span>" +
 					  "</html>";
 		}
 		

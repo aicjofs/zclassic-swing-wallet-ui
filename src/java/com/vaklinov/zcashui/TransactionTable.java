@@ -121,9 +121,9 @@ public class TransactionTable
 						txID = txID.replaceAll("\"", ""); // In case it has quotes
 						
 						System.out.println("Transaction ID for block explorer is: " + txID);
-						// https://explorer.zcha.in/transactions/<ID>
+						// https://classic.zcha.in/transactions/<ID>
 						Desktop.getDesktop().browse(
-							new URL("https://explorer.zcha.in/transactions/" + txID).toURI());
+							new URL("https://classic.zcha.in/transactions/" + txID).toURI());
 					} catch (Exception ex)
 					{
 						ex.printStackTrace();
