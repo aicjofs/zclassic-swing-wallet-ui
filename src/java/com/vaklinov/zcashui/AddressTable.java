@@ -72,10 +72,31 @@ public class AddressTable
 
 						// TODO: We need a much more precise criterion to distinguish T/Z adresses;
 						boolean isZAddress = address.startsWith("z") && address.length() > 40;
+
+						// Check for encrypted wallet
+						final boolean bEncryptedWallet = caller.isWalletEncrypted();
+						if (bEncryptedWallet)
+						{
+							PasswordDialog pd = new PasswordDialog((JFrame)(AddressTable.this.getRootPane().getParent()));
+							pd.setVisible(true);
+							
+							if (!pd.isOKPressed())
+							{
+								return;
+							}
+							
+							caller.unlockWallet(pd.getPassword());
+						}
 						
 						String privateKey = isZAddress ?
 							caller.getZPrivateKey(address) : caller.getTPrivateKey(address);
-							
+						
+						// Lock the wallet again 
+						if (bEncryptedWallet)
+						{
+							caller.lockWallet();
+						}
+								
 						Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 						clipboard.setContents(new StringSelection(privateKey), null);
 						

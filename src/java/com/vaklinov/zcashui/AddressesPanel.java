@@ -202,6 +202,22 @@ public class AddressesPanel
 		});
 		
 	}
+	
+	
+	// Null if not selected
+	public String getSelectedAddress()
+	{
+		String address = null;
+		
+		int selectedRow = this.addressBalanceTable.getSelectedRow();
+		
+		if (selectedRow != -1)
+		{
+			address = this.addressBalanceTable.getModel().getValueAt(selectedRow, 2).toString();
+		}
+		
+		return address;
+	}
 
 	
 	private void createNewAddress(boolean isZAddress)

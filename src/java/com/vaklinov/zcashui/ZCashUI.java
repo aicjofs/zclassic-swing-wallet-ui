@@ -80,6 +80,7 @@ public class ZCashUI
     private JMenuItem menuItemBackup;
     private JMenuItem menuItemExportKeys;
     private JMenuItem menuItemImportKeys;
+    private JMenuItem menuItemShowPrivateKey;
 
     private DashboardPanel dashboard;
     private AddressesPanel addresses;
@@ -88,7 +89,7 @@ public class ZCashUI
     public ZCashUI()
         throws IOException, InterruptedException, WalletCallException
     {
-        super("ZClassic Swing Wallet UI 0.42 (beta)");
+        super("ZClassic Swing Wallet UI 0.43 (beta)");
         ClassLoader cl = this.getClass().getClassLoader();
 
         this.setIconImage(new ImageIcon(cl.getResource("images/Z-yellow.orange-logo.png")).getImage());
@@ -116,7 +117,7 @@ public class ZCashUI
         contentPane.add(tabs);
 
         this.walletOps = new WalletOperations(
-            	this, this.dashboard, this.sendPanel, installationObserver, clientCaller, errorReporter);
+            	this, tabs, dashboard, addresses, sendPanel, installationObserver, clientCaller, errorReporter);
 
         this.setSize(new Dimension(870, 427));
 
@@ -142,6 +143,9 @@ public class ZCashUI
         menuItemExportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, accelaratorKeyMask));
         wallet.add(menuItemImportKeys = new JMenuItem("Import private keys...", KeyEvent.VK_I));
         menuItemImportKeys.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, accelaratorKeyMask));
+        wallet.add(menuItemShowPrivateKey = new JMenuItem("Show private key...", KeyEvent.VK_P));
+        menuItemShowPrivateKey.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, accelaratorKeyMask));
+
         mb.add(wallet);
 
         // TODO: Temporarily disable encryption until further notice - Oct 24 2016
@@ -220,6 +224,17 @@ public class ZCashUI
                 public void actionPerformed(ActionEvent e)
                 {
                     ZCashUI.this.walletOps.importWalletPrivateKeys();
+                }
+            }
+       );
+       
+       menuItemShowPrivateKey.addActionListener(   
+            new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    ZCashUI.this.walletOps.showPrivateKey();
                 }
             }
        );
